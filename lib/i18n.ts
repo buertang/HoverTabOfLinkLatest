@@ -1,4 +1,4 @@
-export type Language = 'zh-CN' | 'en' | 'ja' | 'ko';
+export type Language = 'zh-CN' | 'zh-TW' | 'en' | 'ja' | 'ko' | 'fr' | 'de' | 'ru' | 'it' | 'es' | 'pt' | 'ar';
 
 export interface Translations {
   // App title and description
@@ -119,9 +119,17 @@ export interface Translations {
     languageDescription: string;
     languages: {
       'zh-CN': string;
+      'zh-TW': string;
       'en': string;
       'ja': string;
       'ko': string;
+      'fr': string;
+      'de': string;
+      'ru': string;
+      'it': string;
+      'es': string;
+      'pt': string;
+      'ar': string;
     };
     reloadNote: string;
   };
@@ -251,9 +259,17 @@ export const translations: Record<Language, Translations> = {
       languageDescription: '选择界面显示语言',
       languages: {
         'zh-CN': '中文（简体）',
+        'zh-TW': '中文（繁體）',
         'en': 'English',
         'ja': '日本語',
-        'ko': '한국어'
+        'ko': '한국어',
+        'fr': 'Français',
+        'de': 'Deutsch',
+        'ru': 'Русский',
+        'it': 'Italiano',
+        'es': 'Español',
+        'pt': 'Português',
+        'ar': 'العربية'
       },
       reloadNote: '语言更改后需要重新加载扩展才能生效'
     },
@@ -266,7 +282,145 @@ export const translations: Record<Language, Translations> = {
       reset: '重置'
     }
   },
-  
+
+  'zh-TW': {
+    appTitle: '懸停連結預覽',
+    appDescription: '滑鼠懸停時顯示連結預覽',
+    
+    tabs: {
+      linkPreview: {
+        title: '連結預覽',
+        tooltip: '配置連結預覽功能'
+      },
+      dragText: {
+        title: '拖曳文字',
+        tooltip: '配置文字拖曳功能'
+      },
+      other: {
+        title: '其他設定',
+        tooltip: '其他配置選項'
+      }
+    },
+    
+    linkPreview: {
+      title: '連結預覽設定',
+      enableLabel: '啟用連結預覽',
+      enableDescription: '滑鼠懸停在連結上時顯示預覽',
+      triggerMethodLabel: '觸發方式',
+      triggerMethods: {
+        drag: '拖動連結',
+        hover: '滑鼠懸停',
+        longPress: '長按連結',
+        altClick: 'Alt+滑鼠左鍵點擊',
+        customHover: '自訂快捷鍵+懸停',
+        disabled: '停用'
+      },
+      shortcutKeyLabel: '快捷鍵',
+      shortcutKeys: {
+        alt: 'Alt',
+        ctrl: 'Ctrl',
+        shift: 'Shift'
+      },
+      clickText: '點擊',
+      hoverText: '懸停',
+      popupSizeLabel: '彈窗大小',
+      popupSizes: {
+        lastSize: '上次大小',
+        defaultSize: '預設大小',
+        contentAdaptive: '內容自適應'
+      },
+      popupPositionLabel: '彈窗位置',
+      popupPositions: {
+        followMouse: '跟隨滑鼠',
+        center: '螢幕居中',
+        topRight: '螢幕右上角'
+      },
+      themeLabel: '彈窗主題',
+      themes: {
+        light: '淺色',
+        dark: '深色',
+        blue: '藍色',
+        red: '紅色',
+        yellow: '黃色',
+        green: '綠色'
+      },
+      opacityLabel: '背景透明度',
+      positionLabel: '預覽位置',
+      positionDescription: '選擇預覽視窗顯示的位置',
+      positions: {
+        topLeft: '左上角',
+        topRight: '右上角',
+        bottomLeft: '左下角',
+        bottomRight: '右下角'
+      },
+      delayLabel: '顯示延遲',
+      delayDescription: '滑鼠懸停後多久顯示預覽（毫秒）',
+      longPressDelayLabel: '長按延遲',
+      longPressDelayDescription: '長按連結多久後顯示預覽（毫秒）',
+      sizeLabel: '預覽大小',
+      sizeDescription: '選擇預覽視窗的大小',
+      sizes: {
+        small: '小',
+        medium: '中',
+        large: '大'
+      }
+    },
+    
+    dragText: {
+      title: '拖曳文字設定',
+      searchEngineLabel: '搜尋引擎',
+      searchEngines: {
+        bing: 'Bing搜尋',
+        google: 'Google搜尋',
+        baidu: '百度搜尋',
+        duckduckgo: 'DuckDuckGo'
+      },
+      enableLabel: '啟用拖曳文字',
+      enableDescription: '允許拖曳選中的文字',
+      maxLengthLabel: '最大長度',
+      maxLengthDescription: '拖曳文字的最大字元數',
+      customTextLabel: '自訂文字',
+      customTextDescription: '設定自訂的拖曳文字內容',
+      customTextPlaceholder: '輸入自訂文字...'
+    },
+    
+    other: {
+      title: '其他設定',
+      themeLabel: '主題設定',
+      themeDescription: '選擇應用程式主題外觀',
+      themes: {
+        system: '跟隨系統',
+        light: '淺色',
+        dark: '深色'
+      },
+      languageLabel: '介面語言',
+      languageDescription: '選擇介面顯示語言',
+      languages: {
+        'zh-CN': '中文（简体）',
+        'zh-TW': '中文（繁體）',
+        'en': 'English',
+        'ja': '日本語',
+        'ko': '한국어',
+        'fr': 'Français',
+        'de': 'Deutsch',
+        'ru': 'Русский',
+        'it': 'Italiano',
+        'es': 'Español',
+        'pt': 'Português',
+        'ar': 'العربية'
+      },
+      reloadNote: '語言更改後需要重新載入擴充功能才能生效'
+    },
+    
+    common: {
+      enabled: '已啟用',
+      disabled: '已停用',
+      save: '儲存',
+      cancel: '取消',
+      reset: '重設'
+    }
+  },
+
   'en': {
     appTitle: 'Hover Link Preview',
     appDescription: 'Show link preview on hover',
@@ -381,9 +535,17 @@ export const translations: Record<Language, Translations> = {
       languageDescription: 'Select interface display language',
       languages: {
         'zh-CN': '中文（简体）',
+        'zh-TW': '中文（繁體）',
         'en': 'English',
         'ja': '日本語',
-        'ko': '한국어'
+        'ko': '한국어',
+        'fr': 'Français',
+        'de': 'Deutsch',
+        'ru': 'Русский',
+        'it': 'Italiano',
+        'es': 'Español',
+        'pt': 'Português',
+        'ar': 'العربية'
       },
       reloadNote: 'Extension needs to be reloaded after language change'
     },
@@ -396,7 +558,7 @@ export const translations: Record<Language, Translations> = {
       reset: 'Reset'
     }
   },
-  
+
   'ja': {
     appTitle: 'ホバーリンクプレビュー',
     appDescription: 'ホバー時にリンクプレビューを表示',
@@ -511,9 +673,17 @@ export const translations: Record<Language, Translations> = {
       languageDescription: 'インターフェース表示言語を選択',
       languages: {
         'zh-CN': '中文（简体）',
+        'zh-TW': '中文（繁體）',
         'en': 'English',
         'ja': '日本語',
-        'ko': '한국어'
+        'ko': '한국어',
+        'fr': 'Français',
+        'de': 'Deutsch',
+        'ru': 'Русский',
+        'it': 'Italiano',
+        'es': 'Español',
+        'pt': 'Português',
+        'ar': 'العربية'
       },
       reloadNote: '言語変更後は拡張機能の再読み込みが必要です'
     },
@@ -526,7 +696,7 @@ export const translations: Record<Language, Translations> = {
       reset: 'リセット'
     }
   },
-  
+
   'ko': {
     appTitle: '호버 링크 미리보기',
     appDescription: '호버 시 링크 미리보기 표시',
@@ -641,9 +811,17 @@ export const translations: Record<Language, Translations> = {
       languageDescription: '인터페이스 표시 언어 선택',
       languages: {
         'zh-CN': '中文（简体）',
+        'zh-TW': '中文（繁體）',
         'en': 'English',
         'ja': '日本語',
-        'ko': '한국어'
+        'ko': '한국어',
+        'fr': 'Français',
+        'de': 'Deutsch',
+        'ru': 'Русский',
+        'it': 'Italiano',
+        'es': 'Español',
+        'pt': 'Português',
+        'ar': 'العربية'
       },
       reloadNote: '언어 변경 후 확장 프로그램을 다시 로드해야 합니다'
     },
@@ -655,9 +833,975 @@ export const translations: Record<Language, Translations> = {
       cancel: '취소',
       reset: '재설정'
     }
-  }
-};
+  },
+
+  'fr': {
+    appTitle: 'Aperçu de lien au survol',
+    appDescription: 'Afficher l\'aperçu du lien au survol',
+    
+    tabs: {
+      linkPreview: {
+        title: 'Aperçu de lien',
+        tooltip: 'Configurer les paramètres d\'aperçu de lien'
+      },
+      dragText: {
+        title: 'Glisser le texte',
+        tooltip: 'Configurer les paramètres de glissement de texte'
+      },
+      other: {
+        title: 'Autres paramètres',
+        tooltip: 'Autres options de configuration'
+      }
+    },
+    
+    linkPreview: {
+      title: 'Paramètres d\'aperçu de lien',
+      enableLabel: 'Activer l\'aperçu de lien',
+      enableDescription: 'Afficher l\'aperçu lors du survol des liens',
+      triggerMethodLabel: 'Méthode de déclenchement',
+      triggerMethods: {
+        drag: 'Glisser le lien',
+        hover: 'Survol de la souris',
+        longPress: 'Appui long sur le lien',
+        altClick: 'Alt+Clic gauche',
+        customHover: 'Touche personnalisée+Survol',
+        disabled: 'Désactivé'
+      },
+      shortcutKeyLabel: 'Touche de raccourci',
+      shortcutKeys: {
+        alt: 'Alt',
+        ctrl: 'Ctrl',
+        shift: 'Shift'
+      },
+      clickText: 'Clic',
+      hoverText: 'Survol',
+      popupSizeLabel: 'Taille de la popup',
+      popupSizes: {
+        lastSize: 'Dernière taille',
+        defaultSize: 'Taille par défaut',
+        contentAdaptive: 'Adaptatif au contenu'
+      },
+      popupPositionLabel: 'Position de la popup',
+      popupPositions: {
+        followMouse: 'Suivre la souris',
+        center: 'Centre de l\'écran',
+        topRight: 'Coin supérieur droit'
+      },
+      themeLabel: 'Thème de la popup',
+      themes: {
+        light: 'Clair',
+        dark: 'Sombre',
+        blue: 'Bleu',
+        red: 'Rouge',
+        yellow: 'Jaune',
+        green: 'Vert'
+      },
+      opacityLabel: 'Opacité de l\'arrière-plan',
+      positionLabel: 'Position de l\'aperçu',
+      positionDescription: 'Choisir où la fenêtre d\'aperçu apparaît',
+      positions: {
+        topLeft: 'En haut à gauche',
+        topRight: 'En haut à droite',
+        bottomLeft: 'En bas à gauche',
+        bottomRight: 'En bas à droite'
+      },
+      delayLabel: 'Délai d\'affichage',
+      delayDescription: 'Temps d\'attente avant d\'afficher l\'aperçu (millisecondes)',
+      longPressDelayLabel: 'Délai d\'appui long',
+      longPressDelayDescription: 'Temps d\'appui sur le lien avant d\'afficher l\'aperçu (millisecondes)',
+      sizeLabel: 'Taille de l\'aperçu',
+      sizeDescription: 'Choisir la taille de la fenêtre d\'aperçu',
+      sizes: {
+        small: 'Petit',
+        medium: 'Moyen',
+        large: 'Grand'
+      }
+    },
+    
+    dragText: {
+      title: 'Paramètres de glissement de texte',
+      searchEngineLabel: 'Moteur de recherche',
+      searchEngines: {
+        bing: 'Recherche Bing',
+        google: 'Recherche Google',
+        baidu: 'Recherche Baidu',
+        duckduckgo: 'DuckDuckGo'
+      },
+      enableLabel: 'Activer le glissement de texte',
+      enableDescription: 'Permettre le glissement du texte sélectionné',
+      maxLengthLabel: 'Longueur maximale',
+      maxLengthDescription: 'Nombre maximum de caractères pour le texte glissé',
+      customTextLabel: 'Texte personnalisé',
+      customTextDescription: 'Définir le contenu du texte personnalisé pour le glissement',
+      customTextPlaceholder: 'Entrer le texte personnalisé...'
+    },
+    
+    other: {
+      title: 'Autres paramètres',
+      themeLabel: 'Paramètres de thème',
+      themeDescription: 'Choisir l\'apparence du thème de l\'application',
+      themes: {
+        system: 'Suivre le système',
+        light: 'Clair',
+        dark: 'Sombre'
+      },
+      languageLabel: 'Langue de l\'interface',
+      languageDescription: 'Sélectionner la langue d\'affichage de l\'interface',
+      languages: {
+        'zh-CN': '中文（简体）',
+        'zh-TW': '中文（繁體）',
+        'en': 'English',
+        'ja': '日本語',
+        'ko': '한국어',
+        'fr': 'Français',
+        'de': 'Deutsch',
+        'ru': 'Русский',
+        'it': 'Italiano',
+        'es': 'Español',
+        'pt': 'Português',
+        'ar': 'العربية'
+      },
+      reloadNote: 'L\'extension doit être rechargée après le changement de langue'
+    },
+    
+    common: {
+      enabled: 'Activé',
+      disabled: 'Désactivé',
+      save: 'Enregistrer',
+      cancel: 'Annuler',
+      reset: 'Réinitialiser'
+    }
+  },
+
+  'de': {
+    appTitle: 'Hover-Link-Vorschau',
+    appDescription: 'Link-Vorschau beim Hovern anzeigen',
+    
+    tabs: {
+      linkPreview: {
+        title: 'Link-Vorschau',
+        tooltip: 'Link-Vorschau-Einstellungen konfigurieren'
+      },
+      dragText: {
+        title: 'Text ziehen',
+        tooltip: 'Text-Ziehen-Einstellungen konfigurieren'
+      },
+      other: {
+        title: 'Andere Einstellungen',
+        tooltip: 'Andere Konfigurationsoptionen'
+      }
+    },
+    
+    linkPreview: {
+      title: 'Link-Vorschau-Einstellungen',
+      enableLabel: 'Link-Vorschau aktivieren',
+      enableDescription: 'Vorschau beim Hovern über Links anzeigen',
+      triggerMethodLabel: 'Auslösemethode',
+      triggerMethods: {
+        drag: 'Link ziehen',
+        hover: 'Maus-Hover',
+        longPress: 'Link lang drücken',
+        altClick: 'Alt+Linksklick',
+        customHover: 'Benutzerdefinierte Taste+Hover',
+        disabled: 'Deaktiviert'
+      },
+      shortcutKeyLabel: 'Tastenkürzel',
+      shortcutKeys: {
+        alt: 'Alt',
+        ctrl: 'Strg',
+        shift: 'Umschalt'
+      },
+      clickText: 'Klick',
+      hoverText: 'Hover',
+      popupSizeLabel: 'Popup-Größe',
+      popupSizes: {
+        lastSize: 'Letzte Größe',
+        defaultSize: 'Standardgröße',
+        contentAdaptive: 'Inhaltsanpassend'
+      },
+      popupPositionLabel: 'Popup-Position',
+      popupPositions: {
+        followMouse: 'Maus folgen',
+        center: 'Bildschirmmitte',
+        topRight: 'Obere rechte Ecke'
+      },
+      themeLabel: 'Popup-Theme',
+      themes: {
+        light: 'Hell',
+        dark: 'Dunkel',
+        blue: 'Blau',
+        red: 'Rot',
+        yellow: 'Gelb',
+        green: 'Grün'
+      },
+      opacityLabel: 'Hintergrund-Transparenz',
+      positionLabel: 'Vorschau-Position',
+      positionDescription: 'Wählen Sie, wo das Vorschaufenster erscheint',
+      positions: {
+        topLeft: 'Oben links',
+        topRight: 'Oben rechts',
+        bottomLeft: 'Unten links',
+        bottomRight: 'Unten rechts'
+      },
+      delayLabel: 'Anzeigeverzögerung',
+      delayDescription: 'Wartezeit vor der Anzeige der Vorschau (Millisekunden)',
+      longPressDelayLabel: 'Langes Drücken Verzögerung',
+      longPressDelayDescription: 'Zeit des Drückens des Links vor der Anzeige der Vorschau (Millisekunden)',
+      sizeLabel: 'Vorschau-Größe',
+      sizeDescription: 'Größe des Vorschaufensters wählen',
+      sizes: {
+        small: 'Klein',
+        medium: 'Mittel',
+        large: 'Groß'
+      }
+    },
+    
+    dragText: {
+      title: 'Text-Ziehen-Einstellungen',
+      searchEngineLabel: 'Suchmaschine',
+      searchEngines: {
+        bing: 'Bing-Suche',
+        google: 'Google-Suche',
+        baidu: 'Baidu-Suche',
+        duckduckgo: 'DuckDuckGo'
+      },
+      enableLabel: 'Text-Ziehen aktivieren',
+      enableDescription: 'Ziehen von ausgewähltem Text erlauben',
+      maxLengthLabel: 'Maximale Länge',
+      maxLengthDescription: 'Maximale Anzahl von Zeichen für gezogenen Text',
+      customTextLabel: 'Benutzerdefinierter Text',
+      customTextDescription: 'Benutzerdefinierten Textinhalt zum Ziehen festlegen',
+      customTextPlaceholder: 'Benutzerdefinierten Text eingeben...'
+    },
+    
+    other: {
+      title: 'Andere Einstellungen',
+      themeLabel: 'Theme-Einstellungen',
+      themeDescription: 'Anwendungs-Theme-Erscheinungsbild wählen',
+      themes: {
+        system: 'System folgen',
+        light: 'Hell',
+        dark: 'Dunkel'
+      },
+      languageLabel: 'Oberflächensprache',
+      languageDescription: 'Oberflächenanzeigesprache auswählen',
+      languages: {
+        'zh-CN': '中文（简体）',
+        'zh-TW': '中文（繁體）',
+        'en': 'English',
+        'ja': '日本語',
+        'ko': '한국어',
+        'fr': 'Français',
+        'de': 'Deutsch',
+        'ru': 'Русский',
+        'it': 'Italiano',
+        'es': 'Español',
+        'pt': 'Português',
+        'ar': 'العربية'
+      },
+      reloadNote: 'Erweiterung muss nach Sprachänderung neu geladen werden'
+    },
+    
+    common: {
+      enabled: 'Aktiviert',
+      disabled: 'Deaktiviert',
+      save: 'Speichern',
+      cancel: 'Abbrechen',
+      reset: 'Zurücksetzen'
+    }
+  },
+
+  'ru': {
+    appTitle: 'Предварительный просмотр ссылки при наведении',
+    appDescription: 'Показать предварительный просмотр ссылки при наведении',
+    
+    tabs: {
+      linkPreview: {
+        title: 'Предварительный просмотр ссылки',
+        tooltip: 'Настроить параметры предварительного просмотра ссылки'
+      },
+      dragText: {
+        title: 'Перетаскивание текста',
+        tooltip: 'Настроить параметры перетаскивания текста'
+      },
+      other: {
+        title: 'Другие настройки',
+        tooltip: 'Другие параметры конфигурации'
+      }
+    },
+    
+    linkPreview: {
+      title: 'Настройки предварительного просмотра ссылки',
+      enableLabel: 'Включить предварительный просмотр ссылки',
+      enableDescription: 'Показывать предварительный просмотр при наведении на ссылки',
+      triggerMethodLabel: 'Метод активации',
+      triggerMethods: {
+        drag: 'Перетащить ссылку',
+        hover: 'Наведение мыши',
+        longPress: 'Долгое нажатие на ссылку',
+        altClick: 'Alt+Левый клик',
+        customHover: 'Пользовательская клавиша+Наведение',
+        disabled: 'Отключено'
+      },
+      shortcutKeyLabel: 'Горячая клавиша',
+      shortcutKeys: {
+        alt: 'Alt',
+        ctrl: 'Ctrl',
+        shift: 'Shift'
+      },
+      clickText: 'Клик',
+      hoverText: 'Наведение',
+      popupSizeLabel: 'Размер всплывающего окна',
+      popupSizes: {
+        lastSize: 'Последний размер',
+        defaultSize: 'Размер по умолчанию',
+        contentAdaptive: 'Адаптивный к содержимому'
+      },
+      popupPositionLabel: 'Позиция всплывающего окна',
+      popupPositions: {
+        followMouse: 'Следовать за мышью',
+        center: 'Центр экрана',
+        topRight: 'Верхний правый угол'
+      },
+      themeLabel: 'Тема всплывающего окна',
+      themes: {
+        light: 'Светлая',
+        dark: 'Темная',
+        blue: 'Синяя',
+        red: 'Красная',
+        yellow: 'Желтая',
+        green: 'Зеленая'
+      },
+      opacityLabel: 'Прозрачность фона',
+      positionLabel: 'Позиция предварительного просмотра',
+      positionDescription: 'Выберите, где появляется окно предварительного просмотра',
+      positions: {
+        topLeft: 'Верхний левый',
+        topRight: 'Верхний правый',
+        bottomLeft: 'Нижний левый',
+        bottomRight: 'Нижний правый'
+      },
+      delayLabel: 'Задержка отображения',
+      delayDescription: 'Время ожидания перед показом предварительного просмотра (миллисекунды)',
+      longPressDelayLabel: 'Задержка долгого нажатия',
+      longPressDelayDescription: 'Время нажатия на ссылку перед показом предварительного просмотра (миллисекунды)',
+      sizeLabel: 'Размер предварительного просмотра',
+      sizeDescription: 'Выберите размер окна предварительного просмотра',
+      sizes: {
+        small: 'Маленький',
+        medium: 'Средний',
+        large: 'Большой'
+      }
+    },
+    
+    dragText: {
+      title: 'Настройки перетаскивания текста',
+      searchEngineLabel: 'Поисковая система',
+      searchEngines: {
+        bing: 'Поиск Bing',
+        google: 'Поиск Google',
+        baidu: 'Поиск Baidu',
+        duckduckgo: 'DuckDuckGo'
+      },
+      enableLabel: 'Включить перетаскивание текста',
+      enableDescription: 'Разрешить перетаскивание выделенного текста',
+      maxLengthLabel: 'Максимальная длина',
+      maxLengthDescription: 'Максимальное количество символов для перетаскиваемого текста',
+      customTextLabel: 'Пользовательский текст',
+      customTextDescription: 'Установить пользовательское содержимое текста для перетаскивания',
+      customTextPlaceholder: 'Введите пользовательский текст...'
+    },
+    
+    other: {
+      title: 'Другие настройки',
+      themeLabel: 'Настройки темы',
+      themeDescription: 'Выберите внешний вид темы приложения',
+      themes: {
+        system: 'Следовать системе',
+        light: 'Светлая',
+        dark: 'Темная'
+      },
+      languageLabel: 'Язык интерфейса',
+      languageDescription: 'Выберите язык отображения интерфейса',
+      languages: {
+        'zh-CN': '中文（简体）',
+        'zh-TW': '中文（繁體）',
+        'en': 'English',
+        'ja': '日本語',
+        'ko': '한국어',
+        'fr': 'Français',
+        'de': 'Deutsch',
+        'ru': 'Русский',
+        'it': 'Italiano',
+        'es': 'Español',
+        'pt': 'Português',
+        'ar': 'العربية'
+      },
+      reloadNote: 'Расширение необходимо перезагрузить после изменения языка'
+    },
+    
+    common: {
+      enabled: 'Включено',
+      disabled: 'Отключено',
+      save: 'Сохранить',
+      cancel: 'Отмена',
+      reset: 'Сброс'
+    }
+  },
+
+  'it': {
+    appTitle: 'Anteprima link al passaggio del mouse',
+    appDescription: 'Mostra anteprima del link al passaggio del mouse',
+    
+    tabs: {
+      linkPreview: {
+        title: 'Anteprima link',
+        tooltip: 'Configura le impostazioni dell\'anteprima del link'
+      },
+      dragText: {
+        title: 'Trascina testo',
+        tooltip: 'Configura le impostazioni di trascinamento del testo'
+      },
+      other: {
+        title: 'Altre impostazioni',
+        tooltip: 'Altre opzioni di configurazione'
+      }
+    },
+    
+    linkPreview: {
+      title: 'Impostazioni anteprima link',
+      enableLabel: 'Abilita anteprima link',
+      enableDescription: 'Mostra anteprima al passaggio del mouse sui link',
+      triggerMethodLabel: 'Metodo di attivazione',
+      triggerMethods: {
+        drag: 'Trascina link',
+        hover: 'Passaggio del mouse',
+        longPress: 'Pressione lunga del link',
+        altClick: 'Alt+Clic sinistro',
+        customHover: 'Tasto personalizzato+Passaggio del mouse',
+        disabled: 'Disabilitato'
+      },
+      shortcutKeyLabel: 'Tasto di scelta rapida',
+      shortcutKeys: {
+        alt: 'Alt',
+        ctrl: 'Ctrl',
+        shift: 'Shift'
+      },
+      clickText: 'Clic',
+      hoverText: 'Passaggio del mouse',
+      popupSizeLabel: 'Dimensione popup',
+      popupSizes: {
+        lastSize: 'Ultima dimensione',
+        defaultSize: 'Dimensione predefinita',
+        contentAdaptive: 'Adattivo al contenuto'
+      },
+      popupPositionLabel: 'Posizione popup',
+      popupPositions: {
+        followMouse: 'Segui il mouse',
+        center: 'Centro dello schermo',
+        topRight: 'Angolo superiore destro'
+      },
+      themeLabel: 'Tema popup',
+      themes: {
+        light: 'Chiaro',
+        dark: 'Scuro',
+        blue: 'Blu',
+        red: 'Rosso',
+        yellow: 'Giallo',
+        green: 'Verde'
+      },
+      opacityLabel: 'Opacità dello sfondo',
+      positionLabel: 'Posizione anteprima',
+      positionDescription: 'Scegli dove appare la finestra di anteprima',
+      positions: {
+        topLeft: 'In alto a sinistra',
+        topRight: 'In alto a destra',
+        bottomLeft: 'In basso a sinistra',
+        bottomRight: 'In basso a destra'
+      },
+      delayLabel: 'Ritardo di visualizzazione',
+      delayDescription: 'Tempo di attesa prima di mostrare l\'anteprima (millisecondi)',
+      longPressDelayLabel: 'Ritardo pressione lunga',
+      longPressDelayDescription: 'Tempo di pressione del link prima di mostrare l\'anteprima (millisecondi)',
+      sizeLabel: 'Dimensione anteprima',
+      sizeDescription: 'Scegli la dimensione della finestra di anteprima',
+      sizes: {
+        small: 'Piccola',
+        medium: 'Media',
+        large: 'Grande'
+      }
+    },
+    
+    dragText: {
+      title: 'Impostazioni trascinamento testo',
+      searchEngineLabel: 'Motore di ricerca',
+      searchEngines: {
+        bing: 'Ricerca Bing',
+        google: 'Ricerca Google',
+        baidu: 'Ricerca Baidu',
+        duckduckgo: 'DuckDuckGo'
+      },
+      enableLabel: 'Abilita trascinamento testo',
+      enableDescription: 'Consenti il trascinamento del testo selezionato',
+      maxLengthLabel: 'Lunghezza massima',
+      maxLengthDescription: 'Numero massimo di caratteri per il testo trascinato',
+      customTextLabel: 'Testo personalizzato',
+      customTextDescription: 'Imposta il contenuto del testo personalizzato per il trascinamento',
+      customTextPlaceholder: 'Inserisci testo personalizzato...'
+    },
+    
+    other: {
+      title: 'Altre impostazioni',
+      themeLabel: 'Impostazioni tema',
+      themeDescription: 'Scegli l\'aspetto del tema dell\'applicazione',
+      themes: {
+        system: 'Segui il sistema',
+        light: 'Chiaro',
+        dark: 'Scuro'
+      },
+      languageLabel: 'Lingua dell\'interfaccia',
+      languageDescription: 'Seleziona la lingua di visualizzazione dell\'interfaccia',
+      languages: {
+        'zh-CN': '中文（简体）',
+        'zh-TW': '中文（繁體）',
+        'en': 'English',
+        'ja': '日本語',
+        'ko': '한국어',
+        'fr': 'Français',
+        'de': 'Deutsch',
+        'ru': 'Русский',
+        'it': 'Italiano',
+        'es': 'Español',
+        'pt': 'Português',
+        'ar': 'العربية'
+      },
+      reloadNote: 'L\'estensione deve essere ricaricata dopo il cambio di lingua'
+    },
+    
+    common: {
+      enabled: 'Abilitato',
+      disabled: 'Disabilitato',
+      save: 'Salva',
+       cancel: 'Annulla',
+       reset: 'Ripristina'
+     }
+   },
+
+   'es': {
+     appTitle: 'Vista previa de enlace al pasar el ratón',
+     appDescription: 'Mostrar vista previa del enlace al pasar el ratón',
+     
+     tabs: {
+       linkPreview: {
+         title: 'Vista previa de enlace',
+         tooltip: 'Configurar ajustes de vista previa de enlace'
+       },
+       dragText: {
+         title: 'Arrastrar texto',
+         tooltip: 'Configurar ajustes de arrastre de texto'
+       },
+       other: {
+         title: 'Otros ajustes',
+         tooltip: 'Otras opciones de configuración'
+       }
+     },
+     
+     linkPreview: {
+       title: 'Ajustes de vista previa de enlace',
+       enableLabel: 'Habilitar vista previa de enlace',
+       enableDescription: 'Mostrar vista previa al pasar el ratón sobre enlaces',
+       triggerMethodLabel: 'Método de activación',
+       triggerMethods: {
+         drag: 'Arrastrar enlace',
+         hover: 'Pasar el ratón',
+         longPress: 'Presión larga del enlace',
+         altClick: 'Alt+Clic izquierdo',
+         customHover: 'Tecla personalizada+Pasar el ratón',
+         disabled: 'Deshabilitado'
+       },
+       shortcutKeyLabel: 'Tecla de acceso directo',
+       shortcutKeys: {
+         alt: 'Alt',
+         ctrl: 'Ctrl',
+         shift: 'Shift'
+       },
+       clickText: 'Clic',
+       hoverText: 'Pasar el ratón',
+       popupSizeLabel: 'Tamaño de ventana emergente',
+       popupSizes: {
+         lastSize: 'Último tamaño',
+         defaultSize: 'Tamaño predeterminado',
+         contentAdaptive: 'Adaptativo al contenido'
+       },
+       popupPositionLabel: 'Posición de ventana emergente',
+       popupPositions: {
+         followMouse: 'Seguir el ratón',
+         center: 'Centro de pantalla',
+         topRight: 'Esquina superior derecha'
+       },
+       themeLabel: 'Tema de ventana emergente',
+       themes: {
+         light: 'Claro',
+         dark: 'Oscuro',
+         blue: 'Azul',
+         red: 'Rojo',
+         yellow: 'Amarillo',
+         green: 'Verde'
+       },
+       opacityLabel: 'Opacidad del fondo',
+       positionLabel: 'Posición de vista previa',
+       positionDescription: 'Elegir dónde aparece la ventana de vista previa',
+       positions: {
+         topLeft: 'Arriba a la izquierda',
+         topRight: 'Arriba a la derecha',
+         bottomLeft: 'Abajo a la izquierda',
+         bottomRight: 'Abajo a la derecha'
+       },
+       delayLabel: 'Retraso de visualización',
+       delayDescription: 'Tiempo de espera antes de mostrar la vista previa (milisegundos)',
+       longPressDelayLabel: 'Retraso de presión larga',
+       longPressDelayDescription: 'Tiempo de presión del enlace antes de mostrar la vista previa (milisegundos)',
+       sizeLabel: 'Tamaño de vista previa',
+       sizeDescription: 'Elegir el tamaño de la ventana de vista previa',
+       sizes: {
+         small: 'Pequeño',
+         medium: 'Mediano',
+         large: 'Grande'
+       }
+     },
+     
+     dragText: {
+       title: 'Ajustes de arrastre de texto',
+       searchEngineLabel: 'Motor de búsqueda',
+       searchEngines: {
+         bing: 'Búsqueda Bing',
+         google: 'Búsqueda Google',
+         baidu: 'Búsqueda Baidu',
+         duckduckgo: 'DuckDuckGo'
+       },
+       enableLabel: 'Habilitar arrastre de texto',
+       enableDescription: 'Permitir arrastrar texto seleccionado',
+       maxLengthLabel: 'Longitud máxima',
+       maxLengthDescription: 'Número máximo de caracteres para texto arrastrado',
+       customTextLabel: 'Texto personalizado',
+       customTextDescription: 'Establecer contenido de texto personalizado para arrastre',
+       customTextPlaceholder: 'Introducir texto personalizado...'
+     },
+     
+     other: {
+       title: 'Otros ajustes',
+       themeLabel: 'Ajustes de tema',
+       themeDescription: 'Elegir apariencia del tema de la aplicación',
+       themes: {
+         system: 'Seguir el sistema',
+         light: 'Claro',
+         dark: 'Oscuro'
+       },
+       languageLabel: 'Idioma de la interfaz',
+       languageDescription: 'Seleccionar idioma de visualización de la interfaz',
+       languages: {
+         'zh-CN': '中文（简体）',
+         'zh-TW': '中文（繁體）',
+         'en': 'English',
+         'ja': '日本語',
+         'ko': '한국어',
+         'fr': 'Français',
+         'de': 'Deutsch',
+         'ru': 'Русский',
+         'it': 'Italiano',
+         'es': 'Español',
+         'pt': 'Português',
+         'ar': 'العربية'
+       },
+       reloadNote: 'La extensión debe recargarse después del cambio de idioma'
+     },
+     
+     common: {
+       enabled: 'Habilitado',
+       disabled: 'Deshabilitado',
+       save: 'Guardar',
+       cancel: 'Cancelar',
+       reset: 'Restablecer'
+     }
+   },
+
+   'pt': {
+     appTitle: 'Visualização de link ao passar o mouse',
+     appDescription: 'Mostrar visualização do link ao passar o mouse',
+     
+     tabs: {
+       linkPreview: {
+         title: 'Visualização de link',
+         tooltip: 'Configurar definições de visualização de link'
+       },
+       dragText: {
+         title: 'Arrastar texto',
+         tooltip: 'Configurar definições de arrastar texto'
+       },
+       other: {
+         title: 'Outras definições',
+         tooltip: 'Outras opções de configuração'
+       }
+     },
+     
+     linkPreview: {
+       title: 'Definições de visualização de link',
+       enableLabel: 'Ativar visualização de link',
+       enableDescription: 'Mostrar visualização ao passar o mouse sobre links',
+       triggerMethodLabel: 'Método de ativação',
+       triggerMethods: {
+         drag: 'Arrastar link',
+         hover: 'Passar o mouse',
+         longPress: 'Pressão longa do link',
+         altClick: 'Alt+Clique esquerdo',
+         customHover: 'Tecla personalizada+Passar o mouse',
+         disabled: 'Desativado'
+       },
+       shortcutKeyLabel: 'Tecla de atalho',
+       shortcutKeys: {
+         alt: 'Alt',
+         ctrl: 'Ctrl',
+         shift: 'Shift'
+       },
+       clickText: 'Clique',
+       hoverText: 'Passar o mouse',
+       popupSizeLabel: 'Tamanho do popup',
+       popupSizes: {
+         lastSize: 'Último tamanho',
+         defaultSize: 'Tamanho padrão',
+         contentAdaptive: 'Adaptativo ao conteúdo'
+       },
+       popupPositionLabel: 'Posição do popup',
+       popupPositions: {
+         followMouse: 'Seguir o mouse',
+         center: 'Centro da tela',
+         topRight: 'Canto superior direito'
+       },
+       themeLabel: 'Tema do popup',
+       themes: {
+         light: 'Claro',
+         dark: 'Escuro',
+         blue: 'Azul',
+         red: 'Vermelho',
+         yellow: 'Amarelo',
+         green: 'Verde'
+       },
+       opacityLabel: 'Opacidade do fundo',
+       positionLabel: 'Posição da visualização',
+       positionDescription: 'Escolher onde a janela de visualização aparece',
+       positions: {
+         topLeft: 'Superior esquerdo',
+         topRight: 'Superior direito',
+         bottomLeft: 'Inferior esquerdo',
+         bottomRight: 'Inferior direito'
+       },
+       delayLabel: 'Atraso de exibição',
+       delayDescription: 'Tempo de espera antes de mostrar a visualização (milissegundos)',
+       longPressDelayLabel: 'Atraso de pressão longa',
+       longPressDelayDescription: 'Tempo de pressão do link antes de mostrar a visualização (milissegundos)',
+       sizeLabel: 'Tamanho da visualização',
+       sizeDescription: 'Escolher o tamanho da janela de visualização',
+       sizes: {
+         small: 'Pequeno',
+         medium: 'Médio',
+         large: 'Grande'
+       }
+     },
+     
+     dragText: {
+       title: 'Definições de arrastar texto',
+       searchEngineLabel: 'Motor de busca',
+       searchEngines: {
+         bing: 'Busca Bing',
+         google: 'Busca Google',
+         baidu: 'Busca Baidu',
+         duckduckgo: 'DuckDuckGo'
+       },
+       enableLabel: 'Ativar arrastar texto',
+       enableDescription: 'Permitir arrastar texto selecionado',
+       maxLengthLabel: 'Comprimento máximo',
+       maxLengthDescription: 'Número máximo de caracteres para texto arrastado',
+       customTextLabel: 'Texto personalizado',
+       customTextDescription: 'Definir conteúdo de texto personalizado para arrastar',
+       customTextPlaceholder: 'Inserir texto personalizado...'
+     },
+     
+     other: {
+       title: 'Outras definições',
+       themeLabel: 'Definições de tema',
+       themeDescription: 'Escolher aparência do tema da aplicação',
+       themes: {
+         system: 'Seguir o sistema',
+         light: 'Claro',
+         dark: 'Escuro'
+       },
+       languageLabel: 'Idioma da interface',
+       languageDescription: 'Selecionar idioma de exibição da interface',
+       languages: {
+         'zh-CN': '中文（简体）',
+         'zh-TW': '中文（繁體）',
+         'en': 'English',
+         'ja': '日本語',
+         'ko': '한국어',
+         'fr': 'Français',
+         'de': 'Deutsch',
+         'ru': 'Русский',
+         'it': 'Italiano',
+         'es': 'Español',
+         'pt': 'Português',
+         'ar': 'العربية'
+       },
+       reloadNote: 'A extensão precisa ser recarregada após a mudança de idioma'
+     },
+     
+     common: {
+       enabled: 'Ativado',
+       disabled: 'Desativado',
+       save: 'Salvar',
+       cancel: 'Cancelar',
+       reset: 'Redefinir'
+     }
+   },
+
+   'ar': {
+     appTitle: 'معاينة الرابط عند التمرير',
+     appDescription: 'إظهار معاينة الرابط عند التمرير',
+     
+     tabs: {
+       linkPreview: {
+         title: 'معاينة الرابط',
+         tooltip: 'تكوين إعدادات معاينة الرابط'
+       },
+       dragText: {
+         title: 'سحب النص',
+         tooltip: 'تكوين إعدادات سحب النص'
+       },
+       other: {
+         title: 'إعدادات أخرى',
+         tooltip: 'خيارات تكوين أخرى'
+       }
+     },
+     
+     linkPreview: {
+       title: 'إعدادات معاينة الرابط',
+       enableLabel: 'تمكين معاينة الرابط',
+       enableDescription: 'إظهار المعاينة عند التمرير فوق الروابط',
+       triggerMethodLabel: 'طريقة التشغيل',
+       triggerMethods: {
+         drag: 'سحب الرابط',
+         hover: 'تمرير الماوس',
+         longPress: 'الضغط الطويل على الرابط',
+         altClick: 'Alt+النقر الأيسر',
+         customHover: 'مفتاح مخصص+التمرير',
+         disabled: 'معطل'
+       },
+       shortcutKeyLabel: 'مفتاح الاختصار',
+       shortcutKeys: {
+         alt: 'Alt',
+         ctrl: 'Ctrl',
+         shift: 'Shift'
+       },
+       clickText: 'نقر',
+       hoverText: 'تمرير',
+       popupSizeLabel: 'حجم النافذة المنبثقة',
+       popupSizes: {
+         lastSize: 'الحجم الأخير',
+         defaultSize: 'الحجم الافتراضي',
+         contentAdaptive: 'تكيفي مع المحتوى'
+       },
+       popupPositionLabel: 'موضع النافذة المنبثقة',
+       popupPositions: {
+         followMouse: 'تتبع الماوس',
+         center: 'وسط الشاشة',
+         topRight: 'الزاوية العلوية اليمنى'
+       },
+       themeLabel: 'موضوع النافذة المنبثقة',
+       themes: {
+         light: 'فاتح',
+         dark: 'داكن',
+         blue: 'أزرق',
+         red: 'أحمر',
+         yellow: 'أصفر',
+         green: 'أخضر'
+       },
+       opacityLabel: 'شفافية الخلفية',
+       positionLabel: 'موضع المعاينة',
+       positionDescription: 'اختر مكان ظهور نافذة المعاينة',
+       positions: {
+         topLeft: 'أعلى اليسار',
+         topRight: 'أعلى اليمين',
+         bottomLeft: 'أسفل اليسار',
+         bottomRight: 'أسفل اليمين'
+       },
+       delayLabel: 'تأخير العرض',
+       delayDescription: 'وقت الانتظار قبل إظهار المعاينة (بالميلي ثانية)',
+       longPressDelayLabel: 'تأخير الضغط الطويل',
+       longPressDelayDescription: 'وقت الضغط على الرابط قبل إظهار المعاينة (بالميلي ثانية)',
+       sizeLabel: 'حجم المعاينة',
+       sizeDescription: 'اختر حجم نافذة المعاينة',
+       sizes: {
+         small: 'صغير',
+         medium: 'متوسط',
+         large: 'كبير'
+       }
+     },
+     
+     dragText: {
+       title: 'إعدادات سحب النص',
+       searchEngineLabel: 'محرك البحث',
+       searchEngines: {
+         bing: 'بحث Bing',
+         google: 'بحث Google',
+         baidu: 'بحث Baidu',
+         duckduckgo: 'DuckDuckGo'
+       },
+       enableLabel: 'تمكين سحب النص',
+       enableDescription: 'السماح بسحب النص المحدد',
+       maxLengthLabel: 'الطول الأقصى',
+       maxLengthDescription: 'العدد الأقصى من الأحرف للنص المسحوب',
+       customTextLabel: 'نص مخصص',
+       customTextDescription: 'تعيين محتوى نص مخصص للسحب',
+       customTextPlaceholder: 'أدخل نص مخصص...'
+     },
+     
+     other: {
+       title: 'إعدادات أخرى',
+       themeLabel: 'إعدادات الموضوع',
+       themeDescription: 'اختر مظهر موضوع التطبيق',
+       themes: {
+         system: 'تتبع النظام',
+         light: 'فاتح',
+         dark: 'داكن'
+       },
+       languageLabel: 'لغة الواجهة',
+       languageDescription: 'اختر لغة عرض الواجهة',
+       languages: {
+         'zh-CN': '中文（简体）',
+         'zh-TW': '中文（繁體）',
+         'en': 'English',
+         'ja': '日本語',
+         'ko': '한국어',
+         'fr': 'Français',
+         'de': 'Deutsch',
+         'ru': 'Русский',
+         'it': 'Italiano',
+         'es': 'Español',
+         'pt': 'Português',
+         'ar': 'العربية'
+       },
+       reloadNote: 'يجب إعادة تحميل الإضافة بعد تغيير اللغة'
+     },
+     
+     common: {
+       enabled: 'مُمكن',
+       disabled: 'معطل',
+       save: 'حفظ',
+       cancel: 'إلغاء',
+       reset: 'إعادة تعيين'
+     }
+   }
+ };
 
 export function getTranslation(language: Language): Translations {
-  return translations[language] || translations['zh-CN'];
-}
+   return translations[language] || translations['en'];
+ }

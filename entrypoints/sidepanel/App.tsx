@@ -304,6 +304,19 @@ function App() {
           </TabsContent>
 
           <TabsContent value="dragText" className="space-y-6 p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label className="text-base font-semibold text-foreground">{t.dragText.enableLabel}</Label>
+                <p className="text-sm text-muted-foreground">
+                  {t.dragText.enableDescription}
+                </p>
+              </div>
+              <Switch
+                checked={dragTextSettings.autoOpenLink}
+                onCheckedChange={(checked) => setDragTextSettings(prev => ({ ...prev, autoOpenLink: checked }))}
+              />
+            </div>
+
             <div className="space-y-6">
               <LabelSelect
                 label={t.dragText.searchEngineLabel}
@@ -316,19 +329,6 @@ function App() {
                   { value: 'duckduckgo', label: t.dragText.searchEngines.duckduckgo }
                 ]}
               />
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label className="text-base font-semibold text-foreground">{t.dragText.enableLabel}</Label>
-                  <p className="text-sm text-muted-foreground">
-                    {t.dragText.enableDescription}
-                  </p>
-                </div>
-                <Switch
-                  checked={dragTextSettings.autoOpenLink}
-                  onCheckedChange={(checked) => setDragTextSettings(prev => ({ ...prev, autoOpenLink: checked }))}
-                />
-              </div>
 
               <div className="space-y-3">
                 <Label className="text-base font-semibold text-foreground">{t.dragText.customTextLabel}</Label>
@@ -426,9 +426,17 @@ function App() {
                 onChange={(value) => setLanguage(value as Language)}
                 options={[
                   { value: 'zh-CN', label: t.other.languages['zh-CN'] },
+                  { value: 'zh-TW', label: t.other.languages['zh-TW'] },
                   { value: 'en', label: t.other.languages['en'] },
                   { value: 'ja', label: t.other.languages['ja'] },
-                  { value: 'ko', label: t.other.languages['ko'] }
+                  { value: 'ko', label: t.other.languages['ko'] },
+                  { value: 'fr', label: t.other.languages['fr'] },
+                  { value: 'de', label: t.other.languages['de'] },
+                  { value: 'ru', label: t.other.languages['ru'] },
+                  { value: 'it', label: t.other.languages['it'] },
+                  { value: 'es', label: t.other.languages['es'] },
+                  { value: 'pt', label: t.other.languages['pt'] },
+                  { value: 'ar', label: t.other.languages['ar'] }
                 ]}
               />
             </div>
