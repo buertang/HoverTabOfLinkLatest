@@ -16,6 +16,7 @@ interface LabelSelectProps {
   className?: string
   description?: string
   layout?: 'simple' | 'complex'
+  disabled?: boolean
 }
 
 export function LabelSelect({
@@ -26,15 +27,16 @@ export function LabelSelect({
   placeholder,
   className = '',
   description,
-  layout = 'simple'
+  layout = 'simple',
+  disabled = false
 }: LabelSelectProps) {
   // 简单模式：左侧标签，右侧选择器
   if (layout === 'simple') {
     return (
       <div className={`flex justify-between items-center ${className}`}>
         <Label className="text-base font-semibold text-foreground">{label}</Label>
-        <Select value={value} onValueChange={onChange}>
-          <SelectTrigger>
+        <Select value={value} onValueChange={onChange} disabled={disabled}>
+          <SelectTrigger className={disabled ? 'opacity-50 cursor-not-allowed' : ''}>
             <SelectValue placeholder={placeholder} />
           </SelectTrigger>
           <SelectContent>
@@ -60,8 +62,8 @@ export function LabelSelect({
           </p>
         )}
       </div>
-      <Select value={value} onValueChange={onChange}>
-        <SelectTrigger>
+      <Select value={value} onValueChange={onChange} disabled={disabled}>
+        <SelectTrigger className={disabled ? 'opacity-50 cursor-not-allowed' : ''}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>

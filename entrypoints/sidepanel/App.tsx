@@ -73,6 +73,45 @@ function App() {
     disabledSites: '' // 禁用网站列表
   })
 
+  // 域名验证状态
+  const [domainValidation, setDomainValidation] = React.useState({
+    hasError: false,
+    errorMessage: '',
+    exceedsLimit: false
+  })
+
+  // 域名格式验证函数
+  const validateDomain = (domain: string): boolean => {
+    // 支持一级域名和二级域名格式
+    const domainRegex = /^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+(com|net|org|edu|gov|mil|int|co|io|me|tv|info|biz|name|mobi|pro|travel|museum|aero|jobs|cat|tel|post|xxx|[a-z]{2})$/i
+    const simpleDomainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})$/
+    return domainRegex.test(domain) || simpleDomainRegex.test(domain)
+  }
+
+  // 验证所有域名
+  const validateAllDomains = (domainsText: string) => {
+    const lines = domainsText.split('\n').filter(line => line.trim())
+    const invalidDomains: string[] = []
+    
+    lines.forEach(line => {
+      const domain = line.trim()
+      if (domain && !validateDomain(domain)) {
+        invalidDomains.push(domain)
+      }
+    })
+
+    const exceedsLimit = lines.length > 10
+    const hasError = invalidDomains.length > 0
+
+    setDomainValidation({
+      hasError,
+      errorMessage: hasError ? `${t.dragText.invalidDomains}: ${invalidDomains.join(', ')}` : '',
+      exceedsLimit
+    })
+
+    return !hasError && !exceedsLimit
+  }
+
   // Language settings now managed by useTranslation hook
 
   // 主题选项配置（参考根目录App.tsx的实现）
@@ -155,8 +194,9 @@ function App() {
             </TooltipProvider>
           </TabsList>
 
-          <TabsContent value="linkPreview" className="space-y-6 p-6">
-            <div className="space-y-6">
+          <TabsContent value="linkPreview" className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="space-y-6 p-6">
               <LabelSelect
                 label={t.linkPreview.enableLabel}
                 value={linkPreviewSettings.triggerMethod}
@@ -300,14 +340,16 @@ function App() {
                 step={5}
                 unit="%"
               />
-            </div>
+              </div>
+            </ScrollArea>
           </TabsContent>
 
-          <TabsContent value="dragText" className="space-y-6 p-6">
-            <div className="flex items-center justify-between">
+          <TabsContent value="dragText" className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full p-6">
+            <div className="flex items-center justify-between mb-6">
               <div className="space-y-0.5">
                 <Label className="text-base font-semibold text-foreground">{t.dragText.enableLabel}</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   {t.dragText.enableDescription}
                 </p>
               </div>
@@ -322,6 +364,7 @@ function App() {
                 label={t.dragText.searchEngineLabel}
                 value={dragTextSettings.searchEngine}
                 onChange={(value) => setDragTextSettings(prev => ({ ...prev, searchEngine: value }))}
+                disabled={!dragTextSettings.autoOpenLink}
                 options={[
                   { value: 'bing', label: t.dragText.searchEngines.bing },
                   { value: 'google', label: t.dragText.searchEngines.google },
@@ -331,21 +374,69 @@ function App() {
               />
 
               <div className="space-y-3">
-                <Label className="text-base font-semibold text-foreground">{t.dragText.customTextLabel}</Label>
-                <p className="text-sm text-muted-foreground mb-2">
-                  {t.dragText.customTextDescription}
+                <Label className="text-base font-semibold text-foreground">{t.dragText.disabledSitesLabel}</Label>
+                <p className="text-xs text-muted-foreground mb-2">
+                  {t.dragText.disabledSitesDescription}
                 </p>
-                <Textarea
-                  value={dragTextSettings.disabledSites}
-                  onChange={(e) => setDragTextSettings(prev => ({ ...prev, disabledSites: e.target.value }))}
-                  placeholder={t.dragText.customTextPlaceholder}
-                  className="min-h-[120px] resize-none"
-                />
+                <div className="space-y-2">
+                  <Textarea
+                    value={dragTextSettings.disabledSites}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      setDragTextSettings(prev => ({ ...prev, disabledSites: value }))
+                      
+                      // 实时验证域名
+                      if (value.trim()) {
+                        validateAllDomains(value)
+                      } else {
+                        setDomainValidation({ hasError: false, errorMessage: '', exceedsLimit: false })
+                      }
+                    }}
+                    placeholder={t.dragText.disabledSitesPlaceholder}
+                    className={`min-h-[120px] resize-none text-xs ${
+                      domainValidation.hasError || domainValidation.exceedsLimit 
+                        ? 'border-red-500 focus:border-red-500' 
+                        : ''
+                    }`}
+                  />
+                  
+                  {/* 域名格式提示 */}
+                  <p className="text-xs text-muted-foreground">
+                    {t.dragText.domainFormatHint}
+                  </p>
+                  
+                  {/* 域名数量提示 */}
+                  {dragTextSettings.disabledSites.trim() && (
+                    <p className={`text-xs ${
+                      domainValidation.exceedsLimit ? 'text-red-500' : 'text-muted-foreground'
+                    }`}>
+                      {t.dragText.domainCountHint.replace('{count}', 
+                        dragTextSettings.disabledSites.split('\n').filter(line => line.trim()).length.toString()
+                      )}
+                    </p>
+                  )}
+                  
+                  {/* 错误提示 */}
+                  {domainValidation.hasError && (
+                    <p className="text-xs text-red-500">
+                      {domainValidation.errorMessage}
+                    </p>
+                  )}
+                  
+                  {/* 超限提示 */}
+                  {domainValidation.exceedsLimit && (
+                    <p className="text-xs text-red-500">
+                      {t.dragText.exceedsLimitError}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
+              </div>
+            </ScrollArea>
           </TabsContent>
 
-          <TabsContent value="other" className="space-y-6 p-6">
+          <TabsContent value="other" className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full p-6">
             <div className="space-y-6">
               {/* 主题设置 */}
               <div className="space-y-4">
@@ -439,7 +530,8 @@ function App() {
                   { value: 'ar', label: t.other.languages['ar'] }
                 ]}
               />
-            </div>
+              </div>
+            </ScrollArea>
           </TabsContent>
         </Tabs>
       </div>

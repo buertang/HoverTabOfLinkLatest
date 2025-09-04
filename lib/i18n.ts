@@ -103,6 +103,13 @@ export interface Translations {
     customTextLabel: string;
     customTextDescription: string;
     customTextPlaceholder: string;
+    disabledSitesLabel: string;
+    disabledSitesDescription: string;
+    disabledSitesPlaceholder: string;
+    domainFormatHint: string;
+    domainCountHint: string;
+    invalidDomains: string;
+    exceedsLimitError: string;
   };
   
   // Other settings
@@ -242,8 +249,15 @@ export const translations: Record<Language, Translations> = {
       maxLengthLabel: '最大长度',
       maxLengthDescription: '拖拽文本的最大字符数',
       customTextLabel: '自定义文本',
-      customTextDescription: '设置自定义的拖拽文本内容',
-      customTextPlaceholder: '输入自定义文本...'
+      customTextDescription: '设置拖拽时显示的自定义文本内容',
+      customTextPlaceholder: '输入自定义文本内容...',
+      disabledSitesLabel: '禁用网站',
+      disabledSitesDescription: '管理禁用拖拽文本功能的网站列表',
+      disabledSitesPlaceholder: '每行输入一个域名\n示例：\nexample.com\nwww.google.com',
+      domainFormatHint: '支持一级域名（example.com）和二级域名（www.example.com）',
+      domainCountHint: '当前域名数量：{count}/10',
+      invalidDomains: '无效的域名格式',
+      exceedsLimitError: '最多只能添加10个域名'
     },
     
     other: {
@@ -380,8 +394,15 @@ export const translations: Record<Language, Translations> = {
       maxLengthLabel: '最大長度',
       maxLengthDescription: '拖曳文字的最大字元數',
       customTextLabel: '自訂文字',
-      customTextDescription: '設定自訂的拖曳文字內容',
-      customTextPlaceholder: '輸入自訂文字...'
+      customTextDescription: '設定拖曳時顯示的自訂文字內容',
+      customTextPlaceholder: '輸入自訂文字內容...',
+      disabledSitesLabel: '禁用網站',
+      disabledSitesDescription: '管理禁用拖曳文字功能的網站列表',
+      disabledSitesPlaceholder: '每行輸入一個域名\n範例：\nexample.com\nwww.google.com',
+      domainFormatHint: '支援一級域名（example.com）和二級域名（www.example.com）',
+      domainCountHint: '目前域名數量：{count}/10',
+      invalidDomains: '無效的域名格式',
+      exceedsLimitError: '最多只能新增10個域名'
     },
     
     other: {
@@ -518,8 +539,15 @@ export const translations: Record<Language, Translations> = {
       maxLengthLabel: 'Max Length',
       maxLengthDescription: 'Maximum number of characters for dragged text',
       customTextLabel: 'Custom Text',
-      customTextDescription: 'Set custom text content for dragging',
-      customTextPlaceholder: 'Enter custom text...'
+      customTextDescription: 'Set custom text content to display when dragging',
+      customTextPlaceholder: 'Enter custom text content...',
+      disabledSitesLabel: 'Blocked Websites',
+      disabledSitesDescription: 'Manage the list of websites where drag text functionality is disabled',
+      disabledSitesPlaceholder: 'Enter domain names, one per line\nExample:\nexample.com\nwww.google.com',
+      domainFormatHint: 'Supports primary domains (example.com) and subdomains (www.example.com)',
+      domainCountHint: 'Current domains: {count}/10',
+      invalidDomains: 'Invalid domain format',
+      exceedsLimitError: 'Maximum 10 domains allowed'
     },
     
     other: {
@@ -656,8 +684,15 @@ export const translations: Record<Language, Translations> = {
       maxLengthLabel: '最大長',
       maxLengthDescription: 'ドラッグテキストの最大文字数',
       customTextLabel: 'カスタムテキスト',
-      customTextDescription: 'ドラッグ用のカスタムテキスト内容を設定',
-      customTextPlaceholder: 'カスタムテキストを入力...'
+      customTextDescription: 'ドラッグ時に表示するカスタムテキスト内容を設定',
+      customTextPlaceholder: 'カスタムテキスト内容を入力...',
+      disabledSitesLabel: 'ブロックされたウェブサイト',
+      disabledSitesDescription: 'テキストドラッグ機能を無効にするウェブサイトのリストを管理',
+      disabledSitesPlaceholder: '1行に1つのドメイン名を入力\n例：\nexample.com\nwww.google.com',
+      domainFormatHint: 'プライマリドメイン（example.com）とサブドメイン（www.example.com）をサポート',
+      domainCountHint: '現在のドメイン数：{count}/10',
+      invalidDomains: '無効なドメイン形式',
+      exceedsLimitError: '最大10個のドメインまで許可されています'
     },
     
     other: {
@@ -794,8 +829,15 @@ export const translations: Record<Language, Translations> = {
       maxLengthLabel: '최대 길이',
       maxLengthDescription: '드래그 텍스트의 최대 문자 수',
       customTextLabel: '사용자 정의 텍스트',
-      customTextDescription: '드래그용 사용자 정의 텍스트 내용 설정',
-      customTextPlaceholder: '사용자 정의 텍스트 입력...'
+      customTextDescription: '드래그 시 표시할 사용자 정의 텍스트 내용 설정',
+      customTextPlaceholder: '사용자 정의 텍스트 내용 입력...',
+      disabledSitesLabel: '차단된 웹사이트',
+      disabledSitesDescription: '텍스트 드래그 기능을 비활성화할 웹사이트 목록 관리',
+      disabledSitesPlaceholder: '한 줄에 하나의 도메인 이름 입력\n예시:\nexample.com\nwww.google.com',
+      domainFormatHint: '기본 도메인(example.com)과 서브도메인(www.example.com) 지원',
+      domainCountHint: '현재 도메인 수: {count}/10',
+      invalidDomains: '잘못된 도메인 형식',
+      exceedsLimitError: '최대 10개의 도메인만 허용됩니다'
     },
     
     other: {
@@ -932,8 +974,15 @@ export const translations: Record<Language, Translations> = {
       maxLengthLabel: 'Longueur maximale',
       maxLengthDescription: 'Nombre maximum de caractères pour le texte glissé',
       customTextLabel: 'Texte personnalisé',
-      customTextDescription: 'Définir le contenu du texte personnalisé pour le glissement',
-      customTextPlaceholder: 'Entrer le texte personnalisé...'
+      customTextDescription: 'Définir le contenu du texte personnalisé à afficher lors du glissement',
+      customTextPlaceholder: 'Entrez le contenu du texte personnalisé...',
+      disabledSitesLabel: 'Sites web bloqués',
+      disabledSitesDescription: 'Gérer la liste des sites web où la fonctionnalité de glissement de texte est désactivée',
+      disabledSitesPlaceholder: 'Entrez les noms de domaine, un par ligne\nExemple:\nexample.com\nwww.google.com',
+      domainFormatHint: 'Prend en charge les domaines primaires (example.com) et les sous-domaines (www.example.com)',
+      domainCountHint: 'Domaines actuels: {count}/10',
+      invalidDomains: 'Format de domaine invalide',
+      exceedsLimitError: 'Maximum 10 domaines autorisés'
     },
     
     other: {
@@ -1070,8 +1119,15 @@ export const translations: Record<Language, Translations> = {
       maxLengthLabel: 'Maximale Länge',
       maxLengthDescription: 'Maximale Anzahl von Zeichen für gezogenen Text',
       customTextLabel: 'Benutzerdefinierter Text',
-      customTextDescription: 'Benutzerdefinierten Textinhalt zum Ziehen festlegen',
-      customTextPlaceholder: 'Benutzerdefinierten Text eingeben...'
+      customTextDescription: 'Benutzerdefinierte Textnachricht für die Textziehen-Funktion',
+      customTextPlaceholder: 'Geben Sie Ihren benutzerdefinierten Text ein...',
+      disabledSitesLabel: 'Blockierte Websites',
+      disabledSitesDescription: 'Liste der Websites verwalten, auf denen die Textziehen-Funktion deaktiviert ist',
+      disabledSitesPlaceholder: 'Domain-Namen eingeben, einen pro Zeile\nBeispiel:\nexample.com\nwww.google.com',
+      domainFormatHint: 'Unterstützt primäre Domains (example.com) und Subdomains (www.example.com)',
+      domainCountHint: 'Aktuelle Domains: {count}/10',
+      invalidDomains: 'Ungültiges Domain-Format',
+      exceedsLimitError: 'Maximal 10 Domains erlaubt'
     },
     
     other: {
@@ -1208,8 +1264,15 @@ export const translations: Record<Language, Translations> = {
       maxLengthLabel: 'Максимальная длина',
       maxLengthDescription: 'Максимальное количество символов для перетаскиваемого текста',
       customTextLabel: 'Пользовательский текст',
-      customTextDescription: 'Установить пользовательское содержимое текста для перетаскивания',
-      customTextPlaceholder: 'Введите пользовательский текст...'
+      customTextDescription: 'Пользовательское текстовое сообщение для функции перетаскивания текста',
+      customTextPlaceholder: 'Введите ваш пользовательский текст...',
+      disabledSitesLabel: 'Заблокированные веб-сайты',
+      disabledSitesDescription: 'Управление списком веб-сайтов, где функция перетаскивания текста отключена',
+      disabledSitesPlaceholder: 'Введите доменные имена, по одному в строке\nПример:\nexample.com\nwww.google.com',
+      domainFormatHint: 'Поддерживает основные домены (example.com) и поддомены (www.example.com)',
+      domainCountHint: 'Текущие домены: {count}/10',
+      invalidDomains: 'Неверный формат домена',
+      exceedsLimitError: 'Разрешено максимум 10 доменов'
     },
     
     other: {
@@ -1346,8 +1409,15 @@ export const translations: Record<Language, Translations> = {
       maxLengthLabel: 'Lunghezza massima',
       maxLengthDescription: 'Numero massimo di caratteri per il testo trascinato',
       customTextLabel: 'Testo personalizzato',
-      customTextDescription: 'Imposta il contenuto del testo personalizzato per il trascinamento',
-      customTextPlaceholder: 'Inserisci testo personalizzato...'
+      customTextDescription: 'Messaggio di testo personalizzato per la funzionalità di trascinamento del testo',
+      customTextPlaceholder: 'Inserisci il tuo testo personalizzato...',
+      disabledSitesLabel: 'Siti web bloccati',
+      disabledSitesDescription: 'Gestire l\'elenco dei siti web dove la funzionalità di trascinamento del testo è disabilitata',
+      disabledSitesPlaceholder: 'Inserire i nomi di dominio, uno per riga\nEsempio:\nexample.com\nwww.google.com',
+      domainFormatHint: 'Supporta domini primari (example.com) e sottodomini (www.example.com)',
+      domainCountHint: 'Domini attuali: {count}/10',
+      invalidDomains: 'Formato dominio non valido',
+      exceedsLimitError: 'Massimo 10 domini consentiti'
     },
     
     other: {
@@ -1484,8 +1554,15 @@ export const translations: Record<Language, Translations> = {
        maxLengthLabel: 'Longitud máxima',
        maxLengthDescription: 'Número máximo de caracteres para texto arrastrado',
        customTextLabel: 'Texto personalizado',
-       customTextDescription: 'Establecer contenido de texto personalizado para arrastre',
-       customTextPlaceholder: 'Introducir texto personalizado...'
+       customTextDescription: 'Mensaje de texto personalizado para la funcionalidad de arrastre de texto',
+       customTextPlaceholder: 'Introduce tu texto personalizado...',
+       disabledSitesLabel: 'Sitios web bloqueados',
+       disabledSitesDescription: 'Gestionar la lista de sitios web donde la funcionalidad de arrastre de texto está deshabilitada',
+       disabledSitesPlaceholder: 'Introducir nombres de dominio, uno por línea\nEjemplo:\nexample.com\nwww.google.com',
+       domainFormatHint: 'Soporta dominios primarios (example.com) y subdominios (www.example.com)',
+       domainCountHint: 'Dominios actuales: {count}/10',
+       invalidDomains: 'Formato de dominio inválido',
+       exceedsLimitError: 'Máximo 10 dominios permitidos'
      },
      
      other: {
@@ -1622,8 +1699,15 @@ export const translations: Record<Language, Translations> = {
        maxLengthLabel: 'Comprimento máximo',
        maxLengthDescription: 'Número máximo de caracteres para texto arrastado',
        customTextLabel: 'Texto personalizado',
-       customTextDescription: 'Definir conteúdo de texto personalizado para arrastar',
-       customTextPlaceholder: 'Inserir texto personalizado...'
+       customTextDescription: 'Mensagem de texto personalizada para a funcionalidade de arrastar texto',
+       customTextPlaceholder: 'Insira o seu texto personalizado...',
+       disabledSitesLabel: 'Sites bloqueados',
+       disabledSitesDescription: 'Gerir a lista de sites onde a funcionalidade de arrastar texto está desabilitada',
+       disabledSitesPlaceholder: 'Inserir nomes de domínio, um por linha\nExemplo:\nexample.com\nwww.google.com',
+       domainFormatHint: 'Suporta domínios primários (example.com) e subdomínios (www.example.com)',
+       domainCountHint: 'Domínios atuais: {count}/10',
+       invalidDomains: 'Formato de domínio inválido',
+       exceedsLimitError: 'Máximo 10 domínios permitidos'
      },
      
      other: {
@@ -1760,8 +1844,15 @@ export const translations: Record<Language, Translations> = {
        maxLengthLabel: 'الطول الأقصى',
        maxLengthDescription: 'العدد الأقصى من الأحرف للنص المسحوب',
        customTextLabel: 'نص مخصص',
-       customTextDescription: 'تعيين محتوى نص مخصص للسحب',
-       customTextPlaceholder: 'أدخل نص مخصص...'
+       customTextDescription: 'رسالة نصية مخصصة لوظيفة سحب النص',
+       customTextPlaceholder: 'أدخل النص المخصص الخاص بك...',
+       disabledSitesLabel: 'المواقع المحظورة',
+       disabledSitesDescription: 'إدارة قائمة المواقع التي تم تعطيل وظيفة سحب النص فيها',
+       disabledSitesPlaceholder: 'أدخل أسماء النطاقات، واحد في كل سطر\nمثال:\nexample.com\nwww.google.com',
+       domainFormatHint: 'يدعم النطاقات الأساسية (example.com) والنطاقات الفرعية (www.example.com)',
+       domainCountHint: 'النطاقات الحالية: {count}/10',
+       invalidDomains: 'تنسيق النطاق غير صالح',
+       exceedsLimitError: 'الحد الأقصى 10 نطاقات مسموح'
      },
      
      other: {
