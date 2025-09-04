@@ -136,7 +136,7 @@ function App() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-background">
+    <div className="flex flex-col h-screen bg-background min-w-[430px]">
       {/* Header */}
       <div className="border-none px-4 py-3">
         <div className="flex items-center gap-3">
