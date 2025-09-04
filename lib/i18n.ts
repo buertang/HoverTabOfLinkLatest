@@ -30,7 +30,10 @@ export interface Translations {
     triggerMethods: {
       drag: string;
       hover: string;
+      longPress: string;
       altClick: string;
+      customHover: string;
+      disabled: string;
     };
     shortcutKeyLabel: string;
     shortcutKeys: {
@@ -38,6 +41,8 @@ export interface Translations {
       ctrl: string;
       shift: string;
     };
+    clickText: string;
+    hoverText: string;
     popupSizeLabel: string;
     popupSizes: {
       lastSize: string;
@@ -70,6 +75,8 @@ export interface Translations {
     };
     delayLabel: string;
     delayDescription: string;
+    longPressDelayLabel: string;
+    longPressDelayDescription: string;
     sizeLabel: string;
     sizeDescription: string;
     sizes: {
@@ -157,7 +164,10 @@ export const translations: Record<Language, Translations> = {
       triggerMethods: {
         drag: '拖动链接',
         hover: '鼠标悬停',
-        altClick: 'Alt+鼠标左键点击'
+        longPress: '长按链接',
+        altClick: 'Alt+鼠标左键点击',
+        customHover: '自定义快捷键+悬停',
+        disabled: '禁用'
       },
       shortcutKeyLabel: '快捷键',
       shortcutKeys: {
@@ -165,6 +175,8 @@ export const translations: Record<Language, Translations> = {
         ctrl: 'Ctrl',
         shift: 'Shift'
       },
+      clickText: '点击',
+      hoverText: '悬停',
       popupSizeLabel: '弹窗大小',
       popupSizes: {
         lastSize: '上次大小',
@@ -197,6 +209,8 @@ export const translations: Record<Language, Translations> = {
       },
       delayLabel: '显示延迟',
       delayDescription: '鼠标悬停后多久显示预览（毫秒）',
+      longPressDelayLabel: '长按延迟',
+      longPressDelayDescription: '长按链接多久后显示预览（毫秒）',
       sizeLabel: '预览大小',
       sizeDescription: '选择预览窗口的大小',
       sizes: {
@@ -280,7 +294,10 @@ export const translations: Record<Language, Translations> = {
       triggerMethods: {
         drag: 'Drag Link',
         hover: 'Mouse Hover',
-        altClick: 'Alt+Left Click'
+        longPress: 'Long Press Link',
+        altClick: 'Alt+Left Click',
+        customHover: 'Custom Key+Hover',
+        disabled: 'Disabled'
       },
       shortcutKeyLabel: 'Shortcut Key',
       shortcutKeys: {
@@ -288,6 +305,8 @@ export const translations: Record<Language, Translations> = {
         ctrl: 'Ctrl',
         shift: 'Shift'
       },
+      clickText: 'Click',
+      hoverText: 'Hover',
       popupSizeLabel: 'Popup Size',
       popupSizes: {
         lastSize: 'Last Size',
@@ -320,6 +339,8 @@ export const translations: Record<Language, Translations> = {
       },
       delayLabel: 'Display Delay',
       delayDescription: 'How long to wait before showing preview (milliseconds)',
+      longPressDelayLabel: 'Long Press Delay',
+      longPressDelayDescription: 'How long to press link before showing preview (milliseconds)',
       sizeLabel: 'Preview Size',
       sizeDescription: 'Choose the size of the preview window',
       sizes: {
@@ -403,7 +424,10 @@ export const translations: Record<Language, Translations> = {
       triggerMethods: {
         drag: 'リンクをドラッグ',
         hover: 'マウスホバー',
-        altClick: 'Alt+左クリック'
+        longPress: 'リンク長押し',
+        altClick: 'Alt+左クリック',
+        customHover: 'カスタムキー+ホバー',
+        disabled: '無効'
       },
       shortcutKeyLabel: 'ショートカットキー',
       shortcutKeys: {
@@ -411,6 +435,8 @@ export const translations: Record<Language, Translations> = {
         ctrl: 'Ctrl',
         shift: 'Shift'
       },
+      clickText: 'クリック',
+      hoverText: 'ホバー',
       popupSizeLabel: 'ポップアップサイズ',
       popupSizes: {
         lastSize: '前回のサイズ',
@@ -443,6 +469,8 @@ export const translations: Record<Language, Translations> = {
       },
       delayLabel: '表示遅延',
       delayDescription: 'プレビュー表示までの待機時間（ミリ秒）',
+      longPressDelayLabel: '長押し遅延',
+      longPressDelayDescription: 'リンク長押しからプレビュー表示までの時間（ミリ秒）',
       sizeLabel: 'プレビューサイズ',
       sizeDescription: 'プレビューウィンドウのサイズを選択',
       sizes: {
@@ -526,7 +554,10 @@ export const translations: Record<Language, Translations> = {
       triggerMethods: {
         drag: '링크 드래그',
         hover: '마우스 호버',
-        altClick: 'Alt+왼쪽 클릭'
+        longPress: '링크 길게 누르기',
+        altClick: 'Alt+왼쪽 클릭',
+        customHover: '사용자 정의 키+호버',
+        disabled: '비활성화'
       },
       shortcutKeyLabel: '단축키',
       shortcutKeys: {
@@ -534,6 +565,8 @@ export const translations: Record<Language, Translations> = {
         ctrl: 'Ctrl',
         shift: 'Shift'
       },
+      clickText: '클릭',
+      hoverText: '호버',
       popupSizeLabel: '팝업 크기',
       popupSizes: {
         lastSize: '마지막 크기',
@@ -566,6 +599,8 @@ export const translations: Record<Language, Translations> = {
       },
       delayLabel: '표시 지연',
       delayDescription: '미리보기 표시 전 대기 시간(밀리초)',
+      longPressDelayLabel: '길게 누르기 지연',
+      longPressDelayDescription: '링크를 길게 눌러서 미리보기 표시까지의 시간(밀리초)',
       sizeLabel: '미리보기 크기',
       sizeDescription: '미리보기 창의 크기 선택',
       sizes: {
