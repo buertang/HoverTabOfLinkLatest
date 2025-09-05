@@ -2,6 +2,8 @@ import { storage } from '#imports'
 import { useEffect, useState } from 'react'
 
 type Theme = 'system' | 'light' | 'dark'
+type FloatingPreviewTheme = 'light' | 'dark' | 'blue' | 'red' | 'yellow' | 'green'
+type FloatingPreviewPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center'
 
 interface AppearanceSettings {
   theme: Theme
@@ -14,6 +16,20 @@ interface SystemSettings {
 
 interface UISettings {
   activeTab: string
+}
+
+interface FloatingPreviewSettings {
+  enabled: boolean
+  theme: FloatingPreviewTheme
+  position: FloatingPreviewPosition
+  width: number
+  height: number
+  opacity: number
+  dragToTrigger: boolean
+  showOnHover: boolean
+  hoverDelay: number
+  autoClose: boolean
+  autoCloseDelay: number
 }
 
 // Define storage items
@@ -36,25 +52,56 @@ const uiSettings = storage.defineItem<UISettings>('local:uiSettings', {
   }
 })
 
+const floatingPreviewSettings = storage.defineItem<FloatingPreviewSettings>('local:floatingPreviewSettings', {
+  fallback: {
+    enabled: true,
+    theme: 'light',
+    position: 'center',
+    width: 800,
+    height: 600,
+    opacity: 0.95,
+    dragToTrigger: true,
+    showOnHover: false,
+    hoverDelay: 500,
+    autoClose: true,
+    autoCloseDelay: 5000
+  }
+})
+
 export function useSettings() {
   const [appearance, setAppearance] = useState<AppearanceSettings>({ theme: 'system' })
   const [system, setSystem] = useState<SystemSettings>({ notifications: true, syncInterval: 15 })
   const [ui, setUI] = useState<UISettings>({ activeTab: 'home' })
+  const [floatingPreview, setFloatingPreview] = useState<FloatingPreviewSettings>({
+    enabled: true,
+    theme: 'light',
+    position: 'center',
+    width: 800,
+    height: 600,
+    opacity: 0.95,
+    dragToTrigger: true,
+    showOnHover: false,
+    hoverDelay: 500,
+    autoClose: true,
+    autoCloseDelay: 5000
+  })
   const [loading, setLoading] = useState(true)
 
   // Load settings
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const [appearanceData, systemData, uiData] = await Promise.all([
+        const [appearanceData, systemData, uiData, floatingPreviewData] = await Promise.all([
           appearanceSettings.getValue(),
           systemSettings.getValue(),
-          uiSettings.getValue()
+          uiSettings.getValue(),
+          floatingPreviewSettings.getValue()
         ])
         
         setAppearance(appearanceData)
         setSystem(systemData)
         setUI(uiData)
+        setFloatingPreview(floatingPreviewData)
       } catch (error) {
         console.error('Failed to load settings:', error)
       } finally {
@@ -98,23 +145,49 @@ export function useSettings() {
     }
   }
 
+  // Update FloatingPreview settings
+  const updateFloatingPreview = async (updates: Partial<FloatingPreviewSettings>) => {
+    const newSettings = { ...floatingPreview, ...updates }
+    setFloatingPreview(newSettings)
+    try {
+      await floatingPreviewSettings.setValue(newSettings)
+    } catch (error) {
+      console.error('Failed to save floating preview settings:', error)
+    }
+  }
+
   // Reset all settings
   const resetSettings = async () => {
     try {
       await Promise.all([
         appearanceSettings.removeValue(),
         systemSettings.removeValue(),
-        uiSettings.removeValue()
+        uiSettings.removeValue(),
+        floatingPreviewSettings.removeValue()
       ])
       
       // Reset to default values
       const defaultAppearance = { theme: 'system' as Theme }
       const defaultSystem = { notifications: true, syncInterval: 15 }
       const defaultUI = { activeTab: 'home' }
+      const defaultFloatingPreview = {
+        enabled: true,
+        theme: 'light' as FloatingPreviewTheme,
+        position: 'center' as FloatingPreviewPosition,
+        width: 800,
+        height: 600,
+        opacity: 0.95,
+        dragToTrigger: true,
+        showOnHover: false,
+        hoverDelay: 500,
+        autoClose: true,
+        autoCloseDelay: 5000
+      }
       
       setAppearance(defaultAppearance)
       setSystem(defaultSystem)
       setUI(defaultUI)
+      setFloatingPreview(defaultFloatingPreview)
     } catch (error) {
       console.error('Failed to reset settings:', error)
     }
@@ -124,10 +197,12 @@ export function useSettings() {
     appearance,
     system,
     ui,
+    floatingPreview,
     loading,
     updateAppearance,
     updateSystem,
     updateUI,
+    updateFloatingPreview,
     resetSettings
   }
-} 
+}
