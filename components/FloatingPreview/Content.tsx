@@ -106,26 +106,25 @@ const Content: React.FC<ContentProps> = ({
         display: 'flex'
       }}
     >
-      {/* 左侧宽度调整把手 */}
+      {/* 左侧容器 - 包含左侧调整把手 */}
       <div
         style={{
-          position: 'absolute',
-          left: '0',
-          top: '0',
           width: '4px',
           height: '100%',
           backgroundColor: 'transparent',
           cursor: 'ew-resize',
-          zIndex: 10,
           borderLeft: `2px solid ${themeStyles.borderColor}`,
-          opacity: 0.3
+          opacity: 0.3,
+          flexShrink: 0
         }}
         onMouseDown={handleLeftResizeStart}
         title="拖拽调整宽度"
       />
       
-      {/* 主要内容区域 - iframe容器 */}
-      <div className="flex-1 relative mx-2">
+      {/* 中间容器 - 主要内容区域iframe容器 */}
+      <div style={{
+        flex: 1,
+      }}>
         {/* 加载状态 */}
         {loading && (
           <div
@@ -170,7 +169,12 @@ const Content: React.FC<ContentProps> = ({
         {/* iframe内容 */}
         <iframe
           src={url}
-          className="w-full h-full border-0 rounded"
+          style={{
+            width: '100%',
+            height: '100%',
+            border: '0',
+            borderRadius: '0.25rem'
+          }}
           onLoad={handleIframeLoad}
           onError={handleIframeError}
           sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
@@ -178,19 +182,16 @@ const Content: React.FC<ContentProps> = ({
         />
       </div>
       
-      {/* 右侧宽度调整把手 */}
+      {/* 右侧容器 - 包含右侧调整把手 */}
       <div
         style={{
-          position: 'absolute',
-          right: '0',
-          top: '0',
           width: '4px',
           height: '100%',
           backgroundColor: 'transparent',
           cursor: 'ew-resize',
-          zIndex: 10,
           borderRight: `2px solid ${themeStyles.borderColor}`,
-          opacity: 0.3
+          opacity: 0.3,
+          flexShrink: 0
         }}
         onMouseDown={handleRightResizeStart}
         title="拖拽调整宽度"

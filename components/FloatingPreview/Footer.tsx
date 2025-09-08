@@ -130,56 +130,51 @@ const Footer: React.FC<FooterProps> = ({
         borderTop: `1px solid ${themeStyles.borderColor}`
       }}
     >
-      {/* 左下角调整把手 */}
-      <div
-        style={{
-          position: 'absolute',
-          left: '0',
-          bottom: '0',
-          width: '12px',
-          height: '12px',
-          cursor: 'nesw-resize',
-          backgroundColor: themeStyles.borderColor,
-          opacity: 0.6,
-          borderRadius: '0 0 0 4px'
-        }}
-        onMouseDown={handleCornerLeftResizeStart}
-        title="拖拽等比缩放"
-      />
-      
-      {/* 中间高度调整把手 */}
-      <div
-        style={{
-          position: 'absolute',
-          left: '12px',
-          right: '12px',
-          top: '0',
-          height: '8px',
-          cursor: 'ns-resize',
-          backgroundColor: 'transparent',
-          borderTop: `3px solid ${themeStyles.borderColor}`,
-          opacity: 0.4
-        }}
-        onMouseDown={handleHeightResizeStart}
-        title="拖拽调整高度"
-      />
-      
-      {/* 右下角调整把手 */}
-      <div
-        style={{
-          position: 'absolute',
-          right: '0',
-          bottom: '0',
-          width: '12px',
-          height: '12px',
-          cursor: 'nwse-resize',
-          backgroundColor: themeStyles.borderColor,
-          opacity: 0.6,
-          borderRadius: '0 0 4px 0'
-        }}
-        onMouseDown={handleCornerRightResizeStart}
-        title="拖拽等比缩放"
-      />
+      {/* 使用flexbox布局的三个容器 */}
+      <div style={{ display: 'flex', width: '100%', height: '100%' }}>
+        {/* 左侧半圆形调整把手 */}
+        <div
+          style={{
+            width: '6px',
+            height: '6px',
+            cursor: 'nesw-resize',
+            backgroundColor: themeStyles.borderColor,
+            opacity: 0.6,
+            borderRadius: '0 0 0 6px',
+            flexShrink: 0
+          }}
+          onMouseDown={handleCornerLeftResizeStart}
+          title="拖拽等比缩放"
+        />
+        
+        {/* 中间高度调整把手 */}
+        <div
+          style={{
+            flex: 1,
+            height: '6px',
+            cursor: 'ns-resize',
+            backgroundColor: 'transparent',
+            opacity: 0.4
+          }}
+          onMouseDown={handleHeightResizeStart}
+          title="拖拽调整高度"
+        />
+        
+        {/* 右侧半圆形调整把手 */}
+        <div
+          style={{
+            width: '6px',
+            height: '6px',
+            cursor: 'nwse-resize',
+            backgroundColor: themeStyles.borderColor,
+            opacity: 0.6,
+            borderRadius: '0 0 6px 0',
+            flexShrink: 0
+          }}
+          onMouseDown={handleCornerRightResizeStart}
+          title="拖拽等比缩放"
+        />
+      </div>
     </div>
   );
 };
