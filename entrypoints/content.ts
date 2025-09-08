@@ -5,7 +5,7 @@ import FloatingPreview from '../components/FloatingPreview';
 // 定义FloatingPreview设置接口
 interface FloatingPreviewSettings {
   enabled: boolean;
-  theme: 'light' | 'dark' | 'blue' | 'red' | 'yellow' | 'green';
+  theme: 'light' | 'dark'; // 只支持浅色和深色主题
   position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
   width: number;
   height: number;
@@ -29,13 +29,33 @@ export default defineContentScript({
     let settings: FloatingPreviewSettings | null = null;
     let currentMousePosition = { x: 0, y: 0 }; // 当前鼠标位置
     
+    // 获取系统主题
+    const getSystemTheme = (): 'light' | 'dark' => {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+
+    // 根据全局主题设置确定弹窗主题
+    const determineFloatingPreviewTheme = (globalTheme: 'system' | 'light' | 'dark'): 'light' | 'dark' => {
+      if (globalTheme === 'system') {
+        return getSystemTheme();
+      }
+      return globalTheme;
+    };
+
     // 加载设置
     const loadSettings = async () => {
       try {
-        const result = await browser.storage.local.get(['floatingPreviewSettings']);
+        // 同时加载弹窗设置和全局主题设置
+        const result = await browser.storage.local.get(['floatingPreviewSettings', 'themeSettings']);
+        
+        // 获取全局主题设置
+        const globalThemeSettings = result.themeSettings || { theme: 'system' };
+        const floatingPreviewTheme = determineFloatingPreviewTheme(globalThemeSettings.theme);
+        
+        // 设置弹窗配置，主题与全局主题保持同步
         settings = result.floatingPreviewSettings || {
           enabled: true,
-          theme: 'light',
+          theme: floatingPreviewTheme, // 根据全局主题确定
           position: 'center',
           width: 800,
           height: 600,
@@ -46,12 +66,18 @@ export default defineContentScript({
           autoClose: true,
           autoCloseDelay: 5000
         };
+        
+        // 确保弹窗主题与全局主题同步
+        if (settings) {
+          settings.theme = floatingPreviewTheme;
+        }
       } catch (error) {
         console.error('Failed to load FloatingPreview settings:', error);
         // 使用默认设置
+        const defaultTheme = getSystemTheme();
         settings = {
           enabled: true,
-          theme: 'light',
+          theme: defaultTheme, // 使用系统主题作为默认
           position: 'center',
           width: 800,
           height: 600,
@@ -242,8 +268,34 @@ export default defineContentScript({
     
     // 监听设置变化
     browser.storage.onChanged.addListener((changes, namespace) => {
-      if (namespace === 'local' && changes.floatingPreviewSettings) {
-        settings = changes.floatingPreviewSettings.newValue;
+      if (namespace === 'local') {
+        let shouldUpdatePreview = false;
+        
+        // 监听弹窗设置变化
+        if (changes.floatingPreviewSettings) {
+          const newSettings = changes.floatingPreviewSettings.newValue;
+          if (newSettings) {
+            settings = newSettings;
+            shouldUpdatePreview = true;
+          }
+        }
+        
+        // 监听主题设置变化
+        if (changes.themeSettings) {
+          const newThemeSettings = changes.themeSettings.newValue;
+          if (newThemeSettings && settings) {
+            // 根据新的全局主题设置更新弹窗主题
+            const newFloatingPreviewTheme = determineFloatingPreviewTheme(newThemeSettings.theme);
+            settings.theme = newFloatingPreviewTheme;
+            shouldUpdatePreview = true;
+          }
+        }
+        
+        // 如果设置有变化且当前有预览窗口，更新其样式
+        if (shouldUpdatePreview && floatingPreviewRoot) {
+          updateFloatingPreviewPosition();
+        }
+        
         console.log('FloatingPreview settings updated:', settings);
       }
     });

@@ -13,7 +13,7 @@ export interface ThemeStyles {
 // FloatingPreview设置接口
 export interface FloatingPreviewSettings {
   enabled: boolean;
-  theme: 'light' | 'dark' | 'blue' | 'red' | 'yellow' | 'green';
+  theme: 'light' | 'dark';
   position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
   width: number;
   height: number;

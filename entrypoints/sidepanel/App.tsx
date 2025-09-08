@@ -13,9 +13,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider'
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { useSettings } from '@/hooks/use-settings'
 import { useTheme } from '@/hooks/use-theme'
 import { useTranslation } from '@/hooks/use-i18n'
+import { useSettingsManager } from '@/hooks/use-settings-manager'
 import { Language } from '@/lib/i18n'
 import { DelaySlider } from './components/DelaySlider'
 import { LabelSelect } from './components/LabelSelect'
@@ -44,73 +44,38 @@ function App() {
   const { appearance, system, ui, loading, updateAppearance, updateSystem, updateUI, resetSettings } = useSettings()
   const { t, language, setLanguage, isLoading: i18nLoading } = useTranslation()
   
+  // 使用新的设置管理Hook
+  const {
+    settings,
+    isLoading: settingsLoading,
+    isInitialized,
+    domainValidation,
+    updateSetting,
+    updateSettings,
+    resetSettings: resetAllSettings,
+    validateDomains
+  } = useSettingsManager()
+  
   // 确保默认显示链接预览设置Tab
   React.useEffect(() => {
-    if (!ui.activeTab || !['linkPreview', 'dragText', 'other'].includes(ui.activeTab)) {
-      updateUI({ activeTab: 'linkPreview' })
+    if (!settings.uiSettings.activeTab || !['linkPreview', 'dragText', 'other'].includes(settings.uiSettings.activeTab)) {
+      updateSetting('uiSettings', { activeTab: 'linkPreview' })
     }
-  }, [ui.activeTab, updateUI])
+  }, [settings.uiSettings.activeTab, updateSetting])
+  
   const { resolvedTheme, setTheme } = useTheme({
-    theme: appearance.theme,
-    onThemeChange: (theme) => updateAppearance({ theme })
+    theme: settings.themeSettings.theme,
+    onThemeChange: (theme) => {updateSetting('themeSettings', { theme }),updateAppearance({ theme })}
   })
 
-  // HoverTabOfLink 设置状态
-  const [linkPreviewSettings, setLinkPreviewSettings] = React.useState({
-    triggerMethod: 'drag', // 拖动链接、鼠标悬停、长按链接、Alt+鼠标左键点击
-    customShortcut: 'Alt',
-    hoverDelay: 100, // 100ms - 2000ms
-    longPressDelay: 500, // 200ms - 3000ms
-    popupSize: 'lastSize', // 上次大小、默认大小、内容自适应
-    popupPosition: 'followMouse', // 跟随鼠标、屏幕居中、屏幕右上角
-    popupTheme: 'green', // 浅色、深色、蓝色、红色、黄色、绿色
-    backgroundOpacity: 50 // 0% - 100%
-  })
+  // 同步语言设置
+  React.useEffect(() => {
+    if (isInitialized && settings.languageSettings.language !== language) {
+      setLanguage(settings.languageSettings.language as Language)
+    }
+  }, [settings.languageSettings.language, language, setLanguage, isInitialized])
 
-  const [dragTextSettings, setDragTextSettings] = React.useState({
-    searchEngine: 'bing', // 必应搜索
-    autoOpenLink: false, // 是/否
-    disabledSites: '' // 禁用网站列表
-  })
-
-  // 域名验证状态
-  const [domainValidation, setDomainValidation] = React.useState({
-    hasError: false,
-    errorMessage: '',
-    exceedsLimit: false
-  })
-
-  // 域名格式验证函数
-  const validateDomain = (domain: string): boolean => {
-    // 支持一级域名和二级域名格式
-    const domainRegex = /^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+(com|net|org|edu|gov|mil|int|co|io|me|tv|info|biz|name|mobi|pro|travel|museum|aero|jobs|cat|tel|post|xxx|[a-z]{2})$/i
-    const simpleDomainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})$/
-    return domainRegex.test(domain) || simpleDomainRegex.test(domain)
-  }
-
-  // 验证所有域名
-  const validateAllDomains = (domainsText: string) => {
-    const lines = domainsText.split('\n').filter(line => line.trim())
-    const invalidDomains: string[] = []
-    
-    lines.forEach(line => {
-      const domain = line.trim()
-      if (domain && !validateDomain(domain)) {
-        invalidDomains.push(domain)
-      }
-    })
-
-    const exceedsLimit = lines.length > 10
-    const hasError = invalidDomains.length > 0
-
-    setDomainValidation({
-      hasError,
-      errorMessage: hasError ? `${t.dragText.invalidDomains}: ${invalidDomains.join(', ')}` : '',
-      exceedsLimit
-    })
-
-    return !hasError && !exceedsLimit
-  }
+  // 域名验证逻辑现在由 useSettingsManager Hook 处理
 
   // Language settings now managed by useTranslation hook
 
@@ -122,7 +87,7 @@ function App() {
   ] as const
 
   const handleTabChange = (value: string) => {
-    updateUI({ activeTab: value })
+    updateSetting('uiSettings', { activeTab: value as 'linkPreview' | 'dragText' | 'other' })
   }
 
   if (loading || i18nLoading) {
@@ -154,7 +119,7 @@ function App() {
 
       {/* Content */}
       <div className="flex-1 overflow-hidden border-none">
-        <Tabs value={ui.activeTab} onValueChange={handleTabChange} className="w-full h-full flex flex-col">
+        <Tabs value={settings.uiSettings.activeTab} onValueChange={handleTabChange} className="w-full h-full flex flex-col">
           <TabsList className="grid w-full grid-cols-3 flex-shrink-0">
             <TooltipProvider>
               <Tooltip>
@@ -199,142 +164,101 @@ function App() {
               <div className="space-y-6 p-6">
               <LabelSelect
                 label={t.linkPreview.enableLabel}
-                value={linkPreviewSettings.triggerMethod}
-                onChange={(value) => setLinkPreviewSettings(prev => ({ ...prev, triggerMethod: value }))}
+                value={settings.linkPreviewSettings.triggerMethod}
+                onChange={(value) => updateSetting('linkPreviewSettings', { triggerMethod: value as 'drag' | 'hover' | 'longPress' | 'click' | 'customHover' | 'disabled' })}
                 options={[
                   { value: 'drag', label: t.linkPreview.triggerMethods.drag },
                   { value: 'hover', label: t.linkPreview.triggerMethods.hover },
                   { value: 'longPress', label: t.linkPreview.triggerMethods.longPress },
                   { 
                     value: 'click', 
-                    label: `${t.linkPreview.shortcutKeys[linkPreviewSettings.customShortcut?.toLowerCase() as keyof typeof t.linkPreview.shortcutKeys] || t.linkPreview.shortcutKeys.alt}+${t.linkPreview.clickText}`
+                    label: `${t.linkPreview.shortcutKeys[settings.linkPreviewSettings.customShortcut?.toLowerCase() as keyof typeof t.linkPreview.shortcutKeys] || t.linkPreview.shortcutKeys.alt}+${t.linkPreview.clickText}`
                   },
                   { 
                     value: 'customHover', 
-                    label: `${t.linkPreview.shortcutKeys[linkPreviewSettings.customShortcut?.toLowerCase() as keyof typeof t.linkPreview.shortcutKeys] || t.linkPreview.shortcutKeys.alt}+${t.linkPreview.hoverText}`
+                    label: `${t.linkPreview.shortcutKeys[settings.linkPreviewSettings.customShortcut?.toLowerCase() as keyof typeof t.linkPreview.shortcutKeys] || t.linkPreview.shortcutKeys.alt}+${t.linkPreview.hoverText}`
                   },
                   { value: 'disabled', label: t.linkPreview.triggerMethods.disabled }
                 ]}
               />
 
-              {(linkPreviewSettings.triggerMethod === 'click' || linkPreviewSettings.triggerMethod === 'customHover') && (
-                <LabelSelect
-                  label={t.linkPreview.shortcutKeyLabel}
-                  value={linkPreviewSettings.customShortcut}
-                  onChange={(value) => setLinkPreviewSettings(prev => ({ ...prev, customShortcut: value }))}
-                  options={[
-                    { value: 'Alt', label: t.linkPreview.shortcutKeys.alt },
-                    { value: 'Ctrl', label: t.linkPreview.shortcutKeys.ctrl },
-                    { value: 'Shift', label: t.linkPreview.shortcutKeys.shift }
-                  ]}
-                />
-              )}
+              {(settings.linkPreviewSettings.triggerMethod === 'click' || settings.linkPreviewSettings.triggerMethod === 'customHover') && (
+                    <LabelSelect
+                      label={t.linkPreview.shortcutKeyLabel}
+                      value={settings.linkPreviewSettings.customShortcut}
+                      onChange={(value) => updateSetting('linkPreviewSettings', { customShortcut: value as 'Alt' | 'Ctrl' | 'Shift' })}
+                      options={[
+                        { value: 'Alt', label: t.linkPreview.shortcutKeys.alt },
+                        { value: 'Ctrl', label: t.linkPreview.shortcutKeys.ctrl },
+                        { value: 'Shift', label: t.linkPreview.shortcutKeys.shift }
+                      ]}
+                    />
+                  )}
 
-              {linkPreviewSettings.triggerMethod === 'hover' && (
-                <DelaySlider
-                  label={t.linkPreview.delayLabel}
-                  value={linkPreviewSettings.hoverDelay}
-                  onChange={(value) => setLinkPreviewSettings(prev => ({ ...prev, hoverDelay: value }))}
-                  min={100}
-                  max={3000}
-                  step={50}
-                  unit="ms"
-                />
-              )}
+              {settings.linkPreviewSettings.triggerMethod === 'hover' && (
+                 <DelaySlider
+                   label={t.linkPreview.delayLabel}
+                   value={settings.linkPreviewSettings.hoverDelay}
+                   onChange={(value) => updateSetting('linkPreviewSettings', { hoverDelay: value })}
+                   min={100}
+                   max={2000}
+                   step={50}
+                   unit="ms"
+                 />
+               )}
 
-              {linkPreviewSettings.triggerMethod === 'longPress' && (
-                <DelaySlider
-                  label={t.linkPreview.longPressDelayLabel}
-                  value={linkPreviewSettings.longPressDelay}
-                  onChange={(value) => setLinkPreviewSettings(prev => ({ ...prev, longPressDelay: value }))}
-                  min={200}
-                  max={3000}
-                  step={50}
-                  unit="ms"
-                />
-              )}
+               {settings.linkPreviewSettings.triggerMethod === 'longPress' && (
+                 <DelaySlider
+                   label={t.linkPreview.longPressDelayLabel}
+                   value={settings.linkPreviewSettings.longPressDelay}
+                   onChange={(value) => updateSetting('linkPreviewSettings', { longPressDelay: value })}
+                   min={200}
+                   max={3000}
+                   step={100}
+                   unit="ms"
+                 />
+               )}
 
-              {linkPreviewSettings.triggerMethod === 'customHover' && (
-                <DelaySlider
-                  label={t.linkPreview.delayLabel}
-                  value={linkPreviewSettings.hoverDelay}
-                  onChange={(value) => setLinkPreviewSettings(prev => ({ ...prev, hoverDelay: value }))}
-                  min={100}
-                  max={3000}
-                  step={50}
-                  unit="ms"
-                />
-              )}
+              {settings.linkPreviewSettings.triggerMethod === 'customHover' && (
+                 <DelaySlider
+                   label={t.linkPreview.delayLabel}
+                   value={settings.linkPreviewSettings.hoverDelay}
+                   onChange={(value) => updateSetting('linkPreviewSettings', { hoverDelay: value })}
+                   min={100}
+                   max={2000}
+                   step={50}
+                   unit="ms"
+                 />
+               )}
 
-              <div className="flex justify-between items-center">
-                <Label className="text-base font-semibold text-foreground">{t.linkPreview.sizeLabel}</Label>
-                <Select
-                  value={linkPreviewSettings.popupSize}
-                  onValueChange={(value) => setLinkPreviewSettings(prev => ({ ...prev, popupSize: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="lastSize">{t.linkPreview.popupSizes.lastSize}</SelectItem>
-                    <SelectItem value="default">{t.linkPreview.popupSizes.defaultSize}</SelectItem>
-                    <SelectItem value="adaptive">{t.linkPreview.popupSizes.contentAdaptive}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <LabelSelect
+                label={t.linkPreview.sizeLabel}
+                value={settings.linkPreviewSettings.popupSize}
+                onChange={(value) => updateSetting('linkPreviewSettings', { popupSize: value as 'lastSize' | 'default' | 'adaptive' })}
+                options={[
+                  { value: 'lastSize', label: t.linkPreview.popupSizes.lastSize },
+                  { value: 'default', label: t.linkPreview.popupSizes.defaultSize },
+                  { value: 'adaptive', label: t.linkPreview.popupSizes.contentAdaptive }
+                ]}
+              />
 
-              <div className="flex justify-between items-center">
-                <Label className="text-base font-semibold text-foreground">{t.linkPreview.positionLabel}</Label>
-                <Select
-                  value={linkPreviewSettings.popupPosition}
-                  onValueChange={(value) => setLinkPreviewSettings(prev => ({ ...prev, popupPosition: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="followMouse">{t.linkPreview.popupPositions.followMouse}</SelectItem>
-                    <SelectItem value="center">{t.linkPreview.popupPositions.center}</SelectItem>
-                    <SelectItem value="topRight">{t.linkPreview.popupPositions.topRight}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <LabelSelect
+                label={t.linkPreview.positionLabel}
+                value={settings.linkPreviewSettings.popupPosition}
+                onChange={(value) => updateSetting('linkPreviewSettings', { popupPosition: value as 'followMouse' | 'center' | 'topRight' })}
+                options={[
+                  { value: 'followMouse', label: t.linkPreview.popupPositions.followMouse },
+                  { value: 'center', label: t.linkPreview.popupPositions.center },
+                  { value: 'topRight', label: t.linkPreview.popupPositions.topRight }
+                ]}
+              />
 
-              <div className="space-y-4">
-                <Label className="text-base font-semibold text-foreground">{t.linkPreview.themeLabel}</Label>
-                <div className="grid grid-cols-3 gap-3">
-                  {['light', 'dark', 'blue', 'red', 'yellow', 'green'].map(theme => (
-                    <div
-                      key={theme}
-                      className={`flex flex-col items-center cursor-pointer p-3 rounded-xl border-2 transition-all duration-200 hover:shadow-lg hover:scale-105 ${
-                        linkPreviewSettings.popupTheme === theme 
-                          ? 'border-primary bg-primary/10 shadow-md ring-2 ring-primary/20' 
-                          : 'border-border hover:border-muted-foreground/30 bg-card hover:bg-accent/50'
-                      }`}
-                      onClick={() => setLinkPreviewSettings(prev => ({ ...prev, popupTheme: theme }))}
-                    >
-                      <div 
-                        className={`w-10 h-10 rounded-full mb-2.5 border-2 shadow-sm ${
-                          theme === 'light' ? 'bg-white border-gray-300 shadow-inner' :
-                          theme === 'dark' ? 'bg-gray-900 border-gray-700' :
-                          theme === 'blue' ? 'bg-blue-500 border-blue-600 shadow-blue-200/50' :
-                          theme === 'red' ? 'bg-red-500 border-red-600 shadow-red-200/50' :
-                          theme === 'yellow' ? 'bg-yellow-400 border-yellow-500 shadow-yellow-200/50' :
-                          'bg-green-500 border-green-600 shadow-green-200/50'
-                        }`}
-                      ></div>
-                      <span className="text-xs text-center font-medium text-foreground/90 leading-tight">
-                        {t.linkPreview.themes[theme as keyof typeof t.linkPreview.themes]}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+
 
               <DelaySlider
                 label={t.linkPreview.opacityLabel}
-                value={linkPreviewSettings.backgroundOpacity}
-                onChange={(value) => setLinkPreviewSettings(prev => ({ ...prev, backgroundOpacity: value }))}
+                value={settings.linkPreviewSettings.backgroundOpacity}
+                onChange={(value) => updateSetting('linkPreviewSettings', { backgroundOpacity: value })}
                 min={0}
                 max={100}
                 step={5}
@@ -354,17 +278,17 @@ function App() {
                 </p>
               </div>
               <Switch
-                checked={dragTextSettings.autoOpenLink}
-                onCheckedChange={(checked) => setDragTextSettings(prev => ({ ...prev, autoOpenLink: checked }))}
+                checked={settings.dragTextSettings.autoOpenLink}
+                onCheckedChange={(checked) => updateSetting('dragTextSettings', { autoOpenLink: checked })}
               />
             </div>
 
             <div className="space-y-6">
               <LabelSelect
                 label={t.dragText.searchEngineLabel}
-                value={dragTextSettings.searchEngine}
-                onChange={(value) => setDragTextSettings(prev => ({ ...prev, searchEngine: value }))}
-                disabled={!dragTextSettings.autoOpenLink}
+                value={settings.dragTextSettings.searchEngine}
+                onChange={(value) => updateSetting('dragTextSettings', { searchEngine: value as 'bing' | 'google' | 'baidu' | 'duckduckgo' })}
+                disabled={!settings.dragTextSettings.autoOpenLink}
                 options={[
                   { value: 'bing', label: t.dragText.searchEngines.bing },
                   { value: 'google', label: t.dragText.searchEngines.google },
@@ -380,16 +304,14 @@ function App() {
                 </p>
                 <div className="space-y-2">
                   <Textarea
-                    value={dragTextSettings.disabledSites}
+                    value={settings.dragTextSettings.disabledSites}
                     onChange={(e) => {
                       const value = e.target.value
-                      setDragTextSettings(prev => ({ ...prev, disabledSites: value }))
+                      updateSetting('dragTextSettings', { disabledSites: value })
                       
                       // 实时验证域名
                       if (value.trim()) {
-                        validateAllDomains(value)
-                      } else {
-                        setDomainValidation({ hasError: false, errorMessage: '', exceedsLimit: false })
+                        validateDomains(value)
                       }
                     }}
                     placeholder={t.dragText.disabledSitesPlaceholder}
@@ -406,17 +328,17 @@ function App() {
                   </p>
                   
                   {/* 域名数量提示 */}
-                  {dragTextSettings.disabledSites.trim() && (
+                  {settings.dragTextSettings.disabledSites.trim() && (
                     <p className={`text-xs ${
                       domainValidation.exceedsLimit ? 'text-red-500' : 'text-muted-foreground'
                     }`}>
                       {t.dragText.domainCountHint.replace('{count}', 
-                        dragTextSettings.disabledSites.split('\n').filter(line => line.trim()).length.toString()
+                        settings.dragTextSettings.disabledSites.split('\n').filter(line => line.trim()).length.toString()
                       )}
                     </p>
                   )}
                   
-                  {/* 错误提示 */}
+                  {/* 域名格式错误提示 */}
                   {domainValidation.hasError && (
                     <p className="text-xs text-red-500">
                       {domainValidation.errorMessage}
@@ -455,7 +377,11 @@ function App() {
                         key={option.value}
                         variant={isActive ? "default" : "outline"}
                         size="sm"
-                        onClick={() => setTheme(option.value)}
+                        onClick={() => {
+                          // 同时更新useTheme钩子和本地状态
+                          setTheme(option.value)
+                          updateSetting('themeSettings', { theme: option.value })
+                        }}
                         className="flex flex-col gap-1 h-auto py-3"
                       >
                         <Icon className="h-4 w-4" />
@@ -514,7 +440,11 @@ function App() {
                 description={t.other.languageDescription}
                 layout="complex"
                 value={language}
-                onChange={(value) => setLanguage(value as Language)}
+                onChange={(value) => {
+                  // 同时更新useTranslation钩子和本地状态
+                  setLanguage(value as Language)
+                  updateSetting('languageSettings', { language: value as 'zh-CN' | 'zh-TW' | 'en' | 'ja' | 'ko' | 'fr' | 'de' | 'ru' | 'it' | 'es' | 'pt' | 'ar' })
+                }}
                 options={[
                   { value: 'zh-CN', label: t.other.languages['zh-CN'] },
                   { value: 'zh-TW', label: t.other.languages['zh-TW'] },
