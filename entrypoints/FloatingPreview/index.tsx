@@ -5,7 +5,7 @@ import Content from './Content';
 import Footer from './Footer';
 import { ThemeStyles, FloatingPreviewSettings, FloatingPreviewProps } from '../../types/floating-preview';
 
-// 悬浮窗组件
+// 悬浮窗组件 - 使用TailwindCSS重写样式版本
 const FloatingPreview: React.FC<FloatingPreviewProps> = ({
   url,
   settings,
@@ -19,9 +19,9 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
     return { x: 0, y: 0 }
   });
   const [size, setSize] = useState({ width: settings.width, height: settings.height });
-  const [isPinned, setIsPinned] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [isResizing, setIsResizing] = useState(false);
+  const [isPinned, setIsPinned] = useState(false); // 是否固定窗口
+  const [isDragging, setIsDragging] = useState(false); // 是否正在拖拽
+  const [isResizing, setIsResizing] = useState(false); // 是否正在调整大小
   const [isFollowingMouse, setIsFollowingMouse] = useState(true); // 是否跟随鼠标
   
   // DOM引用
@@ -71,65 +71,29 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
     return position;
   };
 
-  // 获取主题样式
-  const getThemeStyles = () => {
-    const { theme } = settings
-    
-    const themes = {
-      light: {
-        backgroundColor: '#ffffff',
-        borderColor: '#e5e7eb',
-        textColor: '#374151',
-        headerBg: '#f9fafb',
-        border: 'border-gray-200',
-        bg: 'bg-white'
-      },
-      dark: {
-        backgroundColor: '#1f2937',
-        borderColor: '#374151',
-        textColor: '#f9fafb',
-        headerBg: '#111827',
-        border: 'border-gray-600',
-        bg: 'bg-gray-800'
-      },
-      blue: {
-        backgroundColor: '#dbeafe',
-        borderColor: '#3b82f6',
-        textColor: '#1e40af',
-        headerBg: '#bfdbfe',
-        border: 'border-blue-500',
-        bg: 'bg-blue-100'
-      },
-      red: {
-        backgroundColor: '#fecaca',
-        borderColor: '#ef4444',
-        textColor: '#dc2626',
-        headerBg: '#fca5a5',
-        border: 'border-red-500',
-        bg: 'bg-red-100'
-      },
-      yellow: {
-        backgroundColor: '#fef3c7',
-        borderColor: '#f59e0b',
-        textColor: '#d97706',
-        headerBg: '#fed7aa',
-        border: 'border-yellow-500',
-        bg: 'bg-yellow-100'
-      },
-      green: {
-        backgroundColor: '#d1fae5',
-        borderColor: '#10b981',
-        textColor: '#059669',
-        headerBg: '#a7f3d0',
-        border: 'border-green-500',
-        bg: 'bg-green-100'
-      }
+  // 根据主题获取样式类名
+  const getThemeStyles = (theme: 'light' | 'dark'): ThemeStyles => {
+    if (theme === 'dark') {
+      return {
+        backgroundColor: 'bg-gray-900',
+        borderColor: 'border-gray-700',
+        textColor: 'text-white',
+        headerBg: 'bg-gray-800',
+        border: 'border-gray-700',
+        bg: 'bg-gray-900'
+      };
     }
-    
-    return themes[theme] || themes.light
+    return {
+      backgroundColor: 'bg-white',
+      borderColor: 'border-gray-300',
+      textColor: 'text-gray-900',
+      headerBg: 'bg-gray-50',
+      border: 'border-gray-300',
+      bg: 'bg-white'
+    };
   };
   
-  const themeStyles = getThemeStyles();
+  const themeStyles = getThemeStyles(settings.theme);
   
   // 处理拖拽开始
   const handleDragStart = (e: React.MouseEvent) => {
@@ -143,20 +107,24 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
     };
   };
   
-  // 处理拖拽移动
+  // 处理拖拽移动 - 优化流畅性和跟手性
   const handleDragMove = (e: MouseEvent) => {
     if (!isDragging || !dragStartRef.current) return;
     
-    const newX = e.clientX - dragStartRef.current.x;
-    const newY = e.clientY - dragStartRef.current.y;
-    
-    // 限制在屏幕范围内
-    const maxX = window.innerWidth - size.width;
-    const maxY = window.innerHeight - size.height;
-    
-    setPosition({
-      x: Math.max(0, Math.min(newX, maxX)),
-      y: Math.max(0, Math.min(newY, maxY))
+    // 使用requestAnimationFrame确保流畅的动画
+    requestAnimationFrame(() => {
+      const newX = e.clientX - dragStartRef.current!.x;
+      const newY = e.clientY - dragStartRef.current!.y;
+      
+      // 限制在屏幕范围内，添加边界缓冲
+      const buffer = 10;
+      const maxX = window.innerWidth - size.width - buffer;
+      const maxY = window.innerHeight - size.height - buffer;
+      
+      setPosition({
+        x: Math.max(buffer, Math.min(newX, maxX)),
+        y: Math.max(buffer, Math.min(newY, maxY))
+      });
     });
   };
   
@@ -166,20 +134,23 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
     dragStartRef.current = null;
   };
   
-  // 处理尺寸变化
+  // 处理尺寸变化 - 优化响应性能
   const handleResize = (newSize: { width?: number; height?: number }, positionChange?: { x?: number; y?: number }) => {
-    setSize(prev => ({
-      width: newSize.width ?? prev.width,
-      height: newSize.height ?? prev.height
-    }));
-    
-    // 如果有位置变化，更新位置（仅用于左侧拖拽）
-    if (positionChange) {
-      setPosition(prev => ({
-        x: positionChange.x ?? prev.x,
-        y: positionChange.y ?? prev.y
+    // 使用requestAnimationFrame确保流畅的尺寸变化
+    requestAnimationFrame(() => {
+      setSize(prev => ({
+        width: newSize.width ?? prev.width,
+        height: newSize.height ?? prev.height
       }));
-    }
+      
+      // 如果有位置变化，同时更新位置
+      if (positionChange) {
+        setPosition(prev => ({
+          x: positionChange.x ?? prev.x,
+          y: positionChange.y ?? prev.y
+        }));
+      }
+    });
   };
   
   // 处理固定状态切换
@@ -242,11 +213,11 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
   
   const currentPosition = calculatePosition();
 
-  // 渲染悬浮窗
+  // 渲染悬浮窗 - 使用TailwindCSS类名和flex布局
   const floatingWindow = (
     <div
       ref={containerRef}
-      className={`fixed shadow-2xl rounded-lg overflow-hidden ${themeStyles.bg} ${themeStyles.border} border-2`}
+      className={`fixed shadow-2xl rounded-lg overflow-hidden z-[10000] ${themeStyles.backgroundColor} ${themeStyles.borderColor} border-2 transition-all duration-200 ease-in-out flex flex-col`}
       style={{
         width: size.width,
         height: size.height,
@@ -256,39 +227,49 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
         opacity: settings.opacity,
         pointerEvents: 'auto',
         zIndex: 999999,
-        transition: isFollowingMouse && !isDragging ? 'none' : 'all 0.2s ease-out' // 跟随鼠标时无过渡，拖拽时有过渡
+        // 优化过渡效果：拖拽时无过渡确保跟手性，其他时候使用平滑过渡
+        transition: isDragging ? 'none' : isFollowingMouse ? 'none' : 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
+        // 添加硬件加速
+        transform: 'translateZ(0)',
+        willChange: isDragging ? 'transform' : 'auto'
       }}
     >
-      {/* Header组件 */}
-      <Header
-          url={url}
-          isPinned={isPinned}
-          themeStyles={themeStyles}
-          onTogglePin={handleTogglePin}
-          onRefresh={handleRefresh}
-          onOpenInNewTab={handleOpenInNewTab}
-          onClose={onClose}
-          onDragStart={handleDragStart}
-        />
+      {/* Header组件 - 固定高度40px */}
+      <div className="flex-shrink-0">
+        <Header
+            url={url}
+            isPinned={isPinned}
+            themeStyles={themeStyles}
+            onTogglePin={handleTogglePin}
+            onRefresh={handleRefresh}
+            onOpenInNewTab={handleOpenInNewTab}
+            onClose={onClose}
+            onDragStart={handleDragStart}
+          />
+      </div>
       
-      {/* Content组件 */}
-      <Content
-          url={url}
-          width={size.width}
-          height={size.height - 40}
-          themeStyles={themeStyles}
-          currentPosition={currentPosition}
-          onWidthResize={handleResize}
-        />
+      {/* Content组件 - 占据剩余空间，减去Header(40px)和Footer(24px)的高度 */}
+      <div className="flex-1 overflow-hidden">
+        <Content
+            url={url}
+            width={size.width}
+            height={size.height - 64} // 减去Header(40px)和Footer(24px)的高度
+            themeStyles={themeStyles}
+            currentPosition={currentPosition}
+            onWidthResize={handleResize}
+          />
+      </div>
       
-      {/* Footer组件 */}
-      <Footer
-          width={size.width}
-          height={size.height}
-          themeStyles={themeStyles}
-          onHeightResize={handleResize}
-          onCornerResize={handleResize}
-        />
+      {/* Footer组件 - 固定高度24px */}
+      <div className="flex-shrink-0">
+        <Footer
+            width={size.width}
+            height={size.height}
+            themeStyles={themeStyles}
+            onHeightResize={handleResize}
+            onCornerResize={handleResize}
+          />
+      </div>
     </div>
   );
 

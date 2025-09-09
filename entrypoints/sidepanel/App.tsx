@@ -41,7 +41,7 @@ import {
 
 function App() {
   const config = useAppConfig()
-  const { appearance, system, ui, loading, updateAppearance, updateSystem, updateUI, resetSettings } = useSettings()
+  // 已废弃旧的useSettings hook，改用新的useSettingsManager
   const { t, language, setLanguage, isLoading: i18nLoading } = useTranslation()
   
   // 使用新的设置管理Hook
@@ -65,7 +65,7 @@ function App() {
   
   const { resolvedTheme, setTheme } = useTheme({
     theme: settings.themeSettings.theme,
-    onThemeChange: (theme) => {updateSetting('themeSettings', { theme }),updateAppearance({ theme })}
+    onThemeChange: (theme) => updateSetting('themeSettings', { theme })
   })
 
   // 同步语言设置
@@ -90,7 +90,7 @@ function App() {
     updateSetting('uiSettings', { activeTab: value as 'linkPreview' | 'dragText' | 'other' })
   }
 
-  if (loading || i18nLoading) {
+  if (settingsLoading || i18nLoading) {
     return (
       <div className="flex flex-col h-screen bg-background">
         <div className="flex-1 flex items-center justify-center">
@@ -371,7 +371,7 @@ function App() {
                 <div className="grid grid-cols-3 gap-2">
                   {themeOptions.map((option) => {
                     const Icon = option.icon
-                    const isActive = appearance.theme === option.value
+                    const isActive = settings.themeSettings.theme === option.value
                     return (
                       <Button
                         key={option.value}

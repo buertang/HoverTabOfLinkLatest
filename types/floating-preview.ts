@@ -51,7 +51,8 @@ export interface ContentProps {
   width: number;
   height: number;
   themeStyles: ThemeStyles;
-  onWidthResize: (newSize: { width?: number; height?: number }) => void;
+  currentPosition: { x: number; y: number };
+  onWidthResize: (newSize: { width?: number; height?: number }, positionChange?: { x?: number; y?: number }) => void;
 }
 
 // Footer组件的Props接口
