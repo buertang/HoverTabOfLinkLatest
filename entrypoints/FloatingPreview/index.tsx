@@ -750,6 +750,7 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
       {overlayElement}
       <div
         ref={containerRef}
+        id="floating-preview-window"
         className={`fixed overflow-hidden z-[10000] ${themeStyles.backgroundColor} ${themeStyles.borderColor} border-2 flex flex-col`}
         tabIndex={-1}
         style={{

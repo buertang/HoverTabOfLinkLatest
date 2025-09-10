@@ -264,15 +264,29 @@ export default defineContentScript({
     const closeFloatingPreview = () => {
       // 在关闭时记录最后的位置和尺寸
       try {
-        if (floatingPreview?.container) {
-          const rect = floatingPreview.container.getBoundingClientRect();
+        // 通过全局 id 获取真实浮窗元素（使用 portal 渲染到 document.body）
+        const targetEl = document.getElementById('floating-preview-window') as HTMLElement | null;
+        const rect = targetEl?.getBoundingClientRect();
+    
+        if (rect && rect.width > 0 && rect.height > 0) {
+          const vw = Math.max(0, window.innerWidth || 0);
+          const vh = Math.max(0, window.innerHeight || 0);
+          const margin = 16;
+          // 将位置约束到当前视口范围，避免极端值
+          const x = Math.round(Math.min(Math.max(margin, rect.left), Math.max(margin, vw - rect.width - margin)));
+          const y = Math.round(Math.min(Math.max(margin, rect.top), Math.max(margin, vh - rect.height - margin)));
+          const width = Math.round(rect.width);
+          const height = Math.round(rect.height);
+    
           browser.storage.local.set({
-            floatingPreviewLastPosition: { x: Math.round(rect.left), y: Math.round(rect.top) },
-            floatingPreviewLastSize: { width: Math.round(rect.width), height: Math.round(rect.height) },
+            floatingPreviewLastPosition: { x, y },
+            floatingPreviewLastSize: { width, height },
           });
+          console.log('floatingPreviewLastPosition', { x: Math.round(rect.left), y: Math.round(rect.top) },
+            'floatingPreviewLastSize', { width: Math.round(rect.width), height: Math.round(rect.height) },)
         }
       } catch {}
-
+    
       if (floatingPreview) {
         floatingPreview.root.unmount();
         document.body.removeChild(floatingPreview.container);
