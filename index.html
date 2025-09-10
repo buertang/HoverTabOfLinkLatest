@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HoverTabOfLink - 链接预览悬浮窗工具</title>
+    <meta name="description"
+        content="HoverTabOfLink是一款现代化的浏览器链接预览工具，支持Chrome/Edge/Firefox，提供流畅、高效、可高度自定义的悬浮窗口预览体验，帮助用户在不离开当前页面的情况下快速获取链接信息。">
+    <meta name="keywords" content="浏览器扩展,链接预览,悬浮窗,Chrome扩展,Firefox扩展,链接预览工具">
+    <link rel="icon" href="./public/icon/32.png" type="image/png">
+    <style>
+        /* 基础样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #5DADE2 0%, #3498DB 100%);
+            min-height: 100vh;
+        }
+
+        /* 容器样式 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 头部导航 */
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            margin-top: 80px;
+        }
+
+        /* 英雄区域 */
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        .hero .description {
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0.8;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
+        /* 按钮样式 */
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease 0.6s both;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-install {
+            background: #f8f9fa;
+            color: black;
+            border: 2px solid rgba(20, 22, 22, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #3498DB;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+        /* 内容区域 */
+        .content-section {
+            background: white;
+            margin: 2rem 0;
+            border-radius: 16px;
+            padding: 3rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 1s ease;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: #333;
+        }
+
+        /* 特性网格 */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .feature-card {
+            background: #ebf5fb;
+            border: 1px solid #aed6f1;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(52, 152, 219, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #3498DB;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2874a6;
+        }
+
+        .feature-card p {
+            color: #5499c7;
+            line-height: 1.6;
+        }
+
+        /* 安装步骤 */
+        .install-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .step {
+            background: linear-gradient(135deg, #5DADE2, #3498DB);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            background: rgba(255, 255, 255, 0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .step h3 {
+            margin-bottom: 1rem;
+        }
+
+        /* 技术栈 */
+        .tech-stack {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 3rem 0;
+        }
+
+        .tech-category {
+            margin-bottom: 2rem;
+        }
+
+        .tech-category h3 {
+            color: #3498DB;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .tech-items {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tech-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            background: #ebf5fb;
+            border: 1px solid #aed6f1;
+            border-radius: 25px;
+            font-weight: 600;
+            color: #2874a6;
+        }
+
+        .tech-icon {
+            font-size: 1.2rem;
+        }
+
+        .tech-name {
+            font-weight: 600;
+        }
+
+        /* 权限说明 */
+        .permissions {
+            background: #d6eaf8;
+            border: 1px solid #aed6f1;
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .permissions h3 {
+            color: #2874a6;
+            margin-bottom: 1rem;
+        }
+
+        .permissions ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .permissions li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #aed6f1;
+        }
+
+        .permissions li:last-child {
+            border-bottom: none;
+        }
+
+        .permissions strong {
+            color: #2874a6;
+        }
+
+        /* 隐私承诺 */
+        .privacy-promise {
+            background: #d6eaf8;
+            border: 1px solid #aed6f1;
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .privacy-promise h3 {
+            color: #2874a6;
+            margin-bottom: 1rem;
+        }
+
+        .privacy-promise p {
+            color: #2874a6;
+            font-size: 1.1rem;
+        }
+
+        /* 页脚 */
+        .footer {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            text-align: center;
+            padding: 3rem 0;
+            margin-top: 4rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            opacity: 0.8;
+        }
+
+        /* 动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.2rem;
+            }
+
+            .content-section {
+                padding: 2rem 1rem;
+                margin: 1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .btn-group {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 10px;
+            }
+
+            .hero {
+                padding: 2rem 0;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .features-grid,
+            .install-steps {
+                grid-template-columns: 1fr;
+            }
+
+            .tech-stack {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 头部导航 -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <a href="#" class="logo">
+                    <img src="./public/icon/32.png" alt="HoverTabOfLink Logo">
+                    HoverTabOfLink
+                </a>
+                <ul class="nav-links">
+                    <li><a href="#features">功能特性</a></li>
+                    <li><a href="#install">安装使用</a></li>
+                    <!-- <li><a href="#tech">技术栈</a></li> -->
+                    <li><a href="#download">下载</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 英雄区域 -->
+        <section class="hero">
+            <div class="container">
+                <h1>HoverTabOfLink</h1>
+                <p class="subtitle">链接预览悬浮窗工具</p>
+                <p class="description">
+                    一款现代化的浏览器链接预览工具，支持 Chrome/Edge/Firefox，采用 Manifest V3 标准。
+                    提供流畅、高效、可高度自定义的悬浮窗口预览体验，帮助用户在不离开当前页面的情况下快速获取链接信息。
+                </p>
+                <div class="btn-group">
+                    <a href="#install" class="btn btn-primary">
+                        🚀 立即安装
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <div class="container">
+            <!-- 功能特性 -->
+            <section id="features" class="content-section">
+                <h2 class="section-title">🚀 核心特性</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <h3>链接预览</h3>
+                        <p>通过预设的触发方式（如悬停、拖拽链接等），在当前页面上打开悬浮窗口，快速预览链接内容。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🖱️</div>
+                        <h3>多种触发方式</h3>
+                        <p>支持拖动链接、鼠标悬停、Alt+鼠标左键点击等多种触发方式，满足不同用户的使用习惯。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎛️</div>
+                        <h3>高度自定义</h3>
+                        <p>可调整悬浮窗大小、位置、背景遮罩透明度等，提供个性化的预览体验。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📐</div>
+                        <h3>灵活调整</h3>
+                        <p>悬浮窗支持拖拽移动和调整大小，可固定在屏幕任意位置，方便对比查看内容。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌐</div>
+                        <h3>多浏览器支持</h3>
+                        <p>完美支持 Chrome、Edge 等主流基于 Chromium 的浏览器，一次开发，处处可用。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚙️</div>
+                        <h3>现代化架构</h3>
+                        <p>基于 Manifest V3 标准，使用 TypeScript 和 React 开发，代码质量有保障。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 安装使用 -->
+            <section id="install" class="content-section">
+                <h2 class="section-title">🛠️ 安装使用</h2>
+
+                <h3 style="text-align: center; margin-bottom: 2rem; color: #3498DB;">Chrome/Edge 安装步骤</h3>
+                <div class="install-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>下载扩展</h3>
+                            <p>从 Chrome 应用商店搜索并安装 HoverTabOfLink 扩展。</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>开始使用</h3>
+                            <p>安装完成后，在任意网页上尝试拖动链接或悬停，即可看到悬浮预览窗口。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 权限说明 -->
+                <!-- <div class="permissions">
+                    <h3>🔐 权限说明</h3>
+                    <p style="margin-bottom: 1rem;">本扩展需要以下权限来提供完整功能：</p>
+                    <ul>
+                        <li><strong>activeTab</strong>: 获取当前活动标签页信息，用于识别链接和显示预览</li>
+                        <li><strong>storage</strong>: 保存用户设置和偏好，如悬浮窗大小、透明度等</li>
+                        <li><strong>&lt;all_urls&gt;</strong>: 允许在所有网站上显示悬浮预览窗口</li>
+                    </ul>
+                </div> -->
+
+                <!-- 隐私承诺 -->
+                <div class="privacy-promise">
+                    <h3>🔒 隐私承诺</h3>
+                    <p>HoverTabOfLink
+                        承诺保护用户隐私安全。所有数据完全在本地处理，不会上传到任何服务器。我们不会收集、存储或传输您的任何个人信息，包括浏览历史、点击行为等。扩展的所有功能均在浏览器本地完成，确保您的隐私安全。
+                    </p>
+                </div>
+            </section>
+
+            <!-- 技术栈 -->
+            <!-- <section id="tech" class="content-section">
+                <h2 class="section-title">🏗️ 技术栈</h2>
+                <div class="tech-stack">
+                    <div class="tech-category">
+                        <h3>核心框架</h3>
+                        <div class="tech-items">
+                            <div class="tech-item">
+                                <div class="tech-icon">⚙️</div>
+                                <div class="tech-name">WXT</div>
+                            </div>
+                            <div class="tech-item">
+                                <div class="tech-icon">⚛️</div>
+                                <div class="tech-name">React</div>
+                            </div>
+                            <div class="tech-item">
+                                <div class="tech-icon">📝</div>
+                                <div class="tech-name">TypeScript</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tech-category">
+                        <h3>样式与UI</h3>
+                        <div class="tech-items">
+                            <div class="tech-item">
+                                <div class="tech-icon">🎨</div>
+                                <div class="tech-name">Tailwind CSS</div>
+                            </div>
+                            <div class="tech-item">
+                                <div class="tech-icon">🧩</div>
+                                <div class="tech-name">Headless UI</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tech-category">
+                        <h3>开发工具</h3>
+                        <div class="tech-items">
+                            <div class="tech-item">
+                                <div class="tech-icon">📦</div>
+                                <div class="tech-name">pnpm</div>
+                            </div>
+                            <div class="tech-item">
+                                <div class="tech-icon">🔧</div>
+                                <div class="tech-name">ESLint</div>
+                            </div>
+                            <div class="tech-item">
+                                <div class="tech-icon">🧪</div>
+                                <div class="tech-name">Vitest</div>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+
+            <!-- <h3 style="text-align: center; margin: 3rem 0 2rem; color: #667eea;">📋 环境要求</h3>
+                <div style="background: #f8f9fa; padding: 2rem; border-radius: 12px; text-align: center;">
+                    <p><strong>Node.js:</strong> 18+ (推荐 23.8.0+)</p>
+                    <p><strong>包管理器:</strong> pnpm 8+ 或 npm</p>
+                    <p><strong>浏览器支持:</strong></p>
+                    <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                        <li>• Chrome 88+</li>
+                        <li>• Microsoft Edge 88+</li>
+                        <li>• Firefox 109+</li>
+                    </ul>
+                </div> -->
+            </section>
+
+            <!-- 下载区域 -->
+            <section id="download" class="content-section">
+                <h2 class="section-title">📥 下载安装</h2>
+                <div style="text-align: center;">
+                    <p style="font-size: 1.2rem; margin-bottom: 2rem; color: #666;">
+                        获取最新版本的 HoverTabOfLink，体验高效的链接预览功能。目前提供开发版本，支持 Chrome、Edge 等主流基于 Chromium 的浏览器。
+                    </p>
+                    <div class="btn-group">
+                        <a href="https://chrome.google.com/webstore/search/HoverTabOfLink"
+                            class="btn btn-primary btn-install" target="_blank">
+                            🌐 Chrome 应用商店
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 HoverTabOfLink. | <a
+                    href="https://www.termsfeed.com/live/31c973c6-0558-4dca-a3c0-0cb6e5369d1a" target="_blank"
+                    style="color: inherit; text-decoration: none; opacity: 0.8;">隐私政策</a></p>
+            <!-- <p style="margin-top: 1rem; opacity: 0.8;">
+                如果这个项目对您有帮助，请给个 ⭐ Star 支持一下！
+            </p> -->
+        </div>
+    </footer>
+
+    <script>
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 滚动时头部样式变化
+        window.addEventListener('scroll', function () {
+            const header = document.querySelector('.header');
+            const logo = document.querySelector('.logo');
+            const navLinks = document.querySelectorAll('.nav-links a');
+
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.color = '#333';
+                logo.style.color = '#333';
+                navLinks.forEach(link => {
+                    link.style.color = '#333';
+                });
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.1)';
+                header.style.color = 'white';
+                logo.style.color = 'white';
+                navLinks.forEach(link => {
+                    link.style.color = 'white';
+                });
+            }
+        });
+
+        // 动画观察器
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function (entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.8s ease forwards';
+                }
+            });
+        }, observerOptions);
+
+        // 观察所有需要动画的元素
+        document.querySelectorAll('.content-section, .feature-card, .step').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+
+</html>

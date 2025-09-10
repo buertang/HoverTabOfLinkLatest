@@ -70,6 +70,46 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
   const activePointerIdRef = useRef<number | null>(null);
   const pointerCaptureElRef = useRef<HTMLElement | null>(null);
 
+  // 首次定位：根据设置的固定位置（非跟随鼠标）设置初始 left/top，保持与系统设置一致
+  const initialPositionAppliedRef = useRef(false);
+  useEffect(() => {
+    if (initialPositionAppliedRef.current) return;
+    const pos = settings.position;
+    // 如果是固定位置（center/top-right/top-left/bottom-right/bottom-left），则不跟随鼠标
+    if (pos === 'center' || pos === 'top-right' || pos === 'top-left' || pos === 'bottom-right' || pos === 'bottom-left') {
+      const margin = 16; // 边距
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      let x = 0;
+      let y = 0;
+      if (pos === 'center') {
+        x = Math.max((vw - size.width) / 2, margin);
+        y = Math.max((vh - size.height) / 2, margin);
+      } else if (pos === 'top-right') {
+        x = Math.max(vw - size.width - margin, margin);
+        y = margin;
+      } else if (pos === 'top-left') {
+        x = margin;
+        y = margin;
+      } else if (pos === 'bottom-right') {
+        x = Math.max(vw - size.width - margin, margin);
+        y = Math.max(vh - size.height - margin, margin);
+      } else if (pos === 'bottom-left') {
+        x = margin;
+        y = Math.max(vh - size.height - margin, margin);
+      }
+      // 同步到DOM与状态
+      setIsFollowingMouse(false);
+      updatePosition(x, y);
+      setPosition({ x, y });
+      initialPositionAppliedRef.current = true;
+    } else {
+      // 默认跟随鼠标
+      setIsFollowingMouse(true);
+      initialPositionAppliedRef.current = true;
+    }
+  }, [settings.position, size.width, size.height]); // 移除 updatePosition 依赖，因为它是通过 useCallback 创建的稳定引用
+
   // 计算弹窗位置（跟随鼠标或拖拽位置）- 使用useCallback稳定引用
   const calculatePosition = useCallback(() => {
     if (!isFollowingMouse || isDragging) {
@@ -334,6 +374,13 @@ const startResize = useCallback((edge: 'bottom-left' | 'bottom-right') => (e: Re
 
     // 清理状态
     resizeStartRef.current = null;
+
+    // 持久化最新尺寸到本地存储，供下次打开使用
+    try {
+      browser.storage.local.set({
+        floatingPreviewLastSize: { width: size.width, height: size.height }
+      });
+    } catch {}
   };
 
   document.addEventListener('pointermove', onMove as any, { passive: true });
@@ -539,7 +586,8 @@ const startResize = useCallback((edge: 'bottom-left' | 'bottom-right') => (e: Re
       className="fixed inset-0 pointer-events-none"
       style={{
         zIndex: 999998, // 小于悬浮窗的z-index
-        backgroundColor: `rgba(0, 0, 0, ${settings.backgroundOpacity / 100})`, // 根据设置调整透明度
+        // 修复：设置值为背景不透明度，0%应完全透明 => 透明度=背景不透明度/100 的相反数
+        backgroundColor: `rgba(0, 0, 0, ${(100 - settings.backgroundOpacity) / 100})`,
         // 拖拽/缩放时移除blur效果，避免GPU合成压力
         backdropFilter: (isDragging || isResizing) ? 'none' : 'blur(8px)',
         WebkitBackdropFilter: (isDragging || isResizing) ? 'none' : 'blur(8px)',
