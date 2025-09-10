@@ -100,6 +100,7 @@ export default defineContentScript({
         width: 800,
         height: 600,
         opacity: 1,
+        backgroundOpacity: settings?.backgroundOpacity || 80, // 传递背景遮罩透明度
         dragToTrigger: settings?.triggerMethod === 'drag',
         showOnHover: settings?.triggerMethod === 'hover',
         hoverDelay: settings?.hoverDelay || 100,

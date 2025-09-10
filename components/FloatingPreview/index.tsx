@@ -277,8 +277,6 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
           width={size.width}
           height={size.height - 40}
           themeStyles={themeStyles}
-          currentPosition={currentPosition}
-          onWidthResize={handleResize}
         />
       
       {/* Footer组件 */}

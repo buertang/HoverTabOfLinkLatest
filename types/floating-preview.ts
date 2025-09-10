@@ -17,6 +17,7 @@ export interface FloatingPreviewSettings {
   position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
   width: number;
   height: number;
+  backgroundOpacity: number; // 背景遮罩透明度：0-100
   opacity: number;
   dragToTrigger: boolean;
   showOnHover: boolean;
@@ -51,8 +52,6 @@ export interface ContentProps {
   width: number;
   height: number;
   themeStyles: ThemeStyles;
-  currentPosition: { x: number; y: number };
-  onWidthResize: (newSize: { width?: number; height?: number }, positionChange?: { x?: number; y?: number }) => void;
 }
 
 // Footer组件的Props接口
