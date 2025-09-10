@@ -44,6 +44,8 @@ export interface HeaderProps {
   onOpenInNewTab: () => void;
   onClose: () => void;
   onDragStart: (e: React.MouseEvent) => void;
+  // 新增：当按钮区域或布局变化时，回传建议的最小窗口宽度（像素）
+  onHeaderMinWidthChange?: (minWidth: number) => void;
 }
 
 // Content组件的Props接口
