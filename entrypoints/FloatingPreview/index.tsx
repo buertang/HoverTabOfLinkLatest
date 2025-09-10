@@ -115,11 +115,12 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
   // 根据主题选择更合适的手柄颜色（浅色用天蓝，深色用青色），并复用
   const handleColor = useMemo(() => (settings.theme === 'dark' ? '#22d3ee' : '#38bdf8'), [settings.theme]);
   
-  // 高性能位置更新函数 - 直接操作DOM transform，避免React重渲染
-  const updateTransformPosition = useCallback((x: number, y: number) => {
+  // 高性能位置更新函数 - 直接操作DOM left/top，避免React重渲染
+  const updatePosition = useCallback((x: number, y: number) => {
     if (containerRef.current) {
-      // 使用transform: translate3d实现硬件加速的位置更新
-      containerRef.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      // 直接设置left和top属性，避免transform导致的抖动
+      containerRef.current.style.left = `${x}px`;
+      containerRef.current.style.top = `${y}px`;
       currentTransformRef.current = { x, y };
     }
   }, []);
@@ -241,7 +242,7 @@ const startResize = useCallback((edge: 'bottom-left' | 'bottom-right') => (e: Re
 
     switch (resizeStartRef.current.edge) {
       case 'bottom-left': {
-        // 左下角：以“右上角”为锚点，保持右缘与上缘固定
+        // 左下角：以"右上角"为锚点，保持右缘与上缘固定
         const startRight = resizeStartRef.current.startX + resizeStartRef.current.startWidth; // 固定的右缘
         // 向右拖动(dx>0) => 变窄；向左拖动(dx<0) => 变宽
         const widthRaw = resizeStartRef.current.startWidth - dx;
@@ -261,11 +262,36 @@ const startResize = useCallback((edge: 'bottom-left' | 'bottom-right') => (e: Re
 
     // 使用RAF进行节流：仅当当前未排队时入队，避免频繁cancel造成的抖动
     if (!resizeRafRef.current) {
+      // 捕获当前帧的计算结果
+      const capturedWidth = newWidth;
+      const capturedHeight = newHeight;
+      const capturedX = newX;
+      const capturedY = newY;
+      
       resizeRafRef.current = requestAnimationFrame(() => {
-        const positionChange = (resizeStartRef.current && resizeStartRef.current.edge === 'bottom-left')
-          ? { x: newX, y: newY }
-          : undefined;
-        handleResizeRef.current?.({ width: newWidth, height: newHeight }, positionChange);
+        if (!resizeStartRef.current) return;
+        
+        // 原子性更新：先更新DOM位置和尺寸，再更新React state
+        if (resizeStartRef.current.edge === 'bottom-left') {
+          // 同时更新位置和尺寸，避免分步更新导致的重排
+          if (containerRef.current) {
+            containerRef.current.style.left = `${capturedX}px`;
+            containerRef.current.style.top = `${capturedY}px`;
+            containerRef.current.style.width = `${capturedWidth}px`;
+            containerRef.current.style.height = `${capturedHeight}px`;
+            currentTransformRef.current = { x: capturedX, y: capturedY };
+          }
+        } else {
+          // 非左下角拖拽只更新尺寸
+          if (containerRef.current) {
+            containerRef.current.style.width = `${capturedWidth}px`;
+            containerRef.current.style.height = `${capturedHeight}px`;
+          }
+        }
+        
+        // 最后同步React state，确保一致性
+        setSize({ width: capturedWidth, height: capturedHeight });
+        
         resizeRafRef.current = null; // 释放队列占用
       });
     }
@@ -327,10 +353,10 @@ const startResize = useCallback((edge: 'bottom-left' | 'bottom-right') => (e: Re
     if (positionChange) {
       const newX = positionChange.x ?? currentTransformRef.current.x;
       const newY = positionChange.y ?? currentTransformRef.current.y;
-      updateTransformPosition(newX, newY);
+      updatePosition(newX, newY);
       setPosition({ x: newX, y: newY });
     }
-  }, [updateTransformPosition]);
+  }, [updatePosition]);
 
   // 将最新的 handleResize 保存在 ref 中，供缩放逻辑安全调用
   useEffect(() => {
@@ -388,7 +414,7 @@ const startResize = useCallback((edge: 'bottom-left' | 'bottom-right') => (e: Re
             const newY = e.clientY - dragStartRef.current.y;
             
             // 直接更新transform，不触发React重渲染
-            updateTransformPosition(newX, newY);
+            updatePosition(newX, newY);
           }
         });
       };
@@ -414,7 +440,7 @@ const startResize = useCallback((edge: 'bottom-left' | 'bottom-right') => (e: Re
         }
       };
     }
-  }, [isDragging, updateTransformPosition, handleDragEnd]);
+  }, [isDragging, updatePosition, handleDragEnd]);
   
   // 清理资源
   useEffect(() => {
@@ -447,9 +473,9 @@ const startResize = useCallback((edge: 'bottom-left' | 'bottom-right') => (e: Re
   // 初始化transform位置
   useEffect(() => {
     if (!isDragging && (currentTransformRef.current.x !== currentPosition.x || currentTransformRef.current.y !== currentPosition.y)) {
-      updateTransformPosition(currentPosition.x, currentPosition.y);
-    }
-  }, [currentPosition, isDragging, updateTransformPosition]);
+      updatePosition(currentPosition.x, currentPosition.y);
+  }
+}, [currentPosition, isDragging, updatePosition]);
 
   // 处理鼠标进入悬浮窗 - 添加防抖机制
   const handleMouseEnter = useCallback(() => {
@@ -536,10 +562,9 @@ const startResize = useCallback((edge: 'bottom-left' | 'bottom-right') => (e: Re
            height: size.height,
            minWidth: Math.max(MIN_WIDTH, headerMinWidth),
            minHeight: MIN_HEIGHT,
-           // 使用transform定位，初始位置为(0,0)，实际位置由transform控制
-           top: 0,
-           left: 0,
-           transform: `translate3d(${currentPosition.x}px, ${currentPosition.y}px, 0)`,
+           // 直接使用left/top定位，避免transform导致的抖动
+           top: currentPosition.y,
+           left: currentPosition.x,
            cursor: isDragging ? 'grabbing' : 'default',
            opacity: settings.opacity,
            pointerEvents: 'auto',
@@ -549,8 +574,8 @@ const startResize = useCallback((edge: 'bottom-left' | 'bottom-right') => (e: Re
            borderRadius: '0.5rem',
            // 优化过渡效果：拖拽或缩放时完全禁用过渡
            transition: (isDragging || isResizing) ? 'none' : 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
-           // 硬件加速优化：拖拽时transform，缩放时width/height/transform
-           willChange: isDragging ? 'transform' : (isResizing ? 'width, height, transform' : 'auto'),
+           // 硬件加速优化：拖拽时left/top，缩放时width/height/left/top
+           willChange: isDragging ? 'left, top' : (isResizing ? 'width, height, left, top' : 'auto'),
            // 合成层隔离，降低布局影响面
            contain: 'layout paint size',
            // 强制创建合成层
