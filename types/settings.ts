@@ -3,13 +3,13 @@
 
 // 链接预览设置接口
 export interface LinkPreviewSettings {
-  // 触发方式：拖动链接、鼠标悬停、长按链接、Alt+鼠标左键点击、Alt+悬停、禁用
+  // 触发方式：拖动链接、鼠标悬停、长按链接、修饰键+鼠标左键点击、修饰键+悬停、禁用
   triggerMethod: 'drag' | 'hover' | 'longPress' | 'click' | 'customHover' | 'disabled'
-  // 自定义快捷键：Alt、Ctrl、Shift
-  customShortcut: 'Alt' | 'Ctrl' | 'Shift'
-  // 悬停延迟时间（毫秒）：100ms - 3000ms
+  // 自定义快捷键：Alt（Windows）、Cmd（macOS）、Shift（通用）
+  customShortcut: 'Alt' | 'Cmd' | 'Shift'
+  // 悬停延迟时间（秒）：0.1s - 3s
   hoverDelay: number
-  // 长按延迟时间（毫秒）：200ms - 3000ms
+  // 长按延迟时间（秒）：0.2s - 3s
   longPressDelay: number
   // 弹窗大小：上次大小、默认大小、内容自适应
   popupSize: 'lastSize' | 'default' | 'adaptive'
@@ -76,16 +76,33 @@ export type SettingsChangeEvent<T extends SettingsStorageKey> = {
   newValue: AppSettings[T]
 }
 
+// 获取平台默认修饰键的函数（延迟导入避免循环依赖）
+const getDefaultShortcut = (): 'Alt' | 'Cmd' | 'Shift' => {
+  // 在浏览器环境中检测平台
+  if (typeof navigator !== 'undefined') {
+    const userAgent = navigator.userAgent.toLowerCase()
+    const platform = navigator.platform?.toLowerCase() || ''
+    
+    if (platform.includes('mac') || userAgent.includes('mac os')) {
+      return 'Cmd'
+    }
+    if (platform.includes('win') || userAgent.includes('windows')) {
+      return 'Alt'
+    }
+  }
+  return 'Alt' // 默认值
+}
+
 // 默认设置配置
 export const DEFAULT_SETTINGS: AppSettings = {
   linkPreviewSettings: {
     triggerMethod: 'drag',
-    customShortcut: 'Alt',
-    hoverDelay: 100,
-    longPressDelay: 500,
+    customShortcut: getDefaultShortcut(),
+    hoverDelay: 0.2,
+    longPressDelay: 0.5,
     popupSize: 'lastSize',
     popupPosition: 'followMouse',
-    backgroundOpacity: 50
+    backgroundOpacity: 60
   },
   dragTextSettings: {
     searchEngine: 'bing',
@@ -121,8 +138,8 @@ export interface SettingsValidators {
 // 设置验证器实现
 export const SETTINGS_VALIDATORS: SettingsValidators = {
   linkPreviewSettings: {
-    hoverDelay: (value: number) => value >= 100 && value <= 3000,
-    longPressDelay: (value: number) => value >= 200 && value <= 3000,
+    hoverDelay: (value: number) => value >= 0.1 && value <= 3,
+    longPressDelay: (value: number) => value >= 0.2 && value <= 3,
     backgroundOpacity: (value: number) => value >= 0 && value <= 100
   },
   dragTextSettings: {

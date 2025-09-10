@@ -62,7 +62,7 @@ export default defineContentScript({
       try {
         const result = await browser.storage.local.get(['linkPreviewSettings', 'themeSettings', 'floatingPreviewLastSize']);
 
-        const linkPreviewSettings: LinkPreviewSettings = result.linkPreviewSettings || {
+        const rawLinkPreviewSettings: LinkPreviewSettings = result.linkPreviewSettings || {
           triggerMethod: 'drag',
           customShortcut: 'Alt',
           hoverDelay: 100,
@@ -70,6 +70,12 @@ export default defineContentScript({
           popupSize: 'default',
           popupPosition: 'followMouse',
           backgroundOpacity: 50
+        };
+
+        // 兼容旧版本：将历史值 altClick 归一为 click，避免无法触发
+        const linkPreviewSettings: LinkPreviewSettings = {
+          ...rawLinkPreviewSettings,
+          triggerMethod: (rawLinkPreviewSettings as any).triggerMethod === 'altClick' ? 'click' : rawLinkPreviewSettings.triggerMethod
         };
 
         // 读取上次窗口尺寸（如果有）
@@ -284,7 +290,7 @@ export default defineContentScript({
       if (!settings) return false;
       const mod = settings.customShortcut;
       if (mod === 'Alt') return (e as MouseEvent).altKey || (e as KeyboardEvent).altKey;
-      if (mod === 'Ctrl') return (e as MouseEvent).ctrlKey || (e as KeyboardEvent).ctrlKey;
+      if (mod === 'Cmd') return (e as MouseEvent).metaKey || (e as KeyboardEvent).metaKey;
       if (mod === 'Shift') return (e as MouseEvent).shiftKey || (e as KeyboardEvent).shiftKey;
       return false;
     };
@@ -296,7 +302,6 @@ export default defineContentScript({
         try { event.preventDefault(); event.stopPropagation(); } catch {}
         return;
       }
-
       if (!settings || settings.triggerMethod !== 'click') return;
       if (event.button !== 0) return; // 仅左键
       const target = event.target as HTMLElement;
@@ -306,7 +311,7 @@ export default defineContentScript({
       if (!href || !(href.startsWith('http://') || href.startsWith('https://'))) return;
       // 需要修饰键
       if (!checkModifier(event)) return;
-      try { event.preventDefault(); event.stopPropagation(); } catch {}
+      try { event.preventDefault(); event.stopPropagation(); } catch { }
       createFloatingPreview(href, event.clientX, event.clientY);
     };
 
@@ -314,7 +319,7 @@ export default defineContentScript({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!settings) return;
       const mod = settings.customShortcut;
-      if ((mod === 'Alt' && e.altKey) || (mod === 'Ctrl' && e.ctrlKey) || (mod === 'Shift' && e.shiftKey)) {
+      if ((mod === 'Alt' && e.altKey) || (mod === 'Cmd' && e.metaKey) || (mod === 'Shift' && e.shiftKey)) {
         modifierActive = true;
       }
     };
@@ -324,7 +329,7 @@ export default defineContentScript({
       const mod = settings.customShortcut;
       // 松开目标修饰键或失去任何修饰键都置为false
       if (mod === 'Alt' && !e.altKey) modifierActive = false;
-      if (mod === 'Ctrl' && !e.ctrlKey) modifierActive = false;
+      if (mod === 'Cmd' && !e.metaKey) modifierActive = false;
       if (mod === 'Shift' && !e.shiftKey) modifierActive = false;
     };
 

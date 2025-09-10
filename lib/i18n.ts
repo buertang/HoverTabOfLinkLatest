@@ -38,7 +38,7 @@ export interface Translations {
     shortcutKeyLabel: string;
     shortcutKeys: {
       alt: string;
-      ctrl: string;
+      cmd: string;
       shift: string;
     };
     clickText: string;
@@ -187,7 +187,7 @@ export const translations: Record<Language, Translations> = {
       shortcutKeyLabel: '快捷键',
       shortcutKeys: {
         alt: 'Alt',
-        ctrl: 'Ctrl',
+        cmd: 'Cmd',
         shift: 'Shift'
       },
       clickText: '点击',
@@ -332,7 +332,7 @@ export const translations: Record<Language, Translations> = {
       shortcutKeyLabel: '快捷鍵',
       shortcutKeys: {
         alt: 'Alt',
-        ctrl: 'Ctrl',
+        cmd: 'Cmd',
         shift: 'Shift'
       },
       clickText: '點擊',
@@ -477,7 +477,7 @@ export const translations: Record<Language, Translations> = {
       shortcutKeyLabel: 'Shortcut Key',
       shortcutKeys: {
         alt: 'Alt',
-        ctrl: 'Ctrl',
+        cmd: 'Cmd',
         shift: 'Shift'
       },
       clickText: 'Click',
@@ -622,7 +622,7 @@ export const translations: Record<Language, Translations> = {
       shortcutKeyLabel: 'ショートカットキー',
       shortcutKeys: {
         alt: 'Alt',
-        ctrl: 'Ctrl',
+        cmd: 'Cmd',
         shift: 'Shift'
       },
       clickText: 'クリック',
@@ -767,7 +767,7 @@ export const translations: Record<Language, Translations> = {
       shortcutKeyLabel: '단축키',
       shortcutKeys: {
         alt: 'Alt',
-        ctrl: 'Ctrl',
+        cmd: 'Cmd',
         shift: 'Shift'
       },
       clickText: '클릭',
@@ -912,7 +912,7 @@ export const translations: Record<Language, Translations> = {
       shortcutKeyLabel: 'Touche de raccourci',
       shortcutKeys: {
         alt: 'Alt',
-        ctrl: 'Ctrl',
+        cmd: 'Cmd',
         shift: 'Shift'
       },
       clickText: 'Clic',
@@ -1057,7 +1057,7 @@ export const translations: Record<Language, Translations> = {
       shortcutKeyLabel: 'Tastenkürzel',
       shortcutKeys: {
         alt: 'Alt',
-        ctrl: 'Strg',
+        cmd: 'Cmd',
         shift: 'Umschalt'
       },
       clickText: 'Klick',
@@ -1202,7 +1202,7 @@ export const translations: Record<Language, Translations> = {
       shortcutKeyLabel: 'Горячая клавиша',
       shortcutKeys: {
         alt: 'Alt',
-        ctrl: 'Ctrl',
+        cmd: 'Cmd',
         shift: 'Shift'
       },
       clickText: 'Клик',
@@ -1347,7 +1347,7 @@ export const translations: Record<Language, Translations> = {
       shortcutKeyLabel: 'Tasto di scelta rapida',
       shortcutKeys: {
         alt: 'Alt',
-        ctrl: 'Ctrl',
+        cmd: 'Cmd',
         shift: 'Shift'
       },
       clickText: 'Clic',
@@ -1492,7 +1492,7 @@ export const translations: Record<Language, Translations> = {
        shortcutKeyLabel: 'Tecla de acceso directo',
        shortcutKeys: {
          alt: 'Alt',
-         ctrl: 'Ctrl',
+         cmd: 'Cmd',
          shift: 'Shift'
        },
        clickText: 'Clic',
@@ -1637,7 +1637,7 @@ export const translations: Record<Language, Translations> = {
        shortcutKeyLabel: 'Tecla de atalho',
        shortcutKeys: {
          alt: 'Alt',
-         ctrl: 'Ctrl',
+         cmd: 'Cmd',
          shift: 'Shift'
        },
        clickText: 'Clique',
@@ -1782,7 +1782,7 @@ export const translations: Record<Language, Translations> = {
        shortcutKeyLabel: 'مفتاح الاختصار',
        shortcutKeys: {
          alt: 'Alt',
-         ctrl: 'Ctrl',
+         cmd: 'Cmd',
          shift: 'Shift'
        },
        clickText: 'نقر',

@@ -1,15 +1,15 @@
-import React from 'react'
-import { Label } from '@/components/ui/label'
-import { Slider } from '@/components/ui/slider'
+import React from "react";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 
 interface DelaySliderProps {
-  label: string
-  value: number
-  onChange: (value: number) => void
-  min: number
-  max: number
-  step?: number
-  unit?: string
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+  min: number;
+  max: number;
+  step?: number;
+  unit?: string;
 }
 
 export function DelaySlider({
@@ -19,14 +19,17 @@ export function DelaySlider({
   min,
   max,
   step = 50,
-  unit = 'ms'
+  unit = "ms",
 }: DelaySliderProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <Label className="text-base font-semibold text-foreground">{label}</Label>
+        <Label className="text-base font-semibold text-foreground">
+          {label}
+        </Label>
         <span className="text-sm font-medium text-primary bg-primary/10 px-2 py-1 rounded-md">
-          {value}{unit}
+          {value}
+          {unit}
         </span>
       </div>
       <div className="space-y-3">
@@ -39,10 +42,16 @@ export function DelaySlider({
           className="w-full"
         />
         <div className="flex justify-between text-xs text-muted-foreground font-medium">
-          <span>{min}{unit}</span>
-          <span>{max}{unit}</span>
+          <span>
+            {min}
+            {unit}
+          </span>
+          <span>
+            {max}
+            {unit}
+          </span>
         </div>
       </div>
     </div>
-  )
+  );
 }
