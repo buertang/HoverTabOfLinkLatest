@@ -29,6 +29,8 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
   const [isResizing, setIsResizing] = useState(false); // 是否正在调整大小
   const [isFollowingMouse, setIsFollowingMouse] = useState(true); // 是否跟随鼠标
   const [showOverlay, setShowOverlay] = useState(false); // 是否显示遮罩层
+  // 新增：是否鼠标在悬浮窗内，用于 ESC 关闭判断
+  const [isMouseInside, setIsMouseInside] = useState(false);
   
   // 最小尺寸限制（可根据产品需要再调整）
   const MIN_WIDTH = 320; // 最小宽度
@@ -457,6 +459,13 @@ const startResize = useCallback((edge: 'bottom-left' | 'bottom-right') => (e: Re
       debounceTimerRef.current = null;
     }
     setShowOverlay(true);
+    setIsMouseInside(true);
+    // 让容器在鼠标进入时尝试获取焦点，从而在跨站 iframe 下也能捕获 ESC
+    if (containerRef.current) {
+      try {
+        (containerRef.current as HTMLDivElement).focus({ preventScroll: true } as any);
+      } catch {}
+    }
   }, []);
 
   // 处理鼠标离开悬浮窗 - 优化拖拽时的遮罩状态，添加防抖机制
@@ -476,10 +485,27 @@ const startResize = useCallback((edge: 'bottom-left' | 'bottom-right') => (e: Re
       // 再次检查是否仍在拖拽状态
       if (!isDragging) {
         setShowOverlay(false);
+        setIsMouseInside(false);
       }
       debounceTimerRef.current = null;
     }, 100); // 100ms延迟，提供稳定性
   }, [isDragging]);
+
+  // 键盘 ESC 关闭（仅在固定且鼠标在窗体内）
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        if (isMouseInside) {
+          e.preventDefault();
+          e.stopPropagation();
+          onClose();
+        }
+      }
+    };
+    // 捕获阶段，优先于页面其他处理
+    document.addEventListener('keydown', onKeyDown, true);
+    return () => document.removeEventListener('keydown', onKeyDown, true);
+  }, [isMouseInside, onClose]);
 
   // 渲染遮罩层 - 拖拽时移除blur效果，显著提升性能
   const overlayElement = showOverlay ? (
@@ -504,35 +530,36 @@ const startResize = useCallback((edge: 'bottom-left' | 'bottom-right') => (e: Re
       <div
         ref={containerRef}
         className={`fixed overflow-hidden z-[10000] ${themeStyles.backgroundColor} ${themeStyles.borderColor} border-2 flex flex-col`}
+        tabIndex={-1}
         style={{
-          width: size.width,
-          height: size.height,
-          minWidth: Math.max(MIN_WIDTH, headerMinWidth),
-          minHeight: MIN_HEIGHT,
-          // 使用transform定位，初始位置为(0,0)，实际位置由transform控制
-          top: 0,
-          left: 0,
-          transform: `translate3d(${currentPosition.x}px, ${currentPosition.y}px, 0)`,
-          cursor: isDragging ? 'grabbing' : 'default',
-          opacity: settings.opacity,
-          pointerEvents: 'auto',
-          zIndex: 999999,
-          // 拖拽/缩放时移除阴影，减少重绘成本；圆角保持不变，避免样式跳变
-          boxShadow: (isDragging || isResizing) ? 'none' : '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-          borderRadius: '0.5rem',
-          // 优化过渡效果：拖拽或缩放时完全禁用过渡
-          transition: (isDragging || isResizing) ? 'none' : 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
-          // 硬件加速优化：拖拽时transform，缩放时width/height/transform
-          willChange: isDragging ? 'transform' : (isResizing ? 'width, height, transform' : 'auto'),
-          // 合成层隔离，降低布局影响面
-          contain: 'layout paint size',
-          // 强制创建合成层
-          backfaceVisibility: 'hidden',
-          perspective: '1000px'
-        }}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
+           width: size.width,
+           height: size.height,
+           minWidth: Math.max(MIN_WIDTH, headerMinWidth),
+           minHeight: MIN_HEIGHT,
+           // 使用transform定位，初始位置为(0,0)，实际位置由transform控制
+           top: 0,
+           left: 0,
+           transform: `translate3d(${currentPosition.x}px, ${currentPosition.y}px, 0)`,
+           cursor: isDragging ? 'grabbing' : 'default',
+           opacity: settings.opacity,
+           pointerEvents: 'auto',
+           zIndex: 999999,
+           // 拖拽/缩放时移除阴影，减少重绘成本；圆角保持不变，避免样式跳变
+           boxShadow: (isDragging || isResizing) ? 'none' : '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+           borderRadius: '0.5rem',
+           // 优化过渡效果：拖拽或缩放时完全禁用过渡
+           transition: (isDragging || isResizing) ? 'none' : 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
+           // 硬件加速优化：拖拽时transform，缩放时width/height/transform
+           willChange: isDragging ? 'transform' : (isResizing ? 'width, height, transform' : 'auto'),
+           // 合成层隔离，降低布局影响面
+           contain: 'layout paint size',
+           // 强制创建合成层
+           backfaceVisibility: 'hidden',
+           perspective: '1000px',
+         }}
+         onMouseEnter={handleMouseEnter}
+         onMouseLeave={handleMouseLeave}
+       >
         {/* Header组件 - 固定高度40px */}
         <div className="flex-shrink-0">
           <MemoizedHeader
