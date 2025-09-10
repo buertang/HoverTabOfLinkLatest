@@ -2,13 +2,13 @@ import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom';
 import Header from './Header';
 import Content from './Content';
-import Footer from './Footer';
-import { ThemeStyles, FloatingPreviewSettings, FloatingPreviewProps } from '../../types/floating-preview';
+
+import { ThemeStyles, FloatingPreviewProps } from '../../types/floating-preview';
 
 // 优化的Header组件 - 使用React.memo避免不必要的重渲染
 const MemoizedHeader = React.memo(Header);
 const MemoizedContent = React.memo(Content);
-const MemoizedFooter = React.memo(Footer);
+
 
 // 悬浮窗组件 - 性能优化版本
 const FloatingPreview: React.FC<FloatingPreviewProps> = ({
@@ -64,7 +64,10 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
     newSize: { width?: number; height?: number },
     positionChange?: { x?: number; y?: number }
   ) => void | null>(null);
-  
+  // 新增：指针捕获ID与元素引用，确保快速拖拽不丢事件
+  const activePointerIdRef = useRef<number | null>(null);
+  const pointerCaptureElRef = useRef<HTMLElement | null>(null);
+
   // 计算弹窗位置（跟随鼠标或拖拽位置）- 使用useCallback稳定引用
   const calculatePosition = useCallback(() => {
     if (!isFollowingMouse || isDragging) {
@@ -188,104 +191,127 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
     }, 150); // 150ms延迟，确保状态稳定
   }, []);
 
-  // 开始缩放 - 根据边缘类型处理
-  const startResize = useCallback((edge: 'bottom-left' | 'bottom-right') => (e: React.MouseEvent) => {
-    e.stopPropagation(); // 避免触发拖拽
-    setIsResizing(true);
-    setIsFollowingMouse(false);
-    setShowOverlay(true);
+  // 开始缩放 - 根据边缘类型处理（改为Pointer Events并启用指针捕获）
+const startResize = useCallback((edge: 'bottom-left' | 'bottom-right') => (e: React.PointerEvent) => {
+  e.stopPropagation(); // 避免触发拖拽
+  // 记录指针ID并捕获，确保快速拖拽不丢事件
+  const el = e.currentTarget as HTMLElement;
+  const pid = e.pointerId;
+  activePointerIdRef.current = pid;
+  pointerCaptureElRef.current = el;
+  try { el.setPointerCapture(pid); } catch {}
 
-    // 记录起始数据
-    resizeStartRef.current = {
-      edge,
-      mouseX: e.clientX,
-      mouseY: e.clientY,
-      startWidth: size.width,
-      startHeight: size.height,
-      startX: currentTransformRef.current.x,
-      startY: currentTransformRef.current.y,
-    };
+  setIsResizing(true);
+  setIsFollowingMouse(false);
+  setShowOverlay(true);
 
-    // 缩放时禁用iframe事件，避免抢占
-    const iframe = containerRef.current?.querySelector('iframe');
-    if (iframe) {
-      (iframe as HTMLElement).style.pointerEvents = 'none';
+  // 记录起始数据
+  resizeStartRef.current = {
+    edge,
+    mouseX: e.clientX,
+    mouseY: e.clientY,
+    startWidth: size.width,
+    startHeight: size.height,
+    startX: currentTransformRef.current.x,
+    startY: currentTransformRef.current.y,
+  };
+
+  // 缩放时禁用iframe事件，避免抢占
+  const iframe = containerRef.current?.querySelector('iframe');
+  if (iframe) {
+    (iframe as HTMLElement).style.pointerEvents = 'none';
+  }
+
+  const onMove = (ev: PointerEvent) => {
+    // 仅处理当前活动指针
+    if (activePointerIdRef.current !== null && ev.pointerId !== activePointerIdRef.current) return;
+    if (!resizeStartRef.current) return;
+    const dx = ev.clientX - resizeStartRef.current.mouseX; // 指针X位移
+    const dy = ev.clientY - resizeStartRef.current.mouseY; // 指针Y位移
+
+    let newWidth = resizeStartRef.current.startWidth;
+    let newHeight = resizeStartRef.current.startHeight;
+    let newX = resizeStartRef.current.startX;
+    let newY = resizeStartRef.current.startY;
+
+    // 动态最小宽度，确保按钮区域始终可见
+    const effectiveMinWidth = Math.max(MIN_WIDTH, headerMinWidth);
+
+    switch (resizeStartRef.current.edge) {
+      case 'bottom-left': {
+        // 左下角：以“右上角”为锚点，保持右缘与上缘固定
+        const startRight = resizeStartRef.current.startX + resizeStartRef.current.startWidth; // 固定的右缘
+        // 向右拖动(dx>0) => 变窄；向左拖动(dx<0) => 变宽
+        const widthRaw = resizeStartRef.current.startWidth - dx;
+        newWidth = Math.max(effectiveMinWidth, widthRaw);
+        newX = startRight - newWidth; // 右缘固定 => 左缘 = 右缘 - 宽度
+        newY = resizeStartRef.current.startY; // 上缘固定
+        newHeight = Math.max(MIN_HEIGHT, resizeStartRef.current.startHeight + dy);
+        break;
+      }
+      case 'bottom-right': {
+        // 右下角：左侧固定
+        newWidth = Math.max(effectiveMinWidth, resizeStartRef.current.startWidth + dx);
+        newHeight = Math.max(MIN_HEIGHT, resizeStartRef.current.startHeight + dy);
+        break;
+      }
     }
 
-    const onMove = (ev: MouseEvent) => {
-      if (!resizeStartRef.current) return;
-      const dx = ev.clientX - resizeStartRef.current.mouseX; // 鼠标X位移
-      const dy = ev.clientY - resizeStartRef.current.mouseY; // 鼠标Y位移
-
-      let newWidth = resizeStartRef.current.startWidth;
-      let newHeight = resizeStartRef.current.startHeight;
-      let newX = resizeStartRef.current.startX;
-      let newY = resizeStartRef.current.startY;
-
-      // 新增：动态最小宽度，确保按钮区域始终可见
-      const effectiveMinWidth = Math.max(MIN_WIDTH, headerMinWidth);
-
-      switch (resizeStartRef.current.edge) {
-        case 'bottom-left': {
-          // 左下角同时改变宽与高；x跟随左侧规则
-          const maxShrink = resizeStartRef.current.startWidth - effectiveMinWidth;
-          const clampedDx = Math.min(Math.max(dx, -Infinity), maxShrink);
-          newWidth = resizeStartRef.current.startWidth - clampedDx;
-          newX = resizeStartRef.current.startX + clampedDx;
-          newHeight = Math.max(MIN_HEIGHT, resizeStartRef.current.startHeight + dy);
-          break;
-        }
-        case 'bottom-right': {
-          // 右下角同时改变宽与高；位置不变
-          newWidth = Math.max(effectiveMinWidth, resizeStartRef.current.startWidth + dx);
-          newHeight = Math.max(MIN_HEIGHT, resizeStartRef.current.startHeight + dy);
-          break;
-        }
-      }
-
-      // 使用RAF进行节流，减少重绘引起的卡顿
-      if (resizeRafRef.current) cancelAnimationFrame(resizeRafRef.current);
+    // 使用RAF进行节流：仅当当前未排队时入队，避免频繁cancel造成的抖动
+    if (!resizeRafRef.current) {
       resizeRafRef.current = requestAnimationFrame(() => {
         const positionChange = (resizeStartRef.current && resizeStartRef.current.edge === 'bottom-left')
           ? { x: newX, y: newY }
           : undefined;
         handleResizeRef.current?.({ width: newWidth, height: newHeight }, positionChange);
+        resizeRafRef.current = null; // 释放队列占用
       });
-    };
+    }
+  };
 
-    const onUp = (ev: MouseEvent) => {
-      document.removeEventListener('mousemove', onMove);
-      document.removeEventListener('mouseup', onUp);
-      setIsResizing(false);
+  const finishResize = (ev?: PointerEvent) => {
+    document.removeEventListener('pointermove', onMove as any);
+    document.removeEventListener('pointerup', finishResize as any);
+    document.removeEventListener('pointercancel', finishResize as any);
 
-      if (resizeRafRef.current) {
-        cancelAnimationFrame(resizeRafRef.current);
-        resizeRafRef.current = null;
-      }
+    setIsResizing(false);
 
-      // 恢复iframe事件
-      const iframe = containerRef.current?.querySelector('iframe');
-      if (iframe) {
-        (iframe as HTMLElement).style.pointerEvents = 'auto';
-      }
+    if (resizeRafRef.current) {
+      cancelAnimationFrame(resizeRafRef.current);
+      resizeRafRef.current = null;
+    }
 
-      // 同步最终位置
-      setPosition({ x: currentTransformRef.current.x, y: currentTransformRef.current.y });
+    // 释放指针捕获
+    if (pointerCaptureElRef.current && activePointerIdRef.current !== null) {
+      try { pointerCaptureElRef.current.releasePointerCapture(activePointerIdRef.current); } catch {}
+    }
+    activePointerIdRef.current = null;
+    pointerCaptureElRef.current = null;
 
-      // 根据鼠标位置决定是否隐藏遮罩
-      if (containerRef.current && ev) {
-        const rect = containerRef.current.getBoundingClientRect();
-        const inWindow = ev.clientX >= rect.left && ev.clientX <= rect.right && ev.clientY >= rect.top && ev.clientY <= rect.bottom;
-        if (!inWindow) setShowOverlay(false);
-      }
+    // 恢复iframe事件
+    const iframe = containerRef.current?.querySelector('iframe');
+    if (iframe) {
+      (iframe as HTMLElement).style.pointerEvents = 'auto';
+    }
 
-      // 清理状态
-      resizeStartRef.current = null;
-    };
+    // 同步最终位置
+    setPosition({ x: currentTransformRef.current.x, y: currentTransformRef.current.y });
 
-    document.addEventListener('mousemove', onMove, { passive: true });
-    document.addEventListener('mouseup', onUp);
-  }, [size.width, size.height, headerMinWidth]);
+    // 根据指针位置决定是否隐藏遮罩
+    if (containerRef.current && ev) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const inWindow = ev.clientX >= rect.left && ev.clientX <= rect.right && ev.clientY >= rect.top && ev.clientY <= rect.bottom;
+      if (!inWindow) setShowOverlay(false);
+    }
+
+    // 清理状态
+    resizeStartRef.current = null;
+  };
+
+  document.addEventListener('pointermove', onMove as any, { passive: true });
+  document.addEventListener('pointerup', finishResize as any);
+  document.addEventListener('pointercancel', finishResize as any);
+}, [size.width, size.height, headerMinWidth]);
 
   // 处理尺寸变化 - 优化响应性能，直接更新状态
   const handleResize = useCallback((newSize: { width?: number; height?: number }, positionChange?: { x?: number; y?: number }) => {
@@ -434,7 +460,7 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
   }, []);
 
   // 处理鼠标离开悬浮窗 - 优化拖拽时的遮罩状态，添加防抖机制
-  const handleMouseLeave = useCallback((e: React.MouseEvent) => {
+  const handleMouseLeave = useCallback(() => {
     // 如果正在拖拽，强制保持遮罩显示，避免闪烁
     if (isDragging) {
       return;
@@ -462,11 +488,11 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
       style={{
         zIndex: 999998, // 小于悬浮窗的z-index
         backgroundColor: `rgba(0, 0, 0, ${settings.backgroundOpacity / 100})`, // 根据设置调整透明度
-        // 拖拽时移除blur效果，避免GPU合成压力
-        backdropFilter: isDragging ? 'none' : 'blur(8px)',
-        WebkitBackdropFilter: isDragging ? 'none' : 'blur(8px)',
-        // 拖拽时禁用过渡效果，避免闪烁
-        transition: isDragging ? 'none' : 'all 0.3s ease-in-out'
+        // 拖拽/缩放时移除blur效果，避免GPU合成压力
+        backdropFilter: (isDragging || isResizing) ? 'none' : 'blur(8px)',
+        WebkitBackdropFilter: (isDragging || isResizing) ? 'none' : 'blur(8px)',
+        // 拖拽/缩放时禁用过渡效果，避免闪烁
+        transition: (isDragging || isResizing) ? 'none' : 'all 0.3s ease-in-out'
       }}
     />
   ) : null;
@@ -491,13 +517,15 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
           opacity: settings.opacity,
           pointerEvents: 'auto',
           zIndex: 999999,
-          // 拖拽时移除阴影，减少重绘成本；圆角保持不变，避免样式跳变
-          boxShadow: isDragging ? 'none' : '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          // 拖拽/缩放时移除阴影，减少重绘成本；圆角保持不变，避免样式跳变
+          boxShadow: (isDragging || isResizing) ? 'none' : '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
           borderRadius: '0.5rem',
-          // 优化过渡效果：拖拽时完全禁用过渡
-          transition: isDragging ? 'none' : 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
-          // 硬件加速优化
-          willChange: isDragging ? 'transform' : 'auto',
+          // 优化过渡效果：拖拽或缩放时完全禁用过渡
+          transition: (isDragging || isResizing) ? 'none' : 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
+          // 硬件加速优化：拖拽时transform，缩放时width/height/transform
+          willChange: isDragging ? 'transform' : (isResizing ? 'width, height, transform' : 'auto'),
+          // 合成层隔离，降低布局影响面
+          contain: 'layout paint size',
           // 强制创建合成层
           backfaceVisibility: 'hidden',
           perspective: '1000px'
@@ -552,11 +580,12 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
                   height: 22,
                   opacity: activeEdge === 'bottom-left' ? activeOpacity : inactiveOpacity,
                   userSelect: 'none',
+                  touchAction: 'none', // 防止触控滚动干扰Pointer事件
                   backgroundColor: handleColor,
                   // 右角为直角，指向内侧
                   clipPath: 'polygon(0 100%, 100% 100%, 0 0)'
                 }}
-                onMouseDown={startResize('bottom-left')}
+                onPointerDown={startResize('bottom-left')}
                 aria-label="向左下角同时拉伸"
               />
               {/* 右下角：小尺寸三角形（替代 1/4 圆） */}
@@ -567,10 +596,11 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
                   height: 22,
                   opacity: activeEdge === 'bottom-right' ? activeOpacity : inactiveOpacity,
                   userSelect: 'none',
+                  touchAction: 'none', // 防止触控滚动干扰Pointer事件
                   backgroundColor: handleColor,
                   clipPath: 'polygon(0 100%, 100% 100%, 100% 0)'
                 }}
-                onMouseDown={startResize('bottom-right')}
+                onPointerDown={startResize('bottom-right')}
                 aria-label="向右下角同时拉伸"
               />
             </>

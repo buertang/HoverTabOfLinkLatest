@@ -6,8 +6,6 @@ const Content: React.FC<ContentProps> = ({ url, width, height, themeStyles }) =>
   const [loading, setLoading] = useState(true); // 加载状态
   const [error, setError] = useState(false); // 错误状态
   
-
-  
   // 处理iframe加载完成
   const handleIframeLoad = () => {
     setLoading(false);
@@ -19,8 +17,6 @@ const Content: React.FC<ContentProps> = ({ url, width, height, themeStyles }) =>
     setLoading(false);
     setError(true);
   };
-  
-
   
   return (
     <div
