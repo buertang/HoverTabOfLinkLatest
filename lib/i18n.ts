@@ -26,12 +26,10 @@ export interface Translations {
     title: string;
     enableLabel: string;
     enableDescription: string;
-    triggerMethodLabel: string;
     triggerMethods: {
       drag: string;
       hover: string;
       longPress: string;
-      altClick: string;
       customHover: string;
       disabled: string;
     };
@@ -44,46 +42,22 @@ export interface Translations {
     clickText: string;
     hoverText: string;
     popupSizeLabel: string;
-    popupSizes: {
-      lastSize: string;
-      defaultSize: string;
-      contentAdaptive: string;
-    };
+    popupSizes: Record<string, string>;
     popupPositionLabel: string;
-    popupPositions: {
-      followMouse: string;
-      center: string;
-      topRight: string;
-    };
+    popupPositions: Record<string, string>;
     themeLabel: string;
-    themes: {
-      light: string;
-      dark: string;
-      blue: string;
-      red: string;
-      yellow: string;
-      green: string;
-    };
+    themes?: Record<string, string>;
     opacityLabel: string;
-    positionLabel: string;
-    positionDescription: string;
-    positions: {
-      topLeft: string;
-      topRight: string;
-      bottomLeft: string;
-      bottomRight: string;
-    };
+    positionLabel?: string;
+    positionDescription?: string;
+    positions?: Record<string, string>;
     delayLabel: string;
-    delayDescription: string;
+    delayDescription?: string;
     longPressDelayLabel: string;
-    longPressDelayDescription: string;
+    longPressDelayDescription?: string;
     sizeLabel: string;
-    sizeDescription: string;
-    sizes: {
-      small: string;
-      medium: string;
-      large: string;
-    };
+    sizeDescription?: string;
+    sizes?: Record<string, string>;
   };
   
   // Drag Text settings
@@ -175,12 +149,12 @@ export const translations: Record<Language, Translations> = {
       title: '链接预览设置',
       enableLabel: '启用链接预览',
       enableDescription: '鼠标悬停在链接上时显示预览',
-      triggerMethodLabel: '触发方式',
+
       triggerMethods: {
         drag: '拖动链接',
         hover: '鼠标悬停',
         longPress: '长按链接',
-        altClick: 'Alt+鼠标左键点击',
+
         customHover: '自定义快捷键+悬停',
         disabled: '禁用'
       },
@@ -196,23 +170,22 @@ export const translations: Record<Language, Translations> = {
       popupSizes: {
         lastSize: '上次大小',
         defaultSize: '默认大小',
-        contentAdaptive: '内容自适应'
+        contentAdaptive: '内容自适应',
+        last: '上次大小',
+        small: '小',
+        medium: '中',
+        large: '大'
       },
       popupPositionLabel: '弹窗位置',
       popupPositions: {
         followMouse: '跟随鼠标',
         center: '屏幕居中',
-        topRight: '屏幕右上角'
+        topRight: '屏幕右上角',
+        last: '上次位置',
+        left: '屏幕左侧',
+        right: '屏幕右侧'
       },
       themeLabel: '弹窗主题',
-      themes: {
-        light: '浅色',
-        dark: '深色',
-        blue: '蓝色',
-        red: '红色',
-        yellow: '黄色',
-        green: '绿色'
-      },
       opacityLabel: '背景透明度',
       positionLabel: '预览位置',
       positionDescription: '选择预览窗口显示的位置',
@@ -320,12 +293,12 @@ export const translations: Record<Language, Translations> = {
       title: '連結預覽設定',
       enableLabel: '啟用連結預覽',
       enableDescription: '滑鼠懸停在連結上時顯示預覽',
-      triggerMethodLabel: '觸發方式',
+
       triggerMethods: {
         drag: '拖動連結',
         hover: '滑鼠懸停',
         longPress: '長按連結',
-        altClick: 'Alt+滑鼠左鍵點擊',
+
         customHover: '自訂快捷鍵+懸停',
         disabled: '停用'
       },
@@ -341,23 +314,22 @@ export const translations: Record<Language, Translations> = {
       popupSizes: {
         lastSize: '上次大小',
         defaultSize: '預設大小',
-        contentAdaptive: '內容自適應'
+        contentAdaptive: '內容自適應',
+        last: '上次大小',
+        small: '小',
+        medium: '中',
+        large: '大'
       },
       popupPositionLabel: '彈窗位置',
       popupPositions: {
         followMouse: '跟隨滑鼠',
         center: '螢幕居中',
-        topRight: '螢幕右上角'
+        topRight: '螢幕右上角',
+        last: '上次位置',
+        left: '螢幕左側',
+        right: '螢幕右側'
       },
       themeLabel: '彈窗主題',
-      themes: {
-        light: '淺色',
-        dark: '深色',
-        blue: '藍色',
-        red: '紅色',
-        yellow: '黃色',
-        green: '綠色'
-      },
       opacityLabel: '背景透明度',
       positionLabel: '預覽位置',
       positionDescription: '選擇預覽視窗顯示的位置',
@@ -465,12 +437,12 @@ export const translations: Record<Language, Translations> = {
       title: 'Link Preview Settings',
       enableLabel: 'Enable Link Preview',
       enableDescription: 'Show preview when hovering over links',
-      triggerMethodLabel: 'Trigger Method',
+
       triggerMethods: {
         drag: 'Drag Link',
         hover: 'Mouse Hover',
         longPress: 'Long Press Link',
-        altClick: 'Alt+Left Click',
+
         customHover: 'Custom Key+Hover',
         disabled: 'Disabled'
       },
@@ -486,23 +458,22 @@ export const translations: Record<Language, Translations> = {
       popupSizes: {
         lastSize: 'Last Size',
         defaultSize: 'Default Size',
-        contentAdaptive: 'Content Adaptive'
+        contentAdaptive: 'Content Adaptive',
+        last: 'Last Size',
+        small: 'Small',
+        medium: 'Medium',
+        large: 'Large'
       },
       popupPositionLabel: 'Popup Position',
       popupPositions: {
         followMouse: 'Follow Mouse',
         center: 'Screen Center',
-        topRight: 'Top Right Corner'
+        topRight: 'Top Right Corner',
+        last: 'Last Position',
+        left: 'Left Side',
+        right: 'Right Side'
       },
       themeLabel: 'Popup Theme',
-      themes: {
-        light: 'Light',
-        dark: 'Dark',
-        blue: 'Blue',
-        red: 'Red',
-        yellow: 'Yellow',
-        green: 'Green'
-      },
       opacityLabel: 'Background Opacity',
       positionLabel: 'Preview Position',
       positionDescription: 'Choose where the preview window appears',
@@ -610,12 +581,12 @@ export const translations: Record<Language, Translations> = {
       title: 'リンクプレビュー設定',
       enableLabel: 'リンクプレビューを有効にする',
       enableDescription: 'リンクにホバーした時にプレビューを表示',
-      triggerMethodLabel: 'トリガー方法',
+
       triggerMethods: {
         drag: 'リンクをドラッグ',
         hover: 'マウスホバー',
         longPress: 'リンク長押し',
-        altClick: 'Alt+左クリック',
+
         customHover: 'カスタムキー+ホバー',
         disabled: '無効'
       },
@@ -631,13 +602,20 @@ export const translations: Record<Language, Translations> = {
       popupSizes: {
         lastSize: '前回のサイズ',
         defaultSize: 'デフォルトサイズ',
-        contentAdaptive: 'コンテンツ適応'
+        contentAdaptive: 'コンテンツ適応',
+        last: '前回のサイズ',
+        small: '小',
+        medium: '中',
+        large: '大'
       },
       popupPositionLabel: 'ポップアップ位置',
       popupPositions: {
         followMouse: 'マウスに追従',
         center: '画面中央',
-        topRight: '右上角'
+        topRight: '右上角',
+        last: '前回の位置',
+        left: '画面左側',
+        right: '画面右側'
       },
       themeLabel: 'ポップアップテーマ',
       themes: {
@@ -755,12 +733,12 @@ export const translations: Record<Language, Translations> = {
       title: '링크 미리보기 설정',
       enableLabel: '링크 미리보기 활성화',
       enableDescription: '링크에 호버할 때 미리보기 표시',
-      triggerMethodLabel: '트리거 방법',
+
       triggerMethods: {
         drag: '링크 드래그',
         hover: '마우스 호버',
         longPress: '링크 길게 누르기',
-        altClick: 'Alt+왼쪽 클릭',
+
         customHover: '사용자 정의 키+호버',
         disabled: '비활성화'
       },
@@ -776,13 +754,20 @@ export const translations: Record<Language, Translations> = {
       popupSizes: {
         lastSize: '마지막 크기',
         defaultSize: '기본 크기',
-        contentAdaptive: '콘텐츠 적응'
+        contentAdaptive: '콘텐츠 적응',
+        last: '마지막 크기',
+        small: '작은',
+        medium: '중간',
+        large: '큰'
       },
       popupPositionLabel: '팝업 위치',
       popupPositions: {
         followMouse: '마우스 따라가기',
         center: '화면 중앙',
-        topRight: '오른쪽 위 모서리'
+        topRight: '오른쪽 위 모서리',
+        last: '마지막 위치',
+        left: '화면 왼쪽',
+        right: '화면 오른쪽'
       },
       themeLabel: '팝업 테마',
       themes: {
@@ -900,12 +885,12 @@ export const translations: Record<Language, Translations> = {
       title: 'Paramètres d\'aperçu de lien',
       enableLabel: 'Activer l\'aperçu de lien',
       enableDescription: 'Afficher l\'aperçu lors du survol des liens',
-      triggerMethodLabel: 'Méthode de déclenchement',
+
       triggerMethods: {
         drag: 'Glisser le lien',
         hover: 'Survol de la souris',
         longPress: 'Appui long sur le lien',
-        altClick: 'Alt+Clic gauche',
+
         customHover: 'Touche personnalisée+Survol',
         disabled: 'Désactivé'
       },
@@ -921,13 +906,20 @@ export const translations: Record<Language, Translations> = {
       popupSizes: {
         lastSize: 'Dernière taille',
         defaultSize: 'Taille par défaut',
-        contentAdaptive: 'Adaptatif au contenu'
+        contentAdaptive: 'Adaptatif au contenu',
+        last: 'Dernière taille',
+        small: 'Petit',
+        medium: 'Moyen',
+        large: 'Grand'
       },
       popupPositionLabel: 'Position de la popup',
       popupPositions: {
         followMouse: 'Suivre la souris',
         center: 'Centre de l\'écran',
-        topRight: 'Coin supérieur droit'
+        topRight: 'Coin supérieur droit',
+        last: 'Dernière position',
+        left: 'Côté gauche',
+        right: 'Côté droit'
       },
       themeLabel: 'Thème de la popup',
       themes: {
@@ -1045,12 +1037,12 @@ export const translations: Record<Language, Translations> = {
       title: 'Link-Vorschau-Einstellungen',
       enableLabel: 'Link-Vorschau aktivieren',
       enableDescription: 'Vorschau beim Hovern über Links anzeigen',
-      triggerMethodLabel: 'Auslösemethode',
+
       triggerMethods: {
         drag: 'Link ziehen',
         hover: 'Maus-Hover',
         longPress: 'Link lang drücken',
-        altClick: 'Alt+Linksklick',
+
         customHover: 'Benutzerdefinierte Taste+Hover',
         disabled: 'Deaktiviert'
       },
@@ -1066,13 +1058,20 @@ export const translations: Record<Language, Translations> = {
       popupSizes: {
         lastSize: 'Letzte Größe',
         defaultSize: 'Standardgröße',
-        contentAdaptive: 'Inhaltsanpassend'
+        contentAdaptive: 'Inhaltsanpassend',
+        last: 'Letzte Größe',
+        small: 'Klein',
+        medium: 'Mittel',
+        large: 'Groß'
       },
       popupPositionLabel: 'Popup-Position',
       popupPositions: {
         followMouse: 'Maus folgen',
         center: 'Bildschirmmitte',
-        topRight: 'Obere rechte Ecke'
+        topRight: 'Obere rechte Ecke',
+        last: 'Letzte Position',
+        left: 'Linke Seite',
+        right: 'Rechte Seite'
       },
       themeLabel: 'Popup-Theme',
       themes: {
@@ -1190,12 +1189,12 @@ export const translations: Record<Language, Translations> = {
       title: 'Настройки предварительного просмотра ссылки',
       enableLabel: 'Включить предварительный просмотр ссылки',
       enableDescription: 'Показывать предварительный просмотр при наведении на ссылки',
-      triggerMethodLabel: 'Метод активации',
+
       triggerMethods: {
         drag: 'Перетащить ссылку',
         hover: 'Наведение мыши',
         longPress: 'Долгое нажатие на ссылку',
-        altClick: 'Alt+Левый клик',
+
         customHover: 'Пользовательская клавиша+Наведение',
         disabled: 'Отключено'
       },
@@ -1211,13 +1210,20 @@ export const translations: Record<Language, Translations> = {
       popupSizes: {
         lastSize: 'Последний размер',
         defaultSize: 'Размер по умолчанию',
-        contentAdaptive: 'Адаптивный к содержимому'
+        contentAdaptive: 'Адаптивный к содержимому',
+        last: 'Последний размер',
+        small: 'Маленький',
+        medium: 'Средний',
+        large: 'Большой'
       },
       popupPositionLabel: 'Позиция всплывающего окна',
       popupPositions: {
         followMouse: 'Следовать за мышью',
         center: 'Центр экрана',
-        topRight: 'Верхний правый угол'
+        topRight: 'Верхний правый угол',
+        last: 'Последняя позиция',
+        left: 'Левая сторона',
+        right: 'Правая сторона'
       },
       themeLabel: 'Тема всплывающего окна',
       themes: {
@@ -1335,12 +1341,12 @@ export const translations: Record<Language, Translations> = {
       title: 'Impostazioni anteprima link',
       enableLabel: 'Abilita anteprima link',
       enableDescription: 'Mostra anteprima al passaggio del mouse sui link',
-      triggerMethodLabel: 'Metodo di attivazione',
+
       triggerMethods: {
         drag: 'Trascina link',
         hover: 'Passaggio del mouse',
         longPress: 'Pressione lunga del link',
-        altClick: 'Alt+Clic sinistro',
+
         customHover: 'Tasto personalizzato+Passaggio del mouse',
         disabled: 'Disabilitato'
       },
@@ -1356,13 +1362,20 @@ export const translations: Record<Language, Translations> = {
       popupSizes: {
         lastSize: 'Ultima dimensione',
         defaultSize: 'Dimensione predefinita',
-        contentAdaptive: 'Adattivo al contenuto'
+        contentAdaptive: 'Adattivo al contenuto',
+        last: 'Ultima dimensione',
+        small: 'Piccolo',
+        medium: 'Medio',
+        large: 'Grande'
       },
       popupPositionLabel: 'Posizione popup',
       popupPositions: {
         followMouse: 'Segui il mouse',
         center: 'Centro dello schermo',
-        topRight: 'Angolo superiore destro'
+        topRight: 'Angolo superiore destro',
+        last: 'Ultima posizione',
+        left: 'Lato sinistro',
+        right: 'Lato destro'
       },
       themeLabel: 'Tema popup',
       themes: {
@@ -1480,12 +1493,12 @@ export const translations: Record<Language, Translations> = {
        title: 'Ajustes de vista previa de enlace',
        enableLabel: 'Habilitar vista previa de enlace',
        enableDescription: 'Mostrar vista previa al pasar el ratón sobre enlaces',
-       triggerMethodLabel: 'Método de activación',
+       
        triggerMethods: {
          drag: 'Arrastrar enlace',
          hover: 'Pasar el ratón',
          longPress: 'Presión larga del enlace',
-         altClick: 'Alt+Clic izquierdo',
+ 
          customHover: 'Tecla personalizada+Pasar el ratón',
          disabled: 'Deshabilitado'
        },
@@ -1501,13 +1514,20 @@ export const translations: Record<Language, Translations> = {
        popupSizes: {
          lastSize: 'Último tamaño',
          defaultSize: 'Tamaño predeterminado',
-         contentAdaptive: 'Adaptativo al contenido'
+         contentAdaptive: 'Adaptativo al contenido',
+         last: 'Último tamaño',
+         small: 'Pequeño',
+         medium: 'Mediano',
+         large: 'Grande'
        },
        popupPositionLabel: 'Posición de ventana emergente',
        popupPositions: {
          followMouse: 'Seguir el ratón',
          center: 'Centro de pantalla',
-         topRight: 'Esquina superior derecha'
+         topRight: 'Esquina superior derecha',
+         last: 'Última posición',
+         left: 'Lado izquierdo',
+         right: 'Lado derecho'
        },
        themeLabel: 'Tema de ventana emergente',
        themes: {
@@ -1625,12 +1645,12 @@ export const translations: Record<Language, Translations> = {
        title: 'Definições de visualização de link',
        enableLabel: 'Ativar visualização de link',
        enableDescription: 'Mostrar visualização ao passar o mouse sobre links',
-       triggerMethodLabel: 'Método de ativação',
+       
        triggerMethods: {
          drag: 'Arrastar link',
          hover: 'Passar o mouse',
          longPress: 'Pressão longa do link',
-         altClick: 'Alt+Clique esquerdo',
+ 
          customHover: 'Tecla personalizada+Passar o mouse',
          disabled: 'Desativado'
        },
@@ -1644,16 +1664,23 @@ export const translations: Record<Language, Translations> = {
        hoverText: 'Passar o mouse',
        popupSizeLabel: 'Tamanho do popup',
        popupSizes: {
-         lastSize: 'Último tamanho',
-         defaultSize: 'Tamanho padrão',
-         contentAdaptive: 'Adaptativo ao conteúdo'
-       },
+          lastSize: 'Último tamanho',
+          defaultSize: 'Tamanho padrão',
+          contentAdaptive: 'Adaptativo ao conteúdo',
+          last: 'Último tamanho',
+          small: 'Pequeno',
+          medium: 'Médio',
+          large: 'Grande'
+        },
        popupPositionLabel: 'Posição do popup',
        popupPositions: {
-         followMouse: 'Seguir o mouse',
-         center: 'Centro da tela',
-         topRight: 'Canto superior direito'
-       },
+          followMouse: 'Seguir o mouse',
+          center: 'Centro da tela',
+          topRight: 'Canto superior direito',
+          last: 'Última posição',
+          left: 'Lado esquerdo',
+          right: 'Lado direito'
+        },
        themeLabel: 'Tema do popup',
        themes: {
          light: 'Claro',
@@ -1770,12 +1797,12 @@ export const translations: Record<Language, Translations> = {
        title: 'إعدادات معاينة الرابط',
        enableLabel: 'تمكين معاينة الرابط',
        enableDescription: 'إظهار المعاينة عند التمرير فوق الروابط',
-       triggerMethodLabel: 'طريقة التشغيل',
+       
        triggerMethods: {
          drag: 'سحب الرابط',
          hover: 'تمرير الماوس',
          longPress: 'الضغط الطويل على الرابط',
-         altClick: 'Alt+النقر الأيسر',
+ 
          customHover: 'مفتاح مخصص+التمرير',
          disabled: 'معطل'
        },
@@ -1789,16 +1816,23 @@ export const translations: Record<Language, Translations> = {
        hoverText: 'تمرير',
        popupSizeLabel: 'حجم النافذة المنبثقة',
        popupSizes: {
-         lastSize: 'الحجم الأخير',
-         defaultSize: 'الحجم الافتراضي',
-         contentAdaptive: 'تكيفي مع المحتوى'
-       },
+          lastSize: 'الحجم الأخير',
+          defaultSize: 'الحجم الافتراضي',
+          contentAdaptive: 'تكيفي مع المحتوى',
+          last: 'الحجم الأخير',
+          small: 'صغير',
+          medium: 'متوسط',
+          large: 'كبير'
+        },
        popupPositionLabel: 'موضع النافذة المنبثقة',
        popupPositions: {
-         followMouse: 'تتبع الماوس',
-         center: 'وسط الشاشة',
-         topRight: 'الزاوية العلوية اليمنى'
-       },
+          followMouse: 'تتبع الماوس',
+          center: 'وسط الشاشة',
+          topRight: 'الزاوية العلوية اليمنى',
+          last: 'الموضع الأخير',
+          left: 'يسار الشاشة',
+          right: 'يمين الشاشة'
+        },
        themeLabel: 'موضوع النافذة المنبثقة',
        themes: {
          light: 'فاتح',
@@ -1894,5 +1928,25 @@ export const translations: Record<Language, Translations> = {
  };
 
 export function getTranslation(language: Language): Translations {
-   return translations[language] || translations['en'];
- }
+  // 深度合并：对缺失的键使用英文作为回退，避免各语言未及时补充新文案导致的 undefined
+  function deepMerge<T>(base: any, overrides: any): any {
+    if (base === null || typeof base !== 'object') return overrides ?? base;
+    const result: any = Array.isArray(base) ? [...base] : { ...base };
+    if (overrides === null || typeof overrides !== 'object') return result;
+    for (const key of Object.keys(overrides)) {
+      const b = (base as any)[key];
+      const o = (overrides as any)[key];
+      if (
+        b && o && typeof b === 'object' && typeof o === 'object' &&
+        !Array.isArray(b) && !Array.isArray(o)
+      ) {
+        result[key] = deepMerge(b, o);
+      } else if (o !== undefined) {
+        result[key] = o;
+      }
+    }
+    return result;
+  }
+  const langPack = translations[language] || ({} as Partial<Translations>);
+  return deepMerge(translations['en'], langPack) as Translations;
+}

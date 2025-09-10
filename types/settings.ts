@@ -11,10 +11,10 @@ export interface LinkPreviewSettings {
   hoverDelay: number
   // 长按延迟时间（秒）：0.2s - 3s
   longPressDelay: number
-  // 弹窗大小：上次大小、默认大小、内容自适应
-  popupSize: 'lastSize' | 'default' | 'adaptive'
-  // 弹窗位置：跟随鼠标、屏幕居中、屏幕右上角
-  popupPosition: 'followMouse' | 'center' | 'topRight'
+  // 弹窗大小：上次大小、小型、中型（默认）、大型
+  popupSize: 'last' | 'small' | 'medium' | 'large'
+  // 弹窗位置：上次位置、中央（默认）、左侧、右侧
+  popupPosition: 'last' | 'center' | 'left' | 'right'
   // 背景不透明度：0% - 100%
   backgroundOpacity: number
 }
@@ -100,8 +100,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
     customShortcut: getDefaultShortcut(),
     hoverDelay: 0.2,
     longPressDelay: 0.5,
-    popupSize: 'lastSize',
-    popupPosition: 'followMouse',
+    // 首次打开：中型 + 居中
+    popupSize: 'medium',
+    popupPosition: 'center',
     backgroundOpacity: 60
   },
   dragTextSettings: {

@@ -40,8 +40,9 @@ export default defineContentScript({
     let lastPreviewUrl: string | null = null;
     let lastMousePos: { x: number; y: number } | null = null;
 
-    // 新增：记录上次窗口尺寸（用于 popupSize=lastSize）
+    // 新增：记录上次窗口尺寸与位置（用于 popupSize='last' 和 popupPosition='last'）
     let lastWindowSize: { width: number; height: number } | null = null;
+    let lastWindowPosition: { x: number; y: number } | null = null;
 
     // 新增：修饰键状态（用于 customHover 与 click）
     let modifierActive = false; // 是否按下了配置的修饰键
@@ -57,26 +58,31 @@ export default defineContentScript({
       return mode;
     };
 
-    // 加载设置（包含上次窗口尺寸）
+    // 加载设置（包含上次窗口尺寸与位置）
     const loadSettings = async () => {
       try {
-        const result = await browser.storage.local.get(['linkPreviewSettings', 'themeSettings', 'floatingPreviewLastSize']);
+        const result = await browser.storage.local.get([
+          'linkPreviewSettings',
+          'themeSettings',
+          'floatingPreviewLastSize',
+          'floatingPreviewLastPosition',
+        ]);
 
         const rawLinkPreviewSettings: LinkPreviewSettings = result.linkPreviewSettings || {
           triggerMethod: 'drag',
           customShortcut: 'Alt',
           hoverDelay: 100,
           longPressDelay: 500,
-          popupSize: 'default',
-          popupPosition: 'followMouse',
-          backgroundOpacity: 50
-        };
+          popupSize: 'medium',
+          popupPosition: 'center',
+          backgroundOpacity: 50,
+        } as any;
 
         // 兼容旧版本：将历史值 altClick 归一为 click，避免无法触发
         const linkPreviewSettings: LinkPreviewSettings = {
           ...rawLinkPreviewSettings,
           triggerMethod: (rawLinkPreviewSettings as any).triggerMethod === 'altClick' ? 'click' : rawLinkPreviewSettings.triggerMethod
-        };
+        } as LinkPreviewSettings;
 
         // 读取上次窗口尺寸（如果有）
         if (result.floatingPreviewLastSize && typeof result.floatingPreviewLastSize.width === 'number' && typeof result.floatingPreviewLastSize.height === 'number') {
@@ -86,6 +92,15 @@ export default defineContentScript({
           };
         } else {
           lastWindowSize = null;
+        }
+        // 读取上次窗口位置（如果有）
+        if (result.floatingPreviewLastPosition && typeof result.floatingPreviewLastPosition.x === 'number' && typeof result.floatingPreviewLastPosition.y === 'number') {
+          lastWindowPosition = {
+            x: result.floatingPreviewLastPosition.x,
+            y: result.floatingPreviewLastPosition.y,
+          };
+        } else {
+          lastWindowPosition = null;
         }
 
         const themeSettings: ThemeSettings = result.themeSettings || { theme: 'system' };
@@ -97,21 +112,22 @@ export default defineContentScript({
           ...linkPreviewSettings,
           enabled: linkPreviewSettings.triggerMethod !== 'disabled',
           theme: resolvedTheme
-        };
+        } as ResolvedLinkPreviewSettings;
       } catch (error) {
         settings = {
           triggerMethod: 'drag',
           customShortcut: 'Alt',
-          hoverDelay: 100,
-          longPressDelay: 500,
-          popupSize: 'default',
-          popupPosition: 'followMouse',
-          backgroundOpacity: 50,
+          hoverDelay: 0.1,
+          longPressDelay: 0.5,
+          popupSize: 'medium',
+          popupPosition: 'center',
+          backgroundOpacity: 60,
           enabled: true,
           theme: getSystemTheme()
-        };
+        } as ResolvedLinkPreviewSettings;
         themeMode = 'system';
         lastWindowSize = null;
+        lastWindowPosition = null;
       }
     };
 
@@ -119,21 +135,73 @@ export default defineContentScript({
     const renderFloatingPreview = (url: string, x: number, y: number) => {
       if (!settings) return;
 
-      // 计算尺寸：根据设置选择默认或上次尺寸
-      const defaultSize = { width: 800, height: 600 };
-      const sizeToUse = settings.popupSize === 'lastSize' && lastWindowSize
-        ? lastWindowSize
-        : defaultSize;
+      const vw = Math.max(320, window.innerWidth || 0);
+      const vh = Math.max(240, window.innerHeight || 0);
+      const margin = 16;
 
-      // 计算位置偏好：根据 popupPosition 传递到悬浮窗组件
-      // followMouse -> 组件跟随鼠标；center -> 居中；topRight -> 右上角
-      const positionPref: 'center' | 'top-right' | 'bottom-right' | 'top-left' | 'bottom-left' =
-        settings.popupPosition === 'center' ? 'center' : (settings.popupPosition === 'topRight' ? 'top-right' : 'center');
-      // drag/hover 等布尔开关供兼容旧Props（内部未必使用）
+      // 计算尺寸：根据设置选择 small/medium/large 或上次尺寸
+      const resolveSize = () => {
+        const minW = 320;
+        const minH = 240;
+        if (settings!.popupSize === 'last' && lastWindowSize) {
+          return lastWindowSize;
+        }
+        if (settings!.popupSize === 'small') {
+          return { width: 400, height: 300 };
+        }
+        if (settings!.popupSize === 'large') {
+          return {
+            width: Math.max(minW, vw - margin * 2),
+            height: Math.max(minH, vh - margin * 2),
+          };
+        }
+        // 默认 medium
+        return { width: 800, height: 600 };
+      };
+      const sizeToUse = resolveSize();
+
+      // 计算初始位置：根据 popupPosition 传递给悬浮窗组件
+      // center -> 居中；left/right -> 屏幕左右侧并垂直居中；last -> 上次位置（无则居中）；
+      let initialPosition: { x: number; y: number } | undefined;
+      if (settings.popupPosition === 'center') {
+        initialPosition = {
+          x: Math.max(margin, (vw - sizeToUse.width) / 2),
+          y: Math.max(margin, (vh - sizeToUse.height) / 2),
+        };
+      } else if (settings.popupPosition === 'left') {
+        initialPosition = {
+          x: margin,
+          y: Math.max(margin, (vh - sizeToUse.height) / 2),
+        };
+      } else if (settings.popupPosition === 'right') {
+        initialPosition = {
+          x: Math.max(margin, vw - sizeToUse.width - margin),
+          y: Math.max(margin, (vh - sizeToUse.height) / 2),
+        };
+      } else if (settings.popupPosition === 'last' && lastWindowPosition) {
+        // 约束到当前视口范围内，避免离屏
+        const clampedX = Math.min(
+          Math.max(margin, lastWindowPosition.x),
+          Math.max(margin, vw - sizeToUse.width - margin)
+        );
+        const clampedY = Math.min(
+          Math.max(margin, lastWindowPosition.y),
+          Math.max(margin, vh - sizeToUse.height - margin)
+        );
+        initialPosition = { x: clampedX, y: clampedY };
+      } else {
+        // 兜底：居中
+        initialPosition = {
+          x: Math.max(margin, (vw - sizeToUse.width) / 2),
+          y: Math.max(margin, (vh - sizeToUse.height) / 2),
+        };
+      }
+
+      // 组件设置：位置枚举保留 center 即可，具体像素由 initialPosition 强制
       const floatingPreviewSettings: FloatingPreviewSettingsType = {
         enabled: settings.enabled || true,
         theme: settings.theme || 'light',
-        position: positionPref,
+        position: 'center',
         width: sizeToUse.width,
         height: sizeToUse.height,
         opacity: 1,
@@ -149,6 +217,7 @@ export default defineContentScript({
         url,
         settings: floatingPreviewSettings,
         mousePosition: { x, y },
+        initialPosition,
         onClose: closeFloatingPreview
       });
 
@@ -193,6 +262,17 @@ export default defineContentScript({
     };
 
     const closeFloatingPreview = () => {
+      // 在关闭时记录最后的位置和尺寸
+      try {
+        if (floatingPreview?.container) {
+          const rect = floatingPreview.container.getBoundingClientRect();
+          browser.storage.local.set({
+            floatingPreviewLastPosition: { x: Math.round(rect.left), y: Math.round(rect.top) },
+            floatingPreviewLastSize: { width: Math.round(rect.width), height: Math.round(rect.height) },
+          });
+        }
+      } catch {}
+
       if (floatingPreview) {
         floatingPreview.root.unmount();
         document.body.removeChild(floatingPreview.container);
@@ -358,7 +438,7 @@ export default defineContentScript({
     // 存储变更监听：设置或主题变化时重新加载
     const handleStorageChange = async (changes: any, namespace: string) => {
       if (namespace !== 'local') return;
-      if (changes.linkPreviewSettings || changes.themeSettings || changes.floatingPreviewLastSize) {
+      if (changes.linkPreviewSettings || changes.themeSettings || changes.floatingPreviewLastSize || changes.floatingPreviewLastPosition) {
         await loadSettings();
         rerenderFloatingPreview();
       }

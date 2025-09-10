@@ -225,8 +225,42 @@ export function useSettingsManager(): UseSettingsManagerReturn {
       try {
         setIsLoading(true)
         const loadedSettings = await StorageManager.loadAllSettings()
-        setSettings(loadedSettings)
-        previousSettingsRef.current = loadedSettings
+  
+        // 迁移兼容：将历史值映射到新枚举（popupSize/popupPosition）
+        const mapSize: Record<string, 'last' | 'small' | 'medium' | 'large'> = {
+          lastSize: 'last',
+          defaultSize: 'medium',
+          contentAdaptive: 'medium',
+          default: 'medium',
+          adaptive: 'medium'
+        }
+        const mapPosition: Record<string, 'last' | 'center' | 'left' | 'right'> = {
+          followMouse: 'center',
+          topRight: 'right',
+          default: 'center'
+        }
+        const originalLP = loadedSettings.linkPreviewSettings
+        const migratedLP = {
+          ...originalLP,
+          popupSize: mapSize[originalLP.popupSize as string] || originalLP.popupSize,
+          popupPosition: mapPosition[originalLP.popupPosition as string] || originalLP.popupPosition
+        }
+        const finalSettings =
+          migratedLP.popupSize !== originalLP.popupSize || migratedLP.popupPosition !== originalLP.popupPosition
+            ? { ...loadedSettings, linkPreviewSettings: migratedLP }
+            : loadedSettings
+  
+        // 若发生迁移，落盘保存，避免下次再次迁移
+        if (finalSettings !== loadedSettings) {
+          try {
+            await StorageManager.saveSetting('linkPreviewSettings', migratedLP as any)
+          } catch (e) {
+            console.warn('保存迁移后的 linkPreviewSettings 失败，不影响继续使用', e)
+          }
+        }
+  
+        setSettings(finalSettings)
+        previousSettingsRef.current = finalSettings
         console.log('所有设置已初始化完成')
       } catch (error) {
         console.error('初始化设置失败:', error)
@@ -238,7 +272,7 @@ export function useSettingsManager(): UseSettingsManagerReturn {
         setIsInitialized(true)
       }
     }
-    
+  
     initializeSettings()
   }, [])
   

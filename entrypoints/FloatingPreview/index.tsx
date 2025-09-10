@@ -23,6 +23,7 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
   url,
   settings,
   mousePosition,
+  initialPosition,
   onClose,
 }) => {
   // 悬浮窗状态管理
@@ -83,12 +84,50 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
   const activePointerIdRef = useRef<number | null>(null);
   const pointerCaptureElRef = useRef<HTMLElement | null>(null);
 
-  // 首次定位：根据设置的固定位置（非跟随鼠标）设置初始 left/top，保持与系统设置一致
+  // 首次定位状态与最近一次应用的 initialPosition
   const initialPositionAppliedRef = useRef(false);
+  const lastAppliedInitialRef = useRef<{ x: number; y: number } | null>(null);
+
+  // 根据 props.initialPosition 或 settings.position 计算并应用固定位置
   useEffect(() => {
+    const margin = 16;
+
+    // 如果提供了绝对初始位置，则优先使用，并在变化时更新
+    if (initialPosition && !isDragging && !isResizing) {
+      // 若尺寸变化，需要重新校正边界
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const targetX = Math.max(
+        margin,
+        Math.min(vw - size.width - margin, initialPosition.x)
+      );
+      const targetY = Math.max(
+        margin,
+        Math.min(vh - size.height - margin, initialPosition.y)
+      );
+      const changed =
+        !lastAppliedInitialRef.current ||
+        lastAppliedInitialRef.current.x !== targetX ||
+        lastAppliedInitialRef.current.y !== targetY;
+      if (changed) {
+        setIsFollowingMouse(false);
+        // 直接更新到 DOM 与状态，避免引用尚未声明的 updatePosition
+        if (containerRef.current) {
+          containerRef.current.style.left = `${targetX}px`;
+          containerRef.current.style.top = `${targetY}px`;
+        }
+        currentTransformRef.current = { x: targetX, y: targetY };
+        setPosition({ x: targetX, y: targetY });
+        lastAppliedInitialRef.current = { x: targetX, y: targetY };
+        initialPositionAppliedRef.current = true;
+      }
+      return; // 不再执行 settings.position 分支
+    }
+
+    // 若未提供 initialPosition，且尚未应用过初始定位，则按 settings.position 初始化一次
     if (initialPositionAppliedRef.current) return;
+
     const pos = settings.position;
-    // 如果是固定位置（center/top-right/top-left/bottom-right/bottom-left），则不跟随鼠标
     if (
       pos === "center" ||
       pos === "top-right" ||
@@ -96,7 +135,6 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
       pos === "bottom-right" ||
       pos === "bottom-left"
     ) {
-      const margin = 16; // 边距
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       let x = 0;
@@ -117,9 +155,13 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
         x = margin;
         y = Math.max(vh - size.height - margin, margin);
       }
-      // 同步到DOM与状态
       setIsFollowingMouse(false);
-      updatePosition(x, y);
+      // 直接更新到 DOM 与状态
+      if (containerRef.current) {
+        containerRef.current.style.left = `${x}px`;
+        containerRef.current.style.top = `${y}px`;
+      }
+      currentTransformRef.current = { x, y };
       setPosition({ x, y });
       initialPositionAppliedRef.current = true;
     } else {
@@ -127,7 +169,14 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
       setIsFollowingMouse(true);
       initialPositionAppliedRef.current = true;
     }
-  }, [settings.position, size.width, size.height]); // 移除 updatePosition 依赖，因为它是通过 useCallback 创建的稳定引用
+  }, [
+    initialPosition,
+    settings.position,
+    size.width,
+    size.height,
+    isDragging,
+    isResizing,
+  ]);
 
   // 计算弹窗位置（跟随鼠标或拖拽位置）- 使用useCallback稳定引用
   const calculatePosition = useCallback(() => {

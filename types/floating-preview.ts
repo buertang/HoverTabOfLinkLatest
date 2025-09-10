@@ -31,6 +31,8 @@ export interface FloatingPreviewProps {
   url: string;
   settings: FloatingPreviewSettings;
   mousePosition?: { x: number; y: number }; // 鼠标位置，可选
+  // 新增：用于固定初始位置的绝对坐标（优先级高于 settings.position）
+  initialPosition?: { x: number; y: number };
   onClose: () => void;
 }
 

@@ -8,7 +8,7 @@ interface SelectOption {
 }
 
 interface LabelSelectProps {
-  label: string
+  label: string | undefined
   value: string
   onChange: (value: string) => void
   options: SelectOption[]

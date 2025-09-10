@@ -317,21 +317,25 @@ function App() {
                   value={settings.linkPreviewSettings.popupSize}
                   onChange={(value) =>
                     updateSetting("linkPreviewSettings", {
-                      popupSize: value as "lastSize" | "default" | "adaptive",
+                      popupSize: value as "last" | "small" | "medium" | "large",
                     })
                   }
                   options={[
                     {
-                      value: "lastSize",
-                      label: t.linkPreview.popupSizes.lastSize,
+                      value: "last",
+                      label: t.linkPreview.popupSizes.last,
                     },
                     {
-                      value: "default",
-                      label: t.linkPreview.popupSizes.defaultSize,
+                      value: "small",
+                      label: t.linkPreview.popupSizes.small,
                     },
                     {
-                      value: "adaptive",
-                      label: t.linkPreview.popupSizes.contentAdaptive,
+                      value: "medium",
+                      label: t.linkPreview.popupSizes.medium,
+                    },
+                    {
+                      value: "large",
+                      label: t.linkPreview.popupSizes.large,
                     },
                   ]}
                 />
@@ -341,24 +345,25 @@ function App() {
                   value={settings.linkPreviewSettings.popupPosition}
                   onChange={(value) =>
                     updateSetting("linkPreviewSettings", {
-                      popupPosition: value as
-                        | "followMouse"
-                        | "center"
-                        | "topRight",
+                      popupPosition: value as "last" | "center" | "left" | "right",
                     })
                   }
                   options={[
                     {
-                      value: "followMouse",
-                      label: t.linkPreview.popupPositions.followMouse,
+                      value: "last",
+                      label: t.linkPreview.popupPositions.last,
                     },
                     {
                       value: "center",
                       label: t.linkPreview.popupPositions.center,
                     },
                     {
-                      value: "topRight",
-                      label: t.linkPreview.popupPositions.topRight,
+                      value: "left",
+                      label: t.linkPreview.popupPositions.left,
+                    },
+                    {
+                      value: "right",
+                      label: t.linkPreview.popupPositions.right,
                     },
                   ]}
                 />
