@@ -106,25 +106,7 @@ export default defineContentScript({
      * 3. 安全性增强：防止CSS注入攻击扩散到其他页面元素
      * 4. 性能优化：避免重复注入，减少DOM操作开销
      */
-    // const injectTailwindCSS = () => {
-    //   // 防重复注入检查：如果样式已存在则直接返回，避免重复DOM操作
-    //   if (document.getElementById('floating-preview-tailwind-styles')) {
-    //     return;
-    //   }
-      
-    //   // 创建独立的样式元素，使用唯一ID便于管理和清理
-    //   const styleElement = document.createElement('style');
-    //   styleElement.id = 'floating-preview-tailwind-styles';
-      
-    //   // 核心安全处理：为CSS内容添加作用域前缀，限制样式影响范围
-    //   // 这确保了所有Tailwind样式仅作用于弹窗容器，不会干扰页面其他元素
-    //   styleElement.textContent = tailwindCss;
-      
-    //   // 安全注入：将处理后的样式添加到页面头部
-    //   document.head.appendChild(styleElement);
-    // };
-
-    // injectTailwindCSS();
+    // Tailwind 样式注入已由 FloatingPreview 组件内部负责，此处移除遗留注释代码
 
     // 状态变量
     let isDragging = false; // 拖拽链接状态
@@ -148,8 +130,7 @@ export default defineContentScript({
     let themeMode: 'system' | 'light' | 'dark' = 'system';
     // 系统主题监听器（仅当 themeMode === 'system' 时生效）
     let systemMediaQuery: MediaQueryList | null = null;
-    // 保存最近一次打开的预览信息，便于在主题变更时重新渲染
-    let lastPreviewUrl: string | null = null;
+    // 记录拖拽/悬停过程的最后鼠标位置，用于计算悬浮窗初始坐标
     let lastMousePos: { x: number; y: number } | null = null;
     // 多实例版本不再使用全局最近预览信息
     // 新增：记录上次窗口尺寸与位置（用于 popupSize='last' 和 popupPosition='last'）

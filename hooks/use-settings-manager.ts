@@ -6,7 +6,6 @@ import {
   AppSettings,
   SettingsStorageKey,
   DEFAULT_SETTINGS,
-  SETTINGS_VALIDATORS,
   DomainValidation
 } from '@/types/settings'
 
@@ -85,7 +84,7 @@ class StorageManager {
         return
       }
       await browser.storage.sync.set({ [key]: value })
-      console.log(`设置已保存: ${key}`, value)
+      
     } catch (error) {
       console.error(`保存设置失败: ${key}`, error)
       throw error
@@ -108,7 +107,7 @@ class StorageManager {
       
       if (Object.keys(settingsToSave).length > 0) {
         await browser.storage.sync.set(settingsToSave)
-        console.log('增量设置保存完成:', Object.keys(settingsToSave))
+        
       }
     } catch (error) {
       console.error('批量保存设置失败', error)
@@ -130,7 +129,7 @@ class StorageManager {
       const syncResult = await browser.storage.sync.get([key])
       const savedSync = (syncResult as any)[key]
       if (savedSync) {
-        console.log(`设置已加载: ${key}`, savedSync)
+        
         // 合并默认设置和保存的设置，确保新增的配置项有默认值
         return { ...defaultValue, ...savedSync }
       }
@@ -239,7 +238,8 @@ export function useSettingsManager(): UseSettingsManagerReturn {
 
         setSettings(loadedSettings)
         previousSettingsRef.current = loadedSettings
-        console.log('所有设置已初始化完成')
+        // 初始化完成
+        resolveAndClearSaveResolvers(true)
       } catch (error) {
         console.error('初始化设置失败:', error)
         // 发生错误时使用默认设置
@@ -273,7 +273,7 @@ export function useSettingsManager(): UseSettingsManagerReturn {
         if (Object.keys(changedSettings).length > 0) {
           await StorageManager.saveSettings(changedSettings)
           previousSettingsRef.current = newSettings
-          console.log('增量保存完成，变更项:', Object.keys(changedSettings))
+          
           // 成功保存，通知等待者
           resolveAndClearSaveResolvers(true)
         } else {
@@ -335,7 +335,7 @@ export function useSettingsManager(): UseSettingsManagerReturn {
       setSettings(DEFAULT_SETTINGS)
       await StorageManager.saveSettings(DEFAULT_SETTINGS)
       previousSettingsRef.current = DEFAULT_SETTINGS
-      console.log('设置已重置为默认值')
+      
       // 重置为默认值后也算一次成功保存
       resolveAndClearSaveResolvers(true)
     } catch (error) {

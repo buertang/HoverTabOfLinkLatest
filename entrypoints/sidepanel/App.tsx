@@ -1,5 +1,4 @@
 import React from "react";
-import { useAppConfig } from "#imports";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -21,7 +20,7 @@ import { getAvailableModifierKeys } from "@/lib/utils";
 import { DelaySlider } from "./components/DelaySlider";
 import { LabelSelect } from "./components/LabelSelect";
 import {
-  Heart,
+  // Heart, // 未使用，移除
   Link,
   MousePointer,
   Monitor,
@@ -33,7 +32,7 @@ import {
 import { Toaster, toast } from "sonner";
 
 function App() {
-  const config = useAppConfig();
+  // const config = useAppConfig(); // 未使用，移除
   // 已废弃旧的useSettings hook，改用新的useSettingsManager
   const { t, language, setLanguage, isLoading: i18nLoading } = useTranslation();
 
@@ -116,9 +115,9 @@ function App() {
   ] as const;
 
   const handleTabChange = (value: string) => {
-      updateSetting("uiSettings", {
-        activeTab: value as "linkPreview" | "dragText" | "other",
-      })
+    updateSetting("uiSettings", {
+      activeTab: value as "linkPreview" | "dragText" | "other",
+    });
   };
 
   // 显示设置保存成功提示
@@ -355,7 +354,11 @@ function App() {
                   onChange={(value) => {
                     updateAndToast(() =>
                       updateSetting("linkPreviewSettings", {
-                        popupSize: value as "last" | "small" | "medium" | "large",
+                        popupSize: value as
+                          | "last"
+                          | "small"
+                          | "medium"
+                          | "large",
                       })
                     );
                   }}
@@ -385,7 +388,11 @@ function App() {
                   onChange={(value) => {
                     updateAndToast(() =>
                       updateSetting("linkPreviewSettings", {
-                        popupPosition: value as "last" | "center" | "left" | "right",
+                        popupPosition: value as
+                          | "last"
+                          | "center"
+                          | "left"
+                          | "right",
                       })
                     );
                   }}
@@ -438,12 +445,12 @@ function App() {
                     );
                   }}
                   options={[
-                    { value: '1', label: '1' },
-                    { value: '2', label: '2' },
-                    { value: '3', label: '3' },
-                    { value: '4', label: '4' },
-                    { value: '5', label: '5' },
-                    { value: '6', label: '6' },
+                    { value: "1", label: "1" },
+                    { value: "2", label: "2" },
+                    { value: "3", label: "3" },
+                    { value: "4", label: "4" },
+                    { value: "5", label: "5" },
+                    { value: "6", label: "6" },
                   ]}
                   layout="complex"
                 />
@@ -460,7 +467,11 @@ function App() {
                   <Switch
                     checked={settings.linkPreviewSettings.autoPin}
                     onCheckedChange={(checked) => {
-                      updateAndToast(() => updateSetting("linkPreviewSettings", { autoPin: checked }));
+                      updateAndToast(() =>
+                        updateSetting("linkPreviewSettings", {
+                          autoPin: checked,
+                        })
+                      );
                     }}
                   />
                 </div>
@@ -748,7 +759,7 @@ function App() {
                         resetAllSettings();
                         toast(t.common.resetSuccess);
                       } catch (error) {
-                        console.error('重置设置失败:', error);
+                        console.error("重置设置失败:", error);
                         toast(t.common.resetFailed);
                       }
                     }}
@@ -763,22 +774,24 @@ function App() {
           </TabsContent>
         </Tabs>
       </div>
-      
+
       {/* Toast 通知组件 */}
-      <Toaster 
+      <Toaster
         position="bottom-center"
-        theme={resolvedTheme === 'dark' ? 'dark' : 'light'}
+        theme={resolvedTheme === "dark" ? "dark" : "light"}
         toastOptions={{
-          style:{background: 'var(--primary)', color: 'var(--background)',
-            minHeight: '48px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-            borderRadius: '8px',
-            fontWeight: '1500',
-            fontSize: '14px',
-            maxWidth:'200px',
-}
+          style: {
+            background: "var(--primary)",
+            color: "var(--background)",
+            minHeight: "48px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+            borderRadius: "8px",
+            fontWeight: "1500",
+            fontSize: "14px",
+            maxWidth: "200px",
+          },
         }}
-      /> 
+      />
       {/* <Toaster 
         position="bottom-center"
         theme={resolvedTheme === 'dark' ? 'dark' : 'light'}
