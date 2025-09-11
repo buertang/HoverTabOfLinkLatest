@@ -141,7 +141,7 @@ export default defineContentScript({
     let dragTextSettings: DragTextSettings = {
       // 默认值与DEFAULT_SETTINGS保持一致
       searchEngine: 'bing', // 默认搜索引擎
-      enabled: false, // 开关：是否启用拖拽文字功能（已按PRD改为总开关）
+      enabled: true, // 开关：是否启用拖拽文字功能（默认开启，首次使用即可生效）
       disabledSites: '' // 禁用站点列表
     };
     // 记录用户在侧边栏选择的主题模式（light/dark/system），用于判断是否需要跟随系统
@@ -269,7 +269,7 @@ export default defineContentScript({
         // 读取拖拽文字设置
         const rawDTS: DragTextSettings = result.dragTextSettings || {
           searchEngine: 'bing',
-          enabled: false,
+          enabled: true, // 兜底：默认开启
           disabledSites: ''
         };
         dragTextSettings = { ...rawDTS };
@@ -320,7 +320,7 @@ export default defineContentScript({
         themeMode = 'system';
         lastWindowSize = null;
         lastWindowPosition = null;
-        dragTextSettings = { searchEngine: 'bing', enabled: false, disabledSites: '' };
+        dragTextSettings = { searchEngine: 'bing', enabled: true, disabledSites: '' };
       }
     };
 
@@ -497,26 +497,45 @@ export default defineContentScript({
 
     const handleDragStart = (event: DragEvent) => {
       const target = event.target as HTMLElement;
-      // 优先判断是否在拖拽选中文本
+      // 1) 优先识别“拖拽链接”，即使页面存在选中文本也应以链接为主
+      const anchor = target?.closest?.('a');
+      if (anchor && anchor instanceof HTMLAnchorElement) {
+        isDragging = true;              // 标记为拖拽链接
+        draggedLink = anchor;           // 记录被拖拽的链接
+        isDraggingText = false;         // 明确不是拖拽文本
+        draggedText = null;             // 清空文本
+        return;
+      }
+
+      // 2) 其次识别“拖拽文本”：仅当存在选中文本时才进入文本拖拽流程
       const selection = window.getSelection?.();
       const selectedText = selection ? selection.toString().trim() : '';
       if (selectedText) {
-        isDraggingText = true;
-        draggedText = selectedText;
-        isDragging = false;
-        draggedLink = null;
+        isDraggingText = true;          // 标记为拖拽文本
+        draggedText = selectedText;     // 记录文本内容
+        isDragging = false;             // 不是拖拽链接
+        draggedLink = null;             // 清空链接
         return;
       }
-      // 其次尝试识别拖拽链接
-      const anchor = target?.closest?.('a');
-      if (anchor && anchor instanceof HTMLAnchorElement) {
-        isDragging = true;
-        draggedLink = anchor;
-      }
+
+      // 3) 其他情况：不认为是有效拖拽
+      isDragging = false;
+      draggedLink = null;
+      isDraggingText = false;
+      draggedText = null;
+    };
+
+    // 在拖拽过程中持续记录鼠标位置，避免 dragend 事件 clientX/Y 为 0 的情况
+    const handleDragOver = (event: DragEvent) => {
+      lastMousePos = { x: event.clientX, y: event.clientY };
     };
 
     // 拖拽结束（仅当设置为 drag 时触发打开）
     const handleDragEnd = (event: DragEvent) => {
+      // 统一获取坐标：优先使用拖拽过程记录的最后鼠标位置
+      const posX = (lastMousePos?.x ?? event.clientX ?? 0);
+      const posY = (lastMousePos?.y ?? event.clientY ?? 0);
+
       // 先处理“拖拽文字”功能（按开关控制）
       if (isDraggingText) {
         const text = (draggedText || '').trim();
@@ -528,6 +547,7 @@ export default defineContentScript({
         if (!dragTextSettings?.enabled) {
           isDragging = false;
           draggedLink = null;
+          lastMousePos = null; // 清理坐标
           return;
         }
         // 禁用站点判断
@@ -535,6 +555,7 @@ export default defineContentScript({
         if (isSiteDisabled(window.location.hostname, disabledList)) {
           isDragging = false;
           draggedLink = null;
+          lastMousePos = null; // 清理坐标
           return;
         }
         if (text) {
@@ -545,13 +566,15 @@ export default defineContentScript({
             const host = new URL(targetUrl).hostname.toLowerCase();
             if (host.endsWith('baidu.com') || host.endsWith('perplexity.ai')) {
               window.open(targetUrl, '_blank');
+              lastMousePos = null; // 清理坐标
               return;
             }
           } catch (_) {}
-          createFloatingPreview(targetUrl, event.clientX, event.clientY);
+          createFloatingPreview(targetUrl, posX, posY);
         }
         isDragging = false;
         draggedLink = null;
+        lastMousePos = null; // 清理坐标
         return;
       }
 
@@ -559,11 +582,12 @@ export default defineContentScript({
       if (isDragging && draggedLink && settings?.triggerMethod === 'drag') {
         const url = draggedLink.href;
         if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
-          createFloatingPreview(url, event.clientX, event.clientY);
+          createFloatingPreview(url, posX, posY);
         }
       }
       isDragging = false;
       draggedLink = null;
+      lastMousePos = null; // 清理坐标
     };
 
     // 悬停触发（纯 hover 或 customHover 且按下修饰键）
@@ -754,7 +778,7 @@ export default defineContentScript({
             const result = await browser.storage.sync.get(['dragTextSettings']);
             const rawDTS: DragTextSettings = (result as any).dragTextSettings || {
               searchEngine: 'bing',
-              enabled: false,
+              enabled: true, // 兜底：默认开启
               disabledSites: ''
             };
             dragTextSettings = { ...rawDTS };
@@ -778,7 +802,7 @@ export default defineContentScript({
             ]);
             const rawDTS: DragTextSettings = (syncRes as any).dragTextSettings ?? (localRes as any).dragTextSettings ?? {
               searchEngine: 'bing',
-              enabled: false,
+              enabled: true, // 兜底：默认开启
               disabledSites: ''
             };
             dragTextSettings = { ...rawDTS };
@@ -867,6 +891,7 @@ export default defineContentScript({
       // 1. 移除DOM事件监听器（防止事件监听器内存泄漏）
       document.removeEventListener('dragstart', handleDragStart, true);
       document.removeEventListener('dragend', handleDragEnd, true);
+      document.removeEventListener('dragover', handleDragOver, true); // 记录拖拽过程鼠标坐标
       document.removeEventListener('mouseenter', handleMouseEnter, true);
       document.removeEventListener('mouseleave', handleMouseLeave, true);
       document.removeEventListener('mousedown', handleMouseDown, true);
