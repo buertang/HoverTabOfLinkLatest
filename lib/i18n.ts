@@ -235,7 +235,7 @@ export const translations: Record<Language, Translations> = {
         duckduckgo: 'DuckDuckGo',
         perplexity: 'Perplexity AI'
       },
-      newTabHint: '百度搜索和Perplexity AI会在新标签页中打开',
+      newTabHint: '仅bing搜索使用悬浮窗打开',
       enableLabel: '启用拖拽文本功能',
       enableDescription: '开启后可以拖拽选中的文本进行搜索或预览',
       maxLengthLabel: '最大长度',
@@ -391,7 +391,7 @@ export const translations: Record<Language, Translations> = {
         duckduckgo: 'DuckDuckGo',
         perplexity: 'Perplexity AI'
       },
-      newTabHint: '百度搜尋和Perplexity AI會在新分頁中開啟',
+      newTabHint: '僅bing搜尋使用懸浮窗開啟',
       enableLabel: '啟用拖曳文字功能',
       enableDescription: '開啟後可以拖曳選中的文字進行搜尋或預覽',
       maxLengthLabel: '最大長度',
@@ -547,7 +547,7 @@ export const translations: Record<Language, Translations> = {
         duckduckgo: 'DuckDuckGo',
         perplexity: 'Perplexity AI'
       },
-      newTabHint: 'Baidu Search and Perplexity AI will open in new tabs',
+      newTabHint: 'Only Bing search uses floating window',
       enableLabel: 'Enable Drag Text Feature',
       enableDescription: 'Enable dragging selected text for search or preview',
       maxLengthLabel: 'Max Length',
@@ -708,7 +708,7 @@ export const translations: Record<Language, Translations> = {
         duckduckgo: 'DuckDuckGo',
         perplexity: 'Perplexity AI'
       },
-      newTabHint: 'Baidu検索とPerplexity AIは新しいタブで開きます',
+      newTabHint: 'Bing検索のみフローティングウィンドウを使用',
       enableLabel: 'テキストドラッグ機能を有効にする',
       enableDescription: '選択したテキストをドラッグして検索やプレビューを行う機能を有効にする',
       maxLengthLabel: '最大長',
@@ -869,7 +869,7 @@ export const translations: Record<Language, Translations> = {
         duckduckgo: 'DuckDuckGo',
         perplexity: 'Perplexity AI'
       },
-      newTabHint: 'Baidu 검색과 Perplexity AI는 새 탭에서 열립니다',
+      newTabHint: 'Bing 검색만 플로팅 창을 사용합니다',
       enableLabel: '텍스트 드래그 기능 활성화',
       enableDescription: '선택한 텍스트를 드래그하여 검색하거나 미리보기할 수 있는 기능을 활성화',
       maxLengthLabel: '최대 길이',
@@ -1030,7 +1030,7 @@ export const translations: Record<Language, Translations> = {
         duckduckgo: 'DuckDuckGo',
         perplexity: 'Perplexity AI'
       },
-      newTabHint: 'Baidu Search et Perplexity AI s\'ouvriront dans de nouveaux onglets',
+      newTabHint: 'Seule la recherche Bing utilise une fenêtre flottante',
       enableLabel: 'Activer la fonction de glissement de texte',
       enableDescription: 'Activer le glissement du texte sélectionné pour la recherche ou l\'aperçu',
       maxLengthLabel: 'Longueur maximale',
@@ -1191,7 +1191,7 @@ export const translations: Record<Language, Translations> = {
         duckduckgo: 'DuckDuckGo',
         perplexity: 'Perplexity AI'
       },
-      newTabHint: 'Baidu-Suche und Perplexity AI öffnen sich in neuen Tabs',
+      newTabHint: 'Nur Bing-Suche verwendet schwebendes Fenster',
       enableLabel: 'Text-Ziehen-Funktion aktivieren',
       enableDescription: 'Aktiviert das Ziehen von ausgewähltem Text für Suche oder Vorschau',
       maxLengthLabel: 'Maximale Länge',
@@ -1352,7 +1352,7 @@ export const translations: Record<Language, Translations> = {
         duckduckgo: 'DuckDuckGo',
         perplexity: 'Perplexity AI'
       },
-      newTabHint: 'Поиск Baidu и Perplexity AI откроются в новых вкладках',
+      newTabHint: 'Только поиск Bing использует плавающее окно',
       enableLabel: 'Включить функцию перетаскивания текста',
       enableDescription: 'Включить перетаскивание выделенного текста для поиска или предварительного просмотра',
       maxLengthLabel: 'Максимальная длина',
@@ -1513,7 +1513,7 @@ export const translations: Record<Language, Translations> = {
         duckduckgo: 'DuckDuckGo',
         perplexity: 'Perplexity AI'
       },
-      newTabHint: 'Ricerca Baidu e Perplexity AI si apriranno in nuove schede',
+      newTabHint: 'Solo la ricerca Bing utilizza finestra flottante',
       enableLabel: 'Abilita funzione trascinamento testo',
       enableDescription: 'Abilita il trascinamento del testo selezionato per ricerca o anteprima',
       maxLengthLabel: 'Lunghezza massima',
@@ -1674,7 +1674,7 @@ export const translations: Record<Language, Translations> = {
          duckduckgo: 'DuckDuckGo',
          perplexity: 'Perplexity AI'
        },
-       newTabHint: 'Búsqueda Baidu y Perplexity AI se abrirán en nuevas pestañas',
+       newTabHint: 'Solo la búsqueda de Bing usa ventana flotante',
        enableLabel: 'Habilitar función de arrastrar texto',
       enableDescription: 'Habilitar arrastrar texto seleccionado para búsqueda o vista previa',
        maxLengthLabel: 'Longitud máxima',
@@ -1835,7 +1835,7 @@ export const translations: Record<Language, Translations> = {
           duckduckgo: 'DuckDuckGo',
           perplexity: 'Perplexity AI'
         },
-        newTabHint: 'Busca Baidu e Perplexity AI abrirão em novas abas',
+        newTabHint: 'Apenas a pesquisa do Bing usa janela flutuante',
        enableLabel: 'Ativar função de arrastar texto',
       enableDescription: 'Ativar arrastar texto selecionado para pesquisa ou visualização',
        maxLengthLabel: 'Comprimento máximo',
@@ -1996,7 +1996,7 @@ export const translations: Record<Language, Translations> = {
           duckduckgo: 'DuckDuckGo',
           perplexity: 'Perplexity AI'
         },
-        newTabHint: 'بحث Baidu و Perplexity AI سيفتحان في علامات تبويب جديدة',
+        newTabHint: 'فقط بحث Bing يستخدم النافذة العائمة',
        enableLabel: 'تفعيل وظيفة سحب النص',
       enableDescription: 'تفعيل سحب النص المحدد للبحث أو المعاينة',
        maxLengthLabel: 'الطول الأقصى',

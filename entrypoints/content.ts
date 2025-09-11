@@ -537,10 +537,10 @@ export default defineContentScript({
         if (text) {
           const normalized = normalizeUrlFromText(text);
           const targetUrl = normalized ? normalized : buildSearchUrl(dragTextSettings.searchEngine, text);
-          // 对百度搜索和Perplexity搜索结果采用新标签打开，避免X-Frame-Options/CSP导致的iframe拒绝加载
+          // 对百度、Perplexity、Google、DuckDuckGo 搜索结果采用新标签打开，避免 X-Frame-Options/CSP 导致的 iframe 拒绝加载
           try {
             const host = new URL(targetUrl).hostname.toLowerCase();
-            if (host.endsWith('baidu.com') || host.endsWith('perplexity.ai')) {
+            if (host.endsWith('baidu.com') || host.endsWith('perplexity.ai') || host.endsWith('google.com') || host.endsWith('duckduckgo.com')) {
               window.open(targetUrl, '_blank');
               lastMousePos = null; // 清理坐标
               return;
@@ -588,7 +588,7 @@ export default defineContentScript({
         // 百度页面和Perplexity页面不支持被 iframe 嵌入，直接新开标签
         try {
           const host = new URL(href).hostname.toLowerCase();
-          if (host.endsWith('baidu.com') || host.endsWith('perplexity.ai')) {
+          if (host.endsWith('baidu.com') || host.endsWith('perplexity.ai') || host.endsWith('google.com') || host.endsWith('duckduckgo.com')) {
             window.open(href, '_blank');
             return;
           }
@@ -624,7 +624,7 @@ export default defineContentScript({
         // 百度页面和Perplexity页面不支持被 iframe 嵌入，直接新开标签
         try {
           const host = new URL(href).hostname.toLowerCase();
-          if (host.endsWith('baidu.com') || host.endsWith('perplexity.ai')) {
+          if (host.endsWith('baidu.com') || host.endsWith('perplexity.ai') || host.endsWith('google.com') || host.endsWith('duckduckgo.com')) {
             window.open(href, '_blank');
             // 标记长按已触发，避免后续click跳转
             suppressNextClick = true;
@@ -679,7 +679,7 @@ export default defineContentScript({
       // 百度页面和Perplexity页面不支持被 iframe 嵌入，直接新开标签
       try {
         const host = new URL(href).hostname.toLowerCase();
-        if (host.endsWith('baidu.com') || host.endsWith('perplexity.ai')) {
+        if (host.endsWith('baidu.com') || host.endsWith('perplexity.ai') || host.endsWith('google.com') || host.endsWith('duckduckgo.com')) {
           window.open(href, '_blank');
           return;
         }

@@ -1,41 +1,48 @@
-import React, { useState } from 'react';
-import { ThemeStyles, ContentProps } from '../../types/floating-preview';
+import React, { useState } from "react";
+import { ThemeStyles, ContentProps } from "../../types/floating-preview";
 
 // Content组件 - 悬浮窗内容区域，纯iframe容器
-const Content: React.FC<ContentProps> = ({ url, width, height, themeStyles }) => {
+const Content: React.FC<ContentProps> = ({
+  url,
+  width,
+  height,
+  themeStyles,
+}) => {
   const [loading, setLoading] = useState(true); // 加载状态
   const [error, setError] = useState(false); // 错误状态
-  
+
   // 处理iframe加载完成
   const handleIframeLoad = () => {
     setLoading(false);
     setError(false);
   };
-  
+
   // 处理iframe加载错误
   const handleIframeError = () => {
     setLoading(false);
     setError(true);
   };
-  
+
   return (
     <div
       className={`relative ${themeStyles.bg}`}
       style={{
         width: `${width}px`,
-        height: `${height}px`
+        height: `${height}px`,
       }}
     >
       {/* 加载状态 */}
       {loading && (
-        <div className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-base ${themeStyles.textColor} opacity-60`}>
+        <div
+          className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-base ${themeStyles.textColor} opacity-60`}
+        >
           <div className="flex items-center space-x-2">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
             <span>正在加载...</span>
           </div>
         </div>
       )}
-      
+
       {/* 错误状态 */}
       {error && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center p-5">
@@ -50,7 +57,7 @@ const Content: React.FC<ContentProps> = ({ url, width, height, themeStyles }) =>
           </div>
         </div>
       )}
-      
+
       {/* iframe内容 */}
       <iframe
         src={url}
