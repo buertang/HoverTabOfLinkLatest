@@ -22,6 +22,7 @@ export interface FloatingPreviewSettings {
   dragToTrigger: boolean;
   showOnHover: boolean;
   hoverDelay: number;
+  longPressDelay: number;
   autoClose: boolean;
   autoCloseDelay: number;
   // 新增：默认固定新创建的预览窗口

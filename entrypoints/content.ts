@@ -266,6 +266,16 @@ export default defineContentScript({
           triggerMethod: (rawLinkPreviewSettings as any).triggerMethod === 'altClick' ? 'click' : rawLinkPreviewSettings.triggerMethod
         } as LinkPreviewSettings;
 
+        // 迁移兼容：旧版本将延迟以“秒”保存（<=3），统一转换为“毫秒”
+        try {
+          if ((linkPreviewSettings as any).hoverDelay <= 3) {
+            (linkPreviewSettings as any).hoverDelay = Math.round((linkPreviewSettings as any).hoverDelay * 1000);
+          }
+          if ((linkPreviewSettings as any).longPressDelay <= 3) {
+            (linkPreviewSettings as any).longPressDelay = Math.round((linkPreviewSettings as any).longPressDelay * 1000);
+          }
+        } catch {}
+
         // 读取拖拽文字设置
         const rawDTS: DragTextSettings = result.dragTextSettings || {
           searchEngine: 'bing',
@@ -307,8 +317,8 @@ export default defineContentScript({
         settings = {
           triggerMethod: 'drag',
           customShortcut: 'Alt',
-          hoverDelay: 0.1,
-          longPressDelay: 0.5,
+          hoverDelay: 200, // 毫秒
+          longPressDelay: 500, // 毫秒
           popupSize: 'medium',
           popupPosition: 'center',
           backgroundOpacity: 60,
@@ -401,7 +411,8 @@ export default defineContentScript({
         backgroundOpacity: settings.backgroundOpacity || 80, // 背景遮罩透明度
         dragToTrigger: settings.triggerMethod === 'drag',
         showOnHover: settings.triggerMethod === 'hover' || settings.triggerMethod === 'customHover',
-        hoverDelay: settings.hoverDelay || 100,
+        hoverDelay: settings.hoverDelay || 200, // 毫秒
+        longPressDelay: settings.longPressDelay || 500,
         autoClose: false,
         autoCloseDelay: 3000,
         autoPin: settings.autoPin ?? false,

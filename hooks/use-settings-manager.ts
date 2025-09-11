@@ -291,15 +291,29 @@ export function useSettingsManager(): UseSettingsManagerReturn {
           popupSize: mapSize[originalLP.popupSize as string] || originalLP.popupSize,
           popupPosition: mapPosition[originalLP.popupPosition as string] || originalLP.popupPosition
         }
+
+        // 延迟单位迁移：旧版本以“秒”保存(<=3)，统一转换为“毫秒”
+        const migratedLP2 = { ...migratedLP } as typeof migratedLP & { hoverDelay: number; longPressDelay: number }
+        try {
+          if (typeof migratedLP2.hoverDelay === 'number' && migratedLP2.hoverDelay <= 3) {
+            migratedLP2.hoverDelay = Math.round(migratedLP2.hoverDelay * 1000)
+          }
+          if (typeof migratedLP2.longPressDelay === 'number' && migratedLP2.longPressDelay <= 3) {
+            migratedLP2.longPressDelay = Math.round(migratedLP2.longPressDelay * 1000)
+          }
+        } catch {}
+
         const finalSettings =
-          migratedLP.popupSize !== originalLP.popupSize || migratedLP.popupPosition !== originalLP.popupPosition
-            ? { ...loadedSettings, linkPreviewSettings: migratedLP }
+          (migratedLP.popupSize !== originalLP.popupSize || migratedLP.popupPosition !== originalLP.popupPosition ||
+            (typeof originalLP.hoverDelay === 'number' && migratedLP2.hoverDelay !== originalLP.hoverDelay) ||
+            (typeof originalLP.longPressDelay === 'number' && migratedLP2.longPressDelay !== originalLP.longPressDelay))
+            ? { ...loadedSettings, linkPreviewSettings: migratedLP2 }
             : loadedSettings
   
         // 若发生迁移，落盘保存，避免下次再次迁移
         if (finalSettings !== loadedSettings) {
           try {
-            await StorageManager.saveSetting('linkPreviewSettings', migratedLP as any)
+            await StorageManager.saveSetting('linkPreviewSettings', (finalSettings.linkPreviewSettings as any))
           } catch (e) {
             console.warn('保存迁移后的 linkPreviewSettings 失败，不影响继续使用', e)
           }

@@ -7,9 +7,9 @@ export interface LinkPreviewSettings {
   triggerMethod: 'drag' | 'hover' | 'longPress' | 'click' | 'customHover' | 'disabled'
   // 自定义快捷键：Ctrl（Windows推荐）、Alt（Windows）、Cmd（macOS）、Shift（通用）
   customShortcut: 'Alt' | 'Cmd' | 'Shift' | 'Ctrl'
-  // 悬停延迟时间（秒）：0.1s - 3s
+  // 悬停延迟时间（毫秒）：100ms - 3000ms
   hoverDelay: number
-  // 长按延迟时间（秒）：0.2s - 3s
+  // 长按延迟时间（毫秒）：200ms - 3000ms
   longPressDelay: number
   // 弹窗大小：上次大小、小型、中型（默认）、大型
   popupSize: 'last' | 'small' | 'medium' | 'large'
@@ -103,8 +103,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   linkPreviewSettings: {
     triggerMethod: 'drag',
     customShortcut: getDefaultShortcut(),
-    hoverDelay: 0.2,
-    longPressDelay: 0.5,
+    hoverDelay: 200, // 毫秒
+    longPressDelay: 500, // 毫秒
     // 首次打开：中型 + 居中
     popupSize: 'medium',
     popupPosition: 'center',
@@ -147,8 +147,8 @@ export interface SettingsValidators {
 // 设置验证器实现
 export const SETTINGS_VALIDATORS: SettingsValidators = {
   linkPreviewSettings: {
-    hoverDelay: (value: number) => value >= 0.1 && value <= 3,
-    longPressDelay: (value: number) => value >= 0.2 && value <= 3,
+    hoverDelay: (value: number) => value >= 100 && value <= 3000,
+    longPressDelay: (value: number) => value >= 200 && value <= 3000,
     backgroundOpacity: (value: number) => value >= 0 && value <= 100,
     maxFloatingWindows: (value: number) => value >= 1 && value <= 6,
   },
