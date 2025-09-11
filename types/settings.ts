@@ -25,10 +25,10 @@ export interface LinkPreviewSettings {
 
 // 拖拽文本设置接口
 export interface DragTextSettings {
-  // 搜索引擎：必应、谷歌、百度、DuckDuckGo
-  searchEngine: 'bing' | 'google' | 'baidu' | 'duckduckgo'
-  // 自动打开链接：是/否
-  autoOpenLink: boolean
+  // 搜索引擎：必应、谷歌、百度、DuckDuckGo、Perplexity
+  searchEngine: 'bing' | 'google' | 'baidu' | 'duckduckgo' | 'perplexity'
+  // 启用拖拽文本功能：是/否
+  enabled: boolean
   // 禁用网站列表（每行一个域名）
   disabledSites: string
 }
@@ -114,7 +114,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   },
   dragTextSettings: {
     searchEngine: 'bing',
-    autoOpenLink: false,
+    enabled: true,
     disabledSites: ''
   },
   themeSettings: {

@@ -70,11 +70,13 @@ export interface Translations {
     title: string;
     searchEngineLabel: string;
     searchEngines: {
-      bing: string;
-      google: string;
-      baidu: string;
-      duckduckgo: string;
-    };
+        bing: string;
+        google: string;
+        baidu: string;
+        duckduckgo: string;
+        perplexity: string;
+      };
+    newTabHint: string;
     enableLabel: string;
     enableDescription: string;
     maxLengthLabel: string;
@@ -118,6 +120,7 @@ export interface Translations {
       'ar': string;
     };
     reloadNote: string;
+    settingsSaved: string;
   };
   
   // Common
@@ -127,6 +130,10 @@ export interface Translations {
     save: string;
     cancel: string;
     reset: string;
+    resetSuccess: string;
+    resetFailed: string;
+    resetSettings: string;
+    resetSettingsDescription: string;
   };
 }
 
@@ -225,10 +232,12 @@ export const translations: Record<Language, Translations> = {
         bing: '必应搜索',
         google: '谷歌搜索',
         baidu: '百度搜索',
-        duckduckgo: 'DuckDuckGo'
+        duckduckgo: 'DuckDuckGo',
+        perplexity: 'Perplexity AI'
       },
-      enableLabel: '启用拖拽文本',
-      enableDescription: '允许拖拽选中的文本',
+      newTabHint: '百度搜索和Perplexity AI会在新标签页中打开',
+      enableLabel: '启用拖拽文本功能',
+      enableDescription: '开启后可以拖拽选中的文本进行搜索或预览',
       maxLengthLabel: '最大长度',
       maxLengthDescription: '拖拽文本的最大字符数',
       customTextLabel: '自定义文本',
@@ -268,7 +277,8 @@ export const translations: Record<Language, Translations> = {
         'pt': 'Português',
         'ar': 'العربية'
       },
-      reloadNote: '语言更改后需要重新加载扩展才能生效'
+      reloadNote: '语言更改后需要重新加载扩展才能生效',
+      settingsSaved: '设置已保存'
     },
     
     common: {
@@ -276,7 +286,11 @@ export const translations: Record<Language, Translations> = {
       disabled: '已禁用',
       save: '保存',
       cancel: '取消',
-      reset: '重置'
+      reset: '重置',
+      resetSuccess: '重置成功',
+      resetFailed: '重置失败',
+      resetSettings: '重置设置',
+      resetSettingsDescription: '将所有设置恢复为默认值'
     }
   },
 
@@ -374,10 +388,12 @@ export const translations: Record<Language, Translations> = {
         bing: 'Bing搜尋',
         google: 'Google搜尋',
         baidu: '百度搜尋',
-        duckduckgo: 'DuckDuckGo'
+        duckduckgo: 'DuckDuckGo',
+        perplexity: 'Perplexity AI'
       },
-      enableLabel: '啟用拖曳文字',
-      enableDescription: '允許拖曳選中的文字',
+      newTabHint: '百度搜尋和Perplexity AI會在新分頁中開啟',
+      enableLabel: '啟用拖曳文字功能',
+      enableDescription: '開啟後可以拖曳選中的文字進行搜尋或預覽',
       maxLengthLabel: '最大長度',
       maxLengthDescription: '拖曳文字的最大字元數',
       customTextLabel: '自訂文字',
@@ -417,15 +433,20 @@ export const translations: Record<Language, Translations> = {
         'pt': 'Português',
         'ar': 'العربية'
       },
-      reloadNote: '語言更改後需要重新載入擴充功能才能生效'
+      reloadNote: '語言更改後需要重新載入擴充功能才能生效',
+      settingsSaved: '設定已儲存'
     },
     
     common: {
       enabled: '已啟用',
-      disabled: '已停用',
+      disabled: '已禁用',
       save: '儲存',
       cancel: '取消',
-      reset: '重設'
+      reset: '重置',
+      resetSuccess: '重置成功',
+      resetFailed: '重置失敗',
+      resetSettings: '重置設定',
+      resetSettingsDescription: '將所有設定恢復為預設值'
     }
   },
 
@@ -523,10 +544,12 @@ export const translations: Record<Language, Translations> = {
         bing: 'Bing Search',
         google: 'Google Search',
         baidu: 'Baidu Search',
-        duckduckgo: 'DuckDuckGo'
+        duckduckgo: 'DuckDuckGo',
+        perplexity: 'Perplexity AI'
       },
-      enableLabel: 'Enable Drag Text',
-      enableDescription: 'Allow dragging selected text',
+      newTabHint: 'Baidu Search and Perplexity AI will open in new tabs',
+      enableLabel: 'Enable Drag Text Feature',
+      enableDescription: 'Enable dragging selected text for search or preview',
       maxLengthLabel: 'Max Length',
       maxLengthDescription: 'Maximum number of characters for dragged text',
       customTextLabel: 'Custom Text',
@@ -566,7 +589,8 @@ export const translations: Record<Language, Translations> = {
         'pt': 'Português',
         'ar': 'العربية'
       },
-      reloadNote: 'Extension needs to be reloaded after language change'
+      reloadNote: 'Extension needs to be reloaded after language change',
+      settingsSaved: 'Settings saved'
     },
     
     common: {
@@ -574,7 +598,11 @@ export const translations: Record<Language, Translations> = {
       disabled: 'Disabled',
       save: 'Save',
       cancel: 'Cancel',
-      reset: 'Reset'
+      reset: 'Reset',
+      resetSuccess: 'Reset successful',
+      resetFailed: 'Reset failed',
+      resetSettings: 'Reset Settings',
+      resetSettingsDescription: 'Restore all settings to default values'
     }
   },
 
@@ -677,10 +705,12 @@ export const translations: Record<Language, Translations> = {
         bing: 'Bing検索',
         google: 'Google検索',
         baidu: 'Baidu検索',
-        duckduckgo: 'DuckDuckGo'
+        duckduckgo: 'DuckDuckGo',
+        perplexity: 'Perplexity AI'
       },
-      enableLabel: 'テキストドラッグを有効にする',
-      enableDescription: '選択したテキストのドラッグを許可',
+      newTabHint: 'Baidu検索とPerplexity AIは新しいタブで開きます',
+      enableLabel: 'テキストドラッグ機能を有効にする',
+      enableDescription: '選択したテキストをドラッグして検索やプレビューを行う機能を有効にする',
       maxLengthLabel: '最大長',
       maxLengthDescription: 'ドラッグテキストの最大文字数',
       customTextLabel: 'カスタムテキスト',
@@ -720,7 +750,8 @@ export const translations: Record<Language, Translations> = {
         'pt': 'Português',
         'ar': 'العربية'
       },
-      reloadNote: '言語変更後は拡張機能の再読み込みが必要です'
+      reloadNote: '言語変更後は拡張機能の再読み込みが必要です',
+      settingsSaved: '設定が保存されました'
     },
     
     common: {
@@ -728,7 +759,11 @@ export const translations: Record<Language, Translations> = {
       disabled: '無効',
       save: '保存',
       cancel: 'キャンセル',
-      reset: 'リセット'
+      reset: 'リセット',
+      resetSuccess: 'リセット成功',
+      resetFailed: 'リセット失敗',
+      resetSettings: '設定をリセット',
+      resetSettingsDescription: 'すべての設定をデフォルト値に復元'
     }
   },
 
@@ -831,10 +866,12 @@ export const translations: Record<Language, Translations> = {
         bing: 'Bing 검색',
         google: 'Google 검색',
         baidu: 'Baidu 검색',
-        duckduckgo: 'DuckDuckGo'
+        duckduckgo: 'DuckDuckGo',
+        perplexity: 'Perplexity AI'
       },
-      enableLabel: '텍스트 드래그 활성화',
-      enableDescription: '선택된 텍스트 드래그 허용',
+      newTabHint: 'Baidu 검색과 Perplexity AI는 새 탭에서 열립니다',
+      enableLabel: '텍스트 드래그 기능 활성화',
+      enableDescription: '선택한 텍스트를 드래그하여 검색하거나 미리보기할 수 있는 기능을 활성화',
       maxLengthLabel: '최대 길이',
       maxLengthDescription: '드래그 텍스트의 최대 문자 수',
       customTextLabel: '사용자 정의 텍스트',
@@ -874,7 +911,8 @@ export const translations: Record<Language, Translations> = {
         'pt': 'Português',
         'ar': 'العربية'
       },
-      reloadNote: '언어 변경 후 확장 프로그램을 다시 로드해야 합니다'
+      reloadNote: '언어 변경 후 확장 프로그램을 다시 로드해야 합니다',
+      settingsSaved: '설정이 저장되었습니다'
     },
     
     common: {
@@ -882,7 +920,11 @@ export const translations: Record<Language, Translations> = {
       disabled: '비활성화됨',
       save: '저장',
       cancel: '취소',
-      reset: '재설정'
+      reset: '재설정',
+      resetSuccess: '재설정 성공',
+      resetFailed: '재설정 실패',
+      resetSettings: '설정 재설정',
+      resetSettingsDescription: '모든 설정을 기본값으로 복원'
     }
   },
 
@@ -985,10 +1027,12 @@ export const translations: Record<Language, Translations> = {
         bing: 'Recherche Bing',
         google: 'Recherche Google',
         baidu: 'Recherche Baidu',
-        duckduckgo: 'DuckDuckGo'
+        duckduckgo: 'DuckDuckGo',
+        perplexity: 'Perplexity AI'
       },
-      enableLabel: 'Activer le glissement de texte',
-      enableDescription: 'Permettre le glissement du texte sélectionné',
+      newTabHint: 'Baidu Search et Perplexity AI s\'ouvriront dans de nouveaux onglets',
+      enableLabel: 'Activer la fonction de glissement de texte',
+      enableDescription: 'Activer le glissement du texte sélectionné pour la recherche ou l\'aperçu',
       maxLengthLabel: 'Longueur maximale',
       maxLengthDescription: 'Nombre maximum de caractères pour le texte glissé',
       customTextLabel: 'Texte personnalisé',
@@ -1028,7 +1072,8 @@ export const translations: Record<Language, Translations> = {
         'pt': 'Português',
         'ar': 'العربية'
       },
-      reloadNote: 'L\'extension doit être rechargée après le changement de langue'
+      reloadNote: 'L\'extension doit être rechargée après le changement de langue',
+      settingsSaved: 'Paramètres sauvegardés'
     },
     
     common: {
@@ -1036,7 +1081,11 @@ export const translations: Record<Language, Translations> = {
       disabled: 'Désactivé',
       save: 'Enregistrer',
       cancel: 'Annuler',
-      reset: 'Réinitialiser'
+      reset: 'Réinitialiser',
+      resetSuccess: 'Réinitialisation réussie',
+      resetFailed: 'Échec de la réinitialisation',
+      resetSettings: 'Réinitialiser les paramètres',
+      resetSettingsDescription: 'Restaurer tous les paramètres aux valeurs par défaut'
     }
   },
 
@@ -1139,10 +1188,12 @@ export const translations: Record<Language, Translations> = {
         bing: 'Bing-Suche',
         google: 'Google-Suche',
         baidu: 'Baidu-Suche',
-        duckduckgo: 'DuckDuckGo'
+        duckduckgo: 'DuckDuckGo',
+        perplexity: 'Perplexity AI'
       },
-      enableLabel: 'Text-Ziehen aktivieren',
-      enableDescription: 'Ziehen von ausgewähltem Text erlauben',
+      newTabHint: 'Baidu-Suche und Perplexity AI öffnen sich in neuen Tabs',
+      enableLabel: 'Text-Ziehen-Funktion aktivieren',
+      enableDescription: 'Aktiviert das Ziehen von ausgewähltem Text für Suche oder Vorschau',
       maxLengthLabel: 'Maximale Länge',
       maxLengthDescription: 'Maximale Anzahl von Zeichen für gezogenen Text',
       customTextLabel: 'Benutzerdefinierter Text',
@@ -1182,7 +1233,8 @@ export const translations: Record<Language, Translations> = {
         'pt': 'Português',
         'ar': 'العربية'
       },
-      reloadNote: 'Erweiterung muss nach Sprachänderung neu geladen werden'
+      reloadNote: 'Die Erweiterung muss nach der Sprachänderung neu geladen werden',
+      settingsSaved: 'Einstellungen gespeichert'
     },
     
     common: {
@@ -1190,7 +1242,11 @@ export const translations: Record<Language, Translations> = {
       disabled: 'Deaktiviert',
       save: 'Speichern',
       cancel: 'Abbrechen',
-      reset: 'Zurücksetzen'
+      reset: 'Zurücksetzen',
+      resetSuccess: 'Zurücksetzen erfolgreich',
+      resetFailed: 'Zurücksetzen fehlgeschlagen',
+      resetSettings: 'Einstellungen zurücksetzen',
+      resetSettingsDescription: 'Alle Einstellungen auf Standardwerte zurücksetzen'
     }
   },
 
@@ -1293,10 +1349,12 @@ export const translations: Record<Language, Translations> = {
         bing: 'Поиск Bing',
         google: 'Поиск Google',
         baidu: 'Поиск Baidu',
-        duckduckgo: 'DuckDuckGo'
+        duckduckgo: 'DuckDuckGo',
+        perplexity: 'Perplexity AI'
       },
-      enableLabel: 'Включить перетаскивание текста',
-      enableDescription: 'Разрешить перетаскивание выделенного текста',
+      newTabHint: 'Поиск Baidu и Perplexity AI откроются в новых вкладках',
+      enableLabel: 'Включить функцию перетаскивания текста',
+      enableDescription: 'Включить перетаскивание выделенного текста для поиска или предварительного просмотра',
       maxLengthLabel: 'Максимальная длина',
       maxLengthDescription: 'Максимальное количество символов для перетаскиваемого текста',
       customTextLabel: 'Пользовательский текст',
@@ -1336,7 +1394,8 @@ export const translations: Record<Language, Translations> = {
         'pt': 'Português',
         'ar': 'العربية'
       },
-      reloadNote: 'Расширение необходимо перезагрузить после изменения языка'
+      reloadNote: 'Расширение необходимо перезагрузить после смены языка',
+      settingsSaved: 'Настройки сохранены'
     },
     
     common: {
@@ -1344,7 +1403,11 @@ export const translations: Record<Language, Translations> = {
       disabled: 'Отключено',
       save: 'Сохранить',
       cancel: 'Отмена',
-      reset: 'Сброс'
+      reset: 'Сброс',
+      resetSuccess: 'Сброс успешен',
+      resetFailed: 'Сброс не удался',
+      resetSettings: 'Сбросить настройки',
+      resetSettingsDescription: 'Восстановить все настройки к значениям по умолчанию'
     }
   },
 
@@ -1447,10 +1510,12 @@ export const translations: Record<Language, Translations> = {
         bing: 'Ricerca Bing',
         google: 'Ricerca Google',
         baidu: 'Ricerca Baidu',
-        duckduckgo: 'DuckDuckGo'
+        duckduckgo: 'DuckDuckGo',
+        perplexity: 'Perplexity AI'
       },
-      enableLabel: 'Abilita trascinamento testo',
-      enableDescription: 'Consenti il trascinamento del testo selezionato',
+      newTabHint: 'Ricerca Baidu e Perplexity AI si apriranno in nuove schede',
+      enableLabel: 'Abilita funzione trascinamento testo',
+      enableDescription: 'Abilita il trascinamento del testo selezionato per ricerca o anteprima',
       maxLengthLabel: 'Lunghezza massima',
       maxLengthDescription: 'Numero massimo di caratteri per il testo trascinato',
       customTextLabel: 'Testo personalizzato',
@@ -1490,16 +1555,21 @@ export const translations: Record<Language, Translations> = {
         'pt': 'Português',
         'ar': 'العربية'
       },
-      reloadNote: 'L\'estensione deve essere ricaricata dopo il cambio di lingua'
+      reloadNote: 'L\'estensione deve essere ricaricata dopo il cambio di lingua',
+      settingsSaved: 'Impostazioni salvate'
     },
     
     common: {
       enabled: 'Abilitato',
       disabled: 'Disabilitato',
       save: 'Salva',
-       cancel: 'Annulla',
-       reset: 'Ripristina'
-     }
+      cancel: 'Annulla',
+      reset: 'Ripristina',
+      resetSuccess: 'Ripristino riuscito',
+      resetFailed: 'Ripristino fallito',
+      resetSettings: 'Ripristina impostazioni',
+      resetSettingsDescription: 'Ripristina tutte le impostazioni ai valori predefiniti'
+    }
    },
 
    'es': {
@@ -1601,10 +1671,12 @@ export const translations: Record<Language, Translations> = {
          bing: 'Búsqueda Bing',
          google: 'Búsqueda Google',
          baidu: 'Búsqueda Baidu',
-         duckduckgo: 'DuckDuckGo'
+         duckduckgo: 'DuckDuckGo',
+         perplexity: 'Perplexity AI'
        },
-       enableLabel: 'Habilitar arrastre de texto',
-       enableDescription: 'Permitir arrastrar texto seleccionado',
+       newTabHint: 'Búsqueda Baidu y Perplexity AI se abrirán en nuevas pestañas',
+       enableLabel: 'Habilitar función de arrastrar texto',
+      enableDescription: 'Habilitar arrastrar texto seleccionado para búsqueda o vista previa',
        maxLengthLabel: 'Longitud máxima',
        maxLengthDescription: 'Número máximo de caracteres para texto arrastrado',
        customTextLabel: 'Texto personalizado',
@@ -1644,7 +1716,8 @@ export const translations: Record<Language, Translations> = {
          'pt': 'Português',
          'ar': 'العربية'
        },
-       reloadNote: 'La extensión debe recargarse después del cambio de idioma'
+       reloadNote: 'La extensión debe recargarse después del cambio de idioma',
+       settingsSaved: 'Configuración guardada'
      },
      
      common: {
@@ -1652,7 +1725,11 @@ export const translations: Record<Language, Translations> = {
        disabled: 'Deshabilitado',
        save: 'Guardar',
        cancel: 'Cancelar',
-       reset: 'Restablecer'
+       reset: 'Restablecer',
+       resetSuccess: 'Restablecimiento exitoso',
+       resetFailed: 'Restablecimiento fallido',
+       resetSettings: 'Restablecer configuración',
+       resetSettingsDescription: 'Restaurar toda la configuración a los valores predeterminados'
      }
    },
 
@@ -1707,7 +1784,7 @@ export const translations: Record<Language, Translations> = {
           medium: 'Médio',
           large: 'Grande'
         },
-       popupPositionLabel: 'Posição do popup',
+        popupPositionLabel: 'Posição do popup',
        popupPositions: {
           followMouse: 'Seguir o mouse',
           center: 'Centro da tela',
@@ -1752,13 +1829,15 @@ export const translations: Record<Language, Translations> = {
        title: 'Definições de arrastar texto',
        searchEngineLabel: 'Motor de busca',
        searchEngines: {
-         bing: 'Busca Bing',
-         google: 'Busca Google',
-         baidu: 'Busca Baidu',
-         duckduckgo: 'DuckDuckGo'
-       },
-       enableLabel: 'Ativar arrastar texto',
-       enableDescription: 'Permitir arrastar texto selecionado',
+          bing: 'Busca Bing',
+          google: 'Busca Google',
+          baidu: 'Busca Baidu',
+          duckduckgo: 'DuckDuckGo',
+          perplexity: 'Perplexity AI'
+        },
+        newTabHint: 'Busca Baidu e Perplexity AI abrirão em novas abas',
+       enableLabel: 'Ativar função de arrastar texto',
+      enableDescription: 'Ativar arrastar texto selecionado para pesquisa ou visualização',
        maxLengthLabel: 'Comprimento máximo',
        maxLengthDescription: 'Número máximo de caracteres para texto arrastado',
        customTextLabel: 'Texto personalizado',
@@ -1798,16 +1877,21 @@ export const translations: Record<Language, Translations> = {
          'pt': 'Português',
          'ar': 'العربية'
        },
-       reloadNote: 'A extensão precisa ser recarregada após a mudança de idioma'
-     },
+       reloadNote: 'A extensão precisa ser recarregada após a mudança de idioma',
+        settingsSaved: 'Configurações salvas'
+      },
      
-     common: {
-       enabled: 'Ativado',
-       disabled: 'Desativado',
-       save: 'Salvar',
-       cancel: 'Cancelar',
-       reset: 'Redefinir'
-     }
+      common: {
+        enabled: 'Ativado',
+        disabled: 'Desativado',
+        save: 'Salvar',
+        cancel: 'Cancelar',
+        reset: 'Redefinir',
+        resetSuccess: 'Redefinição bem-sucedida',
+        resetFailed: 'Redefinição falhada',
+        resetSettings: 'Redefinir configurações',
+        resetSettingsDescription: 'Restaurar todas as configurações aos valores padrão'
+      }
    },
 
    'ar': {
@@ -1906,13 +1990,15 @@ export const translations: Record<Language, Translations> = {
        title: 'إعدادات سحب النص',
        searchEngineLabel: 'محرك البحث',
        searchEngines: {
-         bing: 'بحث Bing',
-         google: 'بحث Google',
-         baidu: 'بحث Baidu',
-         duckduckgo: 'DuckDuckGo'
-       },
-       enableLabel: 'تمكين سحب النص',
-       enableDescription: 'السماح بسحب النص المحدد',
+          bing: 'بحث Bing',
+          google: 'بحث Google',
+          baidu: 'بحث Baidu',
+          duckduckgo: 'DuckDuckGo',
+          perplexity: 'Perplexity AI'
+        },
+        newTabHint: 'بحث Baidu و Perplexity AI سيفتحان في علامات تبويب جديدة',
+       enableLabel: 'تفعيل وظيفة سحب النص',
+      enableDescription: 'تفعيل سحب النص المحدد للبحث أو المعاينة',
        maxLengthLabel: 'الطول الأقصى',
        maxLengthDescription: 'العدد الأقصى من الأحرف للنص المسحوب',
        customTextLabel: 'نص مخصص',
@@ -1952,16 +2038,21 @@ export const translations: Record<Language, Translations> = {
          'pt': 'Português',
          'ar': 'العربية'
        },
-       reloadNote: 'يجب إعادة تحميل الإضافة بعد تغيير اللغة'
-     },
+       reloadNote: 'يجب إعادة تحميل الإضافة بعد تغيير اللغة',
+        settingsSaved: 'تم حفظ الإعدادات'
+      },
      
-     common: {
-       enabled: 'مُمكن',
-       disabled: 'معطل',
-       save: 'حفظ',
-       cancel: 'إلغاء',
-       reset: 'إعادة تعيين'
-     }
+      common: {
+        enabled: 'مُمكن',
+        disabled: 'معطل',
+        save: 'حفظ',
+        cancel: 'إلغاء',
+        reset: 'إعادة تعيين',
+        resetSuccess: 'إعادة التعيين نجحت',
+        resetFailed: 'إعادة التعيين فشلت',
+        resetSettings: 'إعادة تعيين الإعدادات',
+        resetSettingsDescription: 'استعادة جميع الإعدادات إلى القيم الافتراضية'
+      }
    }
  };
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import FloatingPreview from './FloatingPreview';
 import tailwindCss from '@/assets/tailwind.css?inline';
-import { LinkPreviewSettings, ThemeSettings } from '@/types/settings';
+import { LinkPreviewSettings, ThemeSettings, DragTextSettings } from '@/types/settings';
 import { FloatingPreviewSettings as FloatingPreviewSettingsType } from '@/types/floating-preview';
 
 // 将本地运行时设置命名为 ResolvedLinkPreviewSettings，避免与全局类型名混淆
@@ -30,11 +30,21 @@ export default defineContentScript({
     // 状态变量
     let isDragging = false; // 拖拽链接状态
     let draggedLink: HTMLAnchorElement | null = null; // 当前拖拽的链接
+    // 新增：拖拽文字状态
+    let isDraggingText = false; // 是否正在拖拽文本
+    let draggedText: string | null = null; // 当前拖拽的文本内容
     // legacy single-instance variable removed
     // 多实例悬浮窗：维护实例集合
     let previews = new Map<string, { container: HTMLElement; root: any; url: string; createdAt: number }>();
     let windowSeq = 0; // 用于生成唯一ID
      let settings: ResolvedLinkPreviewSettings | null = null; // 运行时设置
+    // 新增：拖拽文字设置（来自侧边栏开关与下拉）
+    let dragTextSettings: DragTextSettings = {
+      // 默认值与DEFAULT_SETTINGS保持一致
+      searchEngine: 'bing', // 默认搜索引擎
+      enabled: false, // 开关：是否启用拖拽文字功能（已按PRD改为总开关）
+      disabledSites: '' // 禁用站点列表
+    };
     // 记录用户在侧边栏选择的主题模式（light/dark/system），用于判断是否需要跟随系统
     let themeMode: 'system' | 'light' | 'dark' = 'system';
     // 系统主题监听器（仅当 themeMode === 'system' 时生效）
@@ -61,6 +71,66 @@ export default defineContentScript({
       return mode;
     };
 
+    // 新增：解析“禁用站点列表”为数组
+    const parseDisabledSites = (raw: string): string[] => {
+      return raw
+        .split('\n')
+        .map((s) => s.trim().toLowerCase())
+        .filter((s) => !!s);
+    };
+
+    // 新增：判断当前站点是否被禁用
+    const isSiteDisabled = (hostname: string, list: string[]): boolean => {
+      const host = (hostname || '').toLowerCase();
+      return list.some((rule) => {
+        if (!rule) return false;
+        // 支持以*.开头的通配，例如 *.example.com
+        if (rule.startsWith('*.')) {
+          const base = rule.slice(2);
+          return host === base || host.endsWith('.' + base);
+        }
+        // 一般匹配：末尾匹配即可（包含子域）
+        return host === rule || host.endsWith('.' + rule);
+      });
+    };
+
+    // 新增：判断文本是否为URL，并返回规范化后的URL（若不是则返回null）
+    const normalizeUrlFromText = (text: string): string | null => {
+      try {
+        const t = (text || '').trim();
+        if (!t) return null;
+        // 去除两端引号/空白
+        const cleaned = t.replace(/^['"\s]+|['"\s]+$/g, '');
+        // 直接是http(s)开头
+        if (/^https?:\/\//i.test(cleaned)) return cleaned;
+        // 形如 www.example.com 或 example.com/path
+        if (/^(?:[a-z0-9-]+\.)+[a-z]{2,}(?:\/\S*)?$/i.test(cleaned)) {
+          return 'https://' + cleaned;
+        }
+        return null;
+      } catch {
+        return null;
+      }
+    };
+
+    // 新增：构造搜索引擎查询URL
+    const buildSearchUrl = (engine: DragTextSettings['searchEngine'], query: string): string => {
+      const q = encodeURIComponent(query.trim());
+      switch (engine) {
+        case 'google':
+          return `https://www.google.com/search?q=${q}`;
+        case 'baidu':
+          return `https://www.baidu.com/s?wd=${q}&ie=utf-8&cl=3`;
+        case 'duckduckgo':
+          return `https://duckduckgo.com/?q=${q}`;
+        case 'perplexity':
+          return `https://www.perplexity.ai/search?q=${q}`;
+        case 'bing':
+        default:
+          return `https://www.bing.com/search?q=${q}`;
+      }
+    };
+
     // 加载设置（包含上次窗口尺寸与位置）
     const loadSettings = async () => {
       try {
@@ -69,6 +139,7 @@ export default defineContentScript({
           'themeSettings',
           'floatingPreviewLastSize',
           'floatingPreviewLastPosition',
+          'dragTextSettings',
         ]);
 
         const rawLinkPreviewSettings: LinkPreviewSettings = result.linkPreviewSettings || {
@@ -79,6 +150,8 @@ export default defineContentScript({
           popupSize: 'medium',
           popupPosition: 'center',
           backgroundOpacity: 50,
+          maxFloatingWindows: 3,
+          autoPin: false,
         } as any;
 
         // 兼容旧版本：将历史值 altClick 归一为 click，避免无法触发
@@ -86,6 +159,14 @@ export default defineContentScript({
           ...rawLinkPreviewSettings,
           triggerMethod: (rawLinkPreviewSettings as any).triggerMethod === 'altClick' ? 'click' : rawLinkPreviewSettings.triggerMethod
         } as LinkPreviewSettings;
+
+        // 读取拖拽文字设置
+        const rawDTS: DragTextSettings = result.dragTextSettings || {
+          searchEngine: 'bing',
+          enabled: false,
+          disabledSites: ''
+        };
+        dragTextSettings = { ...rawDTS };
 
         // 读取上次窗口尺寸（如果有）
         if (result.floatingPreviewLastSize && typeof result.floatingPreviewLastSize.width === 'number' && typeof result.floatingPreviewLastSize.height === 'number') {
@@ -125,12 +206,15 @@ export default defineContentScript({
           popupSize: 'medium',
           popupPosition: 'center',
           backgroundOpacity: 60,
+          maxFloatingWindows: 3,
+          autoPin: false,
           enabled: true,
           theme: getSystemTheme()
         } as ResolvedLinkPreviewSettings;
         themeMode = 'system';
         lastWindowSize = null;
         lastWindowPosition = null;
+        dragTextSettings = { searchEngine: 'bing', enabled: false, disabledSites: '' };
       }
     };
 
@@ -302,6 +386,17 @@ export default defineContentScript({
 
     const handleDragStart = (event: DragEvent) => {
       const target = event.target as HTMLElement;
+      // 优先判断是否在拖拽选中文本
+      const selection = window.getSelection?.();
+      const selectedText = selection ? selection.toString().trim() : '';
+      if (selectedText) {
+        isDraggingText = true;
+        draggedText = selectedText;
+        isDragging = false;
+        draggedLink = null;
+        return;
+      }
+      // 其次尝试识别拖拽链接
       const anchor = target?.closest?.('a');
       if (anchor && anchor instanceof HTMLAnchorElement) {
         isDragging = true;
@@ -311,6 +406,45 @@ export default defineContentScript({
 
     // 拖拽结束（仅当设置为 drag 时触发打开）
     const handleDragEnd = (event: DragEvent) => {
+      // 先处理“拖拽文字”功能（按开关控制）
+      if (isDraggingText) {
+        const text = (draggedText || '').trim();
+        // 重置拖拽文字状态
+        isDraggingText = false;
+        draggedText = null;
+
+        // 功能开关：关闭则直接忽略
+        if (!dragTextSettings?.enabled) {
+          isDragging = false;
+          draggedLink = null;
+          return;
+        }
+        // 禁用站点判断
+        const disabledList = parseDisabledSites(dragTextSettings.disabledSites || '');
+        if (isSiteDisabled(window.location.hostname, disabledList)) {
+          isDragging = false;
+          draggedLink = null;
+          return;
+        }
+        if (text) {
+          const normalized = normalizeUrlFromText(text);
+          const targetUrl = normalized ? normalized : buildSearchUrl(dragTextSettings.searchEngine, text);
+          // 对百度搜索和Perplexity搜索结果采用新标签打开，避免X-Frame-Options/CSP导致的iframe拒绝加载
+          try {
+            const host = new URL(targetUrl).hostname.toLowerCase();
+            if (host.endsWith('baidu.com') || host.endsWith('perplexity.ai')) {
+              window.open(targetUrl, '_blank');
+              return;
+            }
+          } catch (_) {}
+          createFloatingPreview(targetUrl, event.clientX, event.clientY);
+        }
+        isDragging = false;
+        draggedLink = null;
+        return;
+      }
+
+      // 其次处理“拖拽链接”逻辑（保持原有行为）
       if (isDragging && draggedLink && settings?.triggerMethod === 'drag') {
         const url = draggedLink.href;
         if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
@@ -339,6 +473,14 @@ export default defineContentScript({
       const delay = Math.max(0, settings.hoverDelay || 0);
       if (hoverTimer) window.clearTimeout(hoverTimer);
       hoverTimer = window.setTimeout(() => {
+        // 百度页面和Perplexity页面不支持被 iframe 嵌入，直接新开标签
+        try {
+          const host = new URL(href).hostname.toLowerCase();
+          if (host.endsWith('baidu.com') || host.endsWith('perplexity.ai')) {
+            window.open(href, '_blank');
+            return;
+          }
+        } catch (_) {}
         createFloatingPreview(href, event.clientX, event.clientY);
       }, delay) as unknown as number;
     };
@@ -365,6 +507,16 @@ export default defineContentScript({
       if (longPressTimer) window.clearTimeout(longPressTimer);
       longPressTimer = window.setTimeout(() => {
         // 触发时机使用按下位置附近
+        // 百度页面和Perplexity页面不支持被 iframe 嵌入，直接新开标签
+        try {
+          const host = new URL(href).hostname.toLowerCase();
+          if (host.endsWith('baidu.com') || host.endsWith('perplexity.ai')) {
+            window.open(href, '_blank');
+            // 标记长按已触发，避免后续click跳转
+            suppressNextClick = true;
+            return;
+          }
+        } catch (_) {}
         createFloatingPreview(href, event.clientX, event.clientY);
         // 标记：本次为长按触发，下一次 click 需要被抑制（避免跳转）
         suppressNextClick = true;
@@ -409,6 +561,14 @@ export default defineContentScript({
       // 需要修饰键
       if (!checkModifier(event)) return;
       try { event.preventDefault(); event.stopPropagation(); } catch { }
+      // 百度页面和Perplexity页面不支持被 iframe 嵌入，直接新开标签
+      try {
+        const host = new URL(href).hostname.toLowerCase();
+        if (host.endsWith('baidu.com') || host.endsWith('perplexity.ai')) {
+          window.open(href, '_blank');
+          return;
+        }
+      } catch (_) {}
       createFloatingPreview(href, event.clientX, event.clientY);
     };
 
@@ -459,6 +619,18 @@ export default defineContentScript({
       if (changes.linkPreviewSettings || changes.themeSettings || changes.floatingPreviewLastSize || changes.floatingPreviewLastPosition) {
         await loadSettings();
         rerenderAllPreviews();
+      }
+      // 新增：监听拖拽文字设置变更
+      if (changes.dragTextSettings) {
+        try {
+          const result = await browser.storage.local.get(['dragTextSettings']);
+          const rawDTS: DragTextSettings = result.dragTextSettings || {
+            searchEngine: 'bing',
+            enabled: false,
+            disabledSites: ''
+          };
+          dragTextSettings = { ...rawDTS };
+        } catch {}
       }
     };
 

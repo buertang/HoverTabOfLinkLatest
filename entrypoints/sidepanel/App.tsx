@@ -28,8 +28,9 @@ import {
   Moon,
   Sun,
   Settings,
+  RotateCcw,
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Toaster, toast } from "sonner";
 
 function App() {
   const config = useAppConfig();
@@ -46,6 +47,7 @@ function App() {
     updateSettings,
     resetSettings: resetAllSettings,
     validateDomains,
+    waitForNextSave,
   } = useSettingsManager();
 
   // 检查当前修饰键是否在当前平台可用，如果不可用则自动切换
@@ -81,7 +83,13 @@ function App() {
 
   const { resolvedTheme, setTheme } = useTheme({
     theme: settings.themeSettings.theme,
-    onThemeChange: (theme) => updateSetting("themeSettings", { theme }),
+    onThemeChange: (theme) => {
+      const p = waitForNextSave();
+      updateSetting("themeSettings", { theme });
+      p.then((ok) => {
+        if (ok) showSuccessToast(t.other.settingsSaved);
+      });
+    },
   });
 
   // 同步语言设置
@@ -108,10 +116,28 @@ function App() {
   ] as const;
 
   const handleTabChange = (value: string) => {
-    updateSetting("uiSettings", {
-      activeTab: value as "linkPreview" | "dragText" | "other",
-    });
+      updateSetting("uiSettings", {
+        activeTab: value as "linkPreview" | "dragText" | "other",
+      })
   };
+
+  // 显示设置保存成功提示
+  const showSuccessToast = (message: string) => {
+    // 使用统一配置的 sonner toast
+    toast(message);
+  };
+
+  // 统一的更新并在保存成功后提示的方法
+  const updateAndToast = React.useCallback(
+    (doUpdate: () => void) => {
+      const p = waitForNextSave();
+      doUpdate();
+      p.then((ok) => {
+        if (ok) showSuccessToast(t.other.settingsSaved);
+      });
+    },
+    [waitForNextSave, t.other.settingsSaved]
+  );
 
   if (settingsLoading || i18nLoading) {
     return (
@@ -129,7 +155,7 @@ function App() {
       <div className="border-none px-4 py-3">
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-            <Heart className="h-5 w-5 text-primary-foreground" />
+            <img src="/icon/128.png" alt="Logo" className="h-6 w-6" />
           </div>
           <div>
             <h1 className="font-semibold text-lg">HoverTabOfLink</h1>
@@ -199,17 +225,19 @@ function App() {
                 <LabelSelect
                   label={t.linkPreview.enableLabel}
                   value={settings.linkPreviewSettings.triggerMethod}
-                  onChange={(value) =>
-                    updateSetting("linkPreviewSettings", {
-                      triggerMethod: value as
-                        | "drag"
-                        | "hover"
-                        | "longPress"
-                        | "click"
-                        | "customHover"
-                        | "disabled",
-                    })
-                  }
+                  onChange={(value) => {
+                    updateAndToast(() =>
+                      updateSetting("linkPreviewSettings", {
+                        triggerMethod: value as
+                          | "drag"
+                          | "hover"
+                          | "longPress"
+                          | "click"
+                          | "customHover"
+                          | "disabled",
+                      })
+                    );
+                  }}
                   options={[
                     { value: "drag", label: t.linkPreview.triggerMethods.drag },
                     {
@@ -249,11 +277,13 @@ function App() {
                   <LabelSelect
                     label={t.linkPreview.shortcutKeyLabel}
                     value={settings.linkPreviewSettings.customShortcut}
-                    onChange={(value) =>
-                      updateSetting("linkPreviewSettings", {
-                        customShortcut: value as "Alt" | "Cmd" | "Shift",
-                      })
-                    }
+                    onChange={(value) => {
+                      updateAndToast(() =>
+                        updateSetting("linkPreviewSettings", {
+                          customShortcut: value as "Alt" | "Cmd" | "Shift",
+                        })
+                      );
+                    }}
                     options={getAvailableModifierKeys().map((key) => ({
                       value: key,
                       label:
@@ -268,11 +298,13 @@ function App() {
                   <DelaySlider
                     label={t.linkPreview.delayLabel}
                     value={settings.linkPreviewSettings.hoverDelay / 1000}
-                    onChange={(value) =>
-                      updateSetting("linkPreviewSettings", {
-                        hoverDelay: value * 1000,
-                      })
-                    }
+                    onChange={(value) => {
+                      updateAndToast(() =>
+                        updateSetting("linkPreviewSettings", {
+                          hoverDelay: value * 1000,
+                        })
+                      );
+                    }}
                     min={0.1}
                     max={2}
                     step={0.05}
@@ -284,11 +316,13 @@ function App() {
                   <DelaySlider
                     label={t.linkPreview.longPressDelayLabel}
                     value={settings.linkPreviewSettings.longPressDelay / 1000}
-                    onChange={(value) =>
-                      updateSetting("linkPreviewSettings", {
-                        longPressDelay: value * 1000,
-                      })
-                    }
+                    onChange={(value) => {
+                      updateAndToast(() =>
+                        updateSetting("linkPreviewSettings", {
+                          longPressDelay: value * 1000,
+                        })
+                      );
+                    }}
                     min={0.2}
                     max={3}
                     step={0.1}
@@ -301,11 +335,13 @@ function App() {
                   <DelaySlider
                     label={t.linkPreview.delayLabel}
                     value={settings.linkPreviewSettings.hoverDelay / 1000}
-                    onChange={(value) =>
-                      updateSetting("linkPreviewSettings", {
-                        hoverDelay: value * 1000,
-                      })
-                    }
+                    onChange={(value) => {
+                      updateAndToast(() =>
+                        updateSetting("linkPreviewSettings", {
+                          hoverDelay: value * 1000,
+                        })
+                      );
+                    }}
                     min={0.1}
                     max={2}
                     step={0.05}
@@ -316,11 +352,13 @@ function App() {
                 <LabelSelect
                   label={t.linkPreview.sizeLabel}
                   value={settings.linkPreviewSettings.popupSize}
-                  onChange={(value) =>
-                    updateSetting("linkPreviewSettings", {
-                      popupSize: value as "last" | "small" | "medium" | "large",
-                    })
-                  }
+                  onChange={(value) => {
+                    updateAndToast(() =>
+                      updateSetting("linkPreviewSettings", {
+                        popupSize: value as "last" | "small" | "medium" | "large",
+                      })
+                    );
+                  }}
                   options={[
                     {
                       value: "last",
@@ -344,11 +382,13 @@ function App() {
                 <LabelSelect
                   label={t.linkPreview.positionLabel}
                   value={settings.linkPreviewSettings.popupPosition}
-                  onChange={(value) =>
-                    updateSetting("linkPreviewSettings", {
-                      popupPosition: value as "last" | "center" | "left" | "right",
-                    })
-                  }
+                  onChange={(value) => {
+                    updateAndToast(() =>
+                      updateSetting("linkPreviewSettings", {
+                        popupPosition: value as "last" | "center" | "left" | "right",
+                      })
+                    );
+                  }}
                   options={[
                     {
                       value: "last",
@@ -372,11 +412,13 @@ function App() {
                 <DelaySlider
                   label={t.linkPreview.opacityLabel}
                   value={settings.linkPreviewSettings.backgroundOpacity}
-                  onChange={(value) =>
-                    updateSetting("linkPreviewSettings", {
-                      backgroundOpacity: value,
-                    })
-                  }
+                  onChange={(value) => {
+                    updateAndToast(() =>
+                      updateSetting("linkPreviewSettings", {
+                        backgroundOpacity: value,
+                      })
+                    );
+                  }}
                   min={0}
                   max={100}
                   step={5}
@@ -389,9 +431,11 @@ function App() {
                   value={settings.linkPreviewSettings.maxFloatingWindows}
                   onChange={(value) => {
                     const numValue = Number(value);
-                    updateSetting("linkPreviewSettings", {
-                      maxFloatingWindows: numValue,
-                    });
+                    updateAndToast(() =>
+                      updateSetting("linkPreviewSettings", {
+                        maxFloatingWindows: numValue,
+                      })
+                    );
                   }}
                   options={[
                     { value: '1', label: '1' },
@@ -415,9 +459,9 @@ function App() {
                   </div>
                   <Switch
                     checked={settings.linkPreviewSettings.autoPin}
-                    onCheckedChange={(checked) =>
-                      updateSetting("linkPreviewSettings", { autoPin: checked })
-                    }
+                    onCheckedChange={(checked) => {
+                      updateAndToast(() => updateSetting("linkPreviewSettings", { autoPin: checked }));
+                    }}
                   />
                 </div>
               </div>
@@ -436,27 +480,34 @@ function App() {
                   </p>
                 </div>
                 <Switch
-                  checked={settings.dragTextSettings.autoOpenLink}
-                  onCheckedChange={(checked) =>
-                    updateSetting("dragTextSettings", { autoOpenLink: checked })
-                  }
+                  checked={settings.dragTextSettings.enabled}
+                  onCheckedChange={(checked) => {
+                    updateAndToast(() => {
+                      updateSetting("dragTextSettings", { enabled: checked });
+                    });
+                  }}
                 />
               </div>
 
               <div className="space-y-6">
                 <LabelSelect
                   label={t.dragText.searchEngineLabel}
+                  description={t.dragText.newTabHint}
+                  layout="complex"
                   value={settings.dragTextSettings.searchEngine}
-                  onChange={(value) =>
-                    updateSetting("dragTextSettings", {
-                      searchEngine: value as
-                        | "bing"
-                        | "google"
-                        | "baidu"
-                        | "duckduckgo",
-                    })
-                  }
-                  disabled={!settings.dragTextSettings.autoOpenLink}
+                  onChange={(value) => {
+                    updateAndToast(() => {
+                      updateSetting("dragTextSettings", {
+                        searchEngine: value as
+                          | "bing"
+                          | "google"
+                          | "baidu"
+                          | "duckduckgo"
+                          | "perplexity",
+                      });
+                    });
+                  }}
+                  disabled={!settings.dragTextSettings.enabled}
                   options={[
                     { value: "bing", label: t.dragText.searchEngines.bing },
                     { value: "google", label: t.dragText.searchEngines.google },
@@ -464,6 +515,10 @@ function App() {
                     {
                       value: "duckduckgo",
                       label: t.dragText.searchEngines.duckduckgo,
+                    },
+                    {
+                      value: "perplexity",
+                      label: t.dragText.searchEngines.perplexity,
                     },
                   ]}
                 />
@@ -477,16 +532,22 @@ function App() {
                   </p>
                   <div className="space-y-2">
                     <Textarea
+                      disabled={!settings.dragTextSettings.enabled}
                       value={settings.dragTextSettings.disabledSites}
                       onChange={(e) => {
                         const value = e.target.value;
-                        updateSetting("dragTextSettings", {
-                          disabledSites: value,
-                        });
+                        updateAndToast(() =>
+                          updateSetting("dragTextSettings", {
+                            disabledSites: value,
+                          })
+                        );
 
                         // 实时验证域名
                         if (value.trim()) {
                           validateDomains(value);
+                        } else {
+                          // 输入框为空时清除验证状态
+                          validateDomains("");
                         }
                       }}
                       placeholder={t.dragText.disabledSitesPlaceholder}
@@ -570,6 +631,7 @@ function App() {
                             updateSetting("themeSettings", {
                               theme: option.value,
                             });
+                            // showSuccessToast已在useTheme的onThemeChange中调用，无需重复
                           }}
                           className="flex flex-col gap-1 h-auto py-3"
                         >
@@ -632,42 +694,115 @@ function App() {
                   onChange={(value) => {
                     // 同时更新useTranslation钩子和本地状态
                     setLanguage(value as Language);
-                    updateSetting("languageSettings", {
-                      language: value as
-                        | "zh-CN"
-                        | "zh-TW"
-                        | "en"
-                        | "ja"
-                        | "ko"
-                        | "fr"
-                        | "de"
-                        | "ru"
-                        | "it"
-                        | "es"
-                        | "pt"
-                        | "ar",
-                    });
+                    updateAndToast(() =>
+                      updateSetting("languageSettings", {
+                        language: value as
+                          | "zh-CN"
+                          | "zh-TW"
+                          | "en"
+                          | "ko"
+                          | "fr"
+                          | "de"
+                          | "ru"
+                          | "it"
+                          | "es"
+                          | "ja"
+                          | "pt"
+                          | "ar",
+                      })
+                    );
                   }}
                   options={[
                     { value: "zh-CN", label: t.other.languages["zh-CN"] },
                     { value: "zh-TW", label: t.other.languages["zh-TW"] },
                     { value: "en", label: t.other.languages["en"] },
-                    { value: "ja", label: t.other.languages["ja"] },
                     { value: "ko", label: t.other.languages["ko"] },
                     { value: "fr", label: t.other.languages["fr"] },
                     { value: "de", label: t.other.languages["de"] },
                     { value: "ru", label: t.other.languages["ru"] },
                     { value: "it", label: t.other.languages["it"] },
                     { value: "es", label: t.other.languages["es"] },
+                    { value: "ja", label: t.other.languages["ja"] },
                     { value: "pt", label: t.other.languages["pt"] },
                     { value: "ar", label: t.other.languages["ar"] },
                   ]}
                 />
+
+                <Separator />
+
+                {/* 重置设置 */}
+                <div className="space-y-4 flex justify-between">
+                  <div>
+                    <Label className="text-base font-semibold text-foreground">
+                      {t.common.resetSettings}
+                    </Label>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {t.common.resetSettingsDescription}
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      try {
+                        resetAllSettings();
+                        toast(t.common.resetSuccess);
+                      } catch (error) {
+                        console.error('重置设置失败:', error);
+                        toast(t.common.resetFailed);
+                      }
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    {t.common.reset}
+                  </Button>
+                </div>
               </div>
             </ScrollArea>
           </TabsContent>
         </Tabs>
       </div>
+      
+      {/* Toast 通知组件 */}
+      <Toaster 
+        position="bottom-center"
+        theme={resolvedTheme === 'dark' ? 'dark' : 'light'}
+        toastOptions={{
+          style:{background: 'var(--primary)', color: 'var(--background)',
+            minHeight: '48px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            borderRadius: '8px',
+            fontWeight: '1500',
+            fontSize: '14px',
+            maxWidth:'200px',
+}
+        }}
+      /> 
+      {/* <Toaster 
+        position="bottom-center"
+        theme={resolvedTheme === 'dark' ? 'dark' : 'light'}
+        richColors
+        expand={false}
+        visibleToasts={2}
+        closeButton={false}
+        toastOptions={{
+          duration: 2000,
+          style: {
+            zIndex: 2147483647,
+            minHeight: '48px',
+            padding: '12px 16px',
+            fontSize: '14px',
+            fontWeight: '500',
+            border: '1px solid var(--border)',
+            background: 'var(--background)',
+            color: 'var(--foreground)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            borderRadius: '8px',
+          },
+          className: 'toast-custom',
+        }}
+      /> */}
     </div>
   );
 }

@@ -28,6 +28,8 @@ interface UseSettingsManagerReturn {
   resetSettings: () => void
   // 验证域名
   validateDomains: (domainsText: string) => boolean
+  // 等待下一次实际保存完成（有变更并成功写入存储）
+  waitForNextSave: () => Promise<boolean>
 }
 
 // 深度比较函数 - 检测对象是否发生变化
@@ -218,6 +220,17 @@ export function useSettingsManager(): UseSettingsManagerReturn {
   // 用于防抖保存的引用
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const previousSettingsRef = useRef<AppSettings>(DEFAULT_SETTINGS)
+  // 用于等待下一次保存完成的Promise集合
+  const saveResolversRef = useRef<Array<(ok: boolean) => void>>([])
+  // 统一resolve并清空等待者
+  const resolveAndClearSaveResolvers = (ok: boolean) => {
+    if (saveResolversRef.current.length > 0) {
+      saveResolversRef.current.forEach((resolve) => {
+        try { resolve(ok) } catch {}
+      })
+      saveResolversRef.current = []
+    }
+  }
   
   // 初始化加载设置
   useEffect(() => {
@@ -296,9 +309,16 @@ export function useSettingsManager(): UseSettingsManagerReturn {
           await StorageManager.saveSettings(changedSettings)
           previousSettingsRef.current = newSettings
           console.log('增量保存完成，变更项:', Object.keys(changedSettings))
+          // 成功保存，通知等待者
+          resolveAndClearSaveResolvers(true)
+        } else {
+          // 无实际变更，不显示成功提示
+          resolveAndClearSaveResolvers(false)
         }
       } catch (error) {
         console.error('保存设置失败:', error)
+        // 失败时通知等待者（false）
+        resolveAndClearSaveResolvers(false)
       }
     }, 300) // 300ms防抖延迟
   }, [isInitialized])
@@ -351,8 +371,11 @@ export function useSettingsManager(): UseSettingsManagerReturn {
       await StorageManager.saveSettings(DEFAULT_SETTINGS)
       previousSettingsRef.current = DEFAULT_SETTINGS
       console.log('设置已重置为默认值')
+      // 重置为默认值后也算一次成功保存
+      resolveAndClearSaveResolvers(true)
     } catch (error) {
       console.error('重置设置失败:', error)
+      resolveAndClearSaveResolvers(false)
     }
   }, [])
   
@@ -361,6 +384,13 @@ export function useSettingsManager(): UseSettingsManagerReturn {
     const validation = DomainValidator.validateDomainList(domainsText)
     setDomainValidation(validation)
     return !validation.hasError && !validation.exceedsLimit
+  }, [])
+  
+  // 提供等待下一次保存结果的Promise
+  const waitForNextSave = useCallback((): Promise<boolean> => {
+    return new Promise<boolean>((resolve) => {
+      saveResolversRef.current.push(resolve)
+    })
   }, [])
   
   // 清理定时器
@@ -380,7 +410,8 @@ export function useSettingsManager(): UseSettingsManagerReturn {
     updateSetting,
     updateSettings,
     resetSettings,
-    validateDomains
+    validateDomains,
+    waitForNextSave
   }
 }
 

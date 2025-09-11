@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HoverTabOfLink - 链接预览悬浮窗工具</title>
     <meta name="description"
-        content="HoverTabOfLink是一款现代化的浏览器链接预览工具，支持Chrome/Edge/Firefox，提供流畅、高效、可高度自定义的悬浮窗口预览体验，帮助用户在不离开当前页面的情况下快速获取链接信息。">
-    <meta name="keywords" content="浏览器扩展,链接预览,悬浮窗,Chrome扩展,Firefox扩展,链接预览工具">
+        content="HoverTabOfLink是一款现代化的浏览器链接预览工具，支持Chrome/Edge/Firefox，提供流畅、高效、可高度自定义的悬浮窗口预览体验，帮助用户在不离开当前页面的情况下快速获取链接信息。支持拖拽文本搜索、多种触发方式和多语言界面。">
+    <meta name="keywords" content="浏览器扩展,链接预览,悬浮窗,Chrome扩展,Firefox扩展,链接预览工具,拖拽搜索,多语言支持">
     <link rel="icon" href="./public/icon/32.png" type="image/png">
     <style>
         /* 基础样式重置 */
@@ -34,7 +34,7 @@
 
         /* 头部导航 */
         .header {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(10px);
             padding: 1rem 0;
             position: fixed;
@@ -55,7 +55,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            color: white;
+            color: #5DADE2;
             text-decoration: none;
             font-size: 1.5rem;
             font-weight: bold;
@@ -73,7 +73,7 @@
         }
 
         .nav-links a {
-            color: white;
+            color: #5DADE2;
             text-decoration: none;
             transition: opacity 0.3s ease;
         }
@@ -468,7 +468,7 @@
                 <ul class="nav-links">
                     <li><a href="#features">功能特性</a></li>
                     <li><a href="#install">安装使用</a></li>
-                    <!-- <li><a href="#tech">技术栈</a></li> -->
+                    <li><a href="#settings">设置选项</a></li>
                     <li><a href="#download">下载</a></li>
                 </ul>
             </nav>
@@ -485,6 +485,7 @@
                 <p class="description">
                     一款现代化的浏览器链接预览工具，支持 Chrome/Edge/Firefox，采用 Manifest V3 标准。
                     提供流畅、高效、可高度自定义的悬浮窗口预览体验，帮助用户在不离开当前页面的情况下快速获取链接信息。
+                    支持拖拽文本搜索、多种触发方式和多语言界面，全面提升您的浏览效率。
                 </p>
                 <div class="btn-group">
                     <a href="#install" class="btn btn-primary">
@@ -502,32 +503,69 @@
                     <div class="feature-card">
                         <div class="feature-icon">🔍</div>
                         <h3>链接预览</h3>
-                        <p>通过预设的触发方式（如悬停、拖拽链接等），在当前页面上打开悬浮窗口，快速预览链接内容。</p>
+                        <p>通过预设的触发方式（如悬停、拖拽链接等），在当前页面上打开悬浮窗口，快速预览链接内容。悬浮窗支持固定、刷新和在新标签页中打开。</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">🖱️</div>
                         <h3>多种触发方式</h3>
-                        <p>支持拖动链接、鼠标悬停、Alt+鼠标左键点击等多种触发方式，满足不同用户的使用习惯。</p>
+                        <p>支持拖动链接、鼠标悬停、长按、Alt+鼠标左键点击、Alt+鼠标悬停等多种触发方式，满足不同用户的使用习惯，并可自定义快捷键。</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">🎛️</div>
                         <h3>高度自定义</h3>
-                        <p>可调整悬浮窗大小、位置、背景遮罩透明度等，提供个性化的预览体验。</p>
+                        <p>可调整悬浮窗大小、位置、背景遮罩透明度等，提供个性化的预览体验。支持系统主题、浅色主题和深色主题切换。</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">📐</div>
                         <h3>灵活调整</h3>
-                        <p>悬浮窗支持拖拽移动和调整大小，可固定在屏幕任意位置，方便对比查看内容。</p>
+                        <p>悬浮窗支持拖拽移动和调整大小，可固定在屏幕任意位置，方便对比查看内容。新增自动固定功能，适合多任务处理场景。</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">🌐</div>
                         <h3>多浏览器支持</h3>
-                        <p>完美支持 Chrome、Edge 等主流基于 Chromium 的浏览器，一次开发，处处可用。</p>
+                        <p>完美支持 Chrome、Edge 等主流基于 Chromium 的浏览器，一次开发，处处可用。智能适配不同操作系统，提供一致体验。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔤</div>
+                        <h3>拖拽文本搜索</h3>
+                        <p>支持拖拽页面选中文本进行搜索，可选择必应、谷歌、百度、DuckDuckGo等搜索引擎。可设置禁用网站列表，最多支持50个域名。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌍</div>
+                        <h3>多语言支持</h3>
+                        <p>支持简体中文、繁体中文、英语、日语、韩语、法语、德语、俄语、意大利语、西班牙语、葡萄牙语、阿拉伯语等12种语言，覆盖全球主要地区用户。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>资源管理</h3>
+                        <p>可设置同时打开的悬浮窗数量（1-6个），当达到上限时自动关闭最早打开的悬浮窗，帮助用户有效管理系统资源，避免过多悬浮窗影响浏览体验。</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">⚙️</div>
                         <h3>现代化架构</h3>
-                        <p>基于 Manifest V3 标准，使用 TypeScript 和 React 开发，代码质量有保障。</p>
+                        <p>基于 Manifest V3 标准，使用 TypeScript 和 React 开发，代码质量有保障。采用 WXT 框架、Tailwind CSS 和 shadcn/ui 组件库，提供流畅的用户体验。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 设置选项 -->
+            <section id="settings" class="content-section">
+                <h2 class="section-title">⚙️ 设置选项</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔗</div>
+                        <h3>链接预览设置</h3>
+                        <p>自定义触发方式、悬停延迟、长按延迟、弹窗大小和位置、背景遮罩透明度、悬浮窗数量限制和自动固定功能，打造个性化的预览体验。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">✋</div>
+                        <h3>拖拽文字设置</h3>
+                        <p>启用或禁用拖拽文本功能，选择默认搜索引擎（必应、谷歌、百度、DuckDuckGo），设置禁用网站列表，支持通配符和域名格式验证。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <h3>主题与语言</h3>
+                        <p>选择系统主题、浅色主题或深色主题，切换界面语言（支持12种语言），提供舒适的视觉体验和本地化界面。</p>
                     </div>
                 </div>
             </section>
@@ -552,18 +590,14 @@
                             <p>安装完成后，在任意网页上尝试拖动链接或悬停，即可看到悬浮预览窗口。</p>
                         </div>
                     </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>个性化设置</h3>
+                            <p>通过扩展侧边栏访问设置面板，根据个人喜好调整各种选项。</p>
+                        </div>
+                    </div>
                 </div>
-
-                <!-- 权限说明 -->
-                <!-- <div class="permissions">
-                    <h3>🔐 权限说明</h3>
-                    <p style="margin-bottom: 1rem;">本扩展需要以下权限来提供完整功能：</p>
-                    <ul>
-                        <li><strong>activeTab</strong>: 获取当前活动标签页信息，用于识别链接和显示预览</li>
-                        <li><strong>storage</strong>: 保存用户设置和偏好，如悬浮窗大小、透明度等</li>
-                        <li><strong>&lt;all_urls&gt;</strong>: 允许在所有网站上显示悬浮预览窗口</li>
-                    </ul>
-                </div> -->
 
                 <!-- 隐私承诺 -->
                 <div class="privacy-promise">
@@ -573,160 +607,23 @@
                     </p>
                 </div>
             </section>
-
-            <!-- 技术栈 -->
-            <!-- <section id="tech" class="content-section">
-                <h2 class="section-title">🏗️ 技术栈</h2>
-                <div class="tech-stack">
-                    <div class="tech-category">
-                        <h3>核心框架</h3>
-                        <div class="tech-items">
-                            <div class="tech-item">
-                                <div class="tech-icon">⚙️</div>
-                                <div class="tech-name">WXT</div>
-                            </div>
-                            <div class="tech-item">
-                                <div class="tech-icon">⚛️</div>
-                                <div class="tech-name">React</div>
-                            </div>
-                            <div class="tech-item">
-                                <div class="tech-icon">📝</div>
-                                <div class="tech-name">TypeScript</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tech-category">
-                        <h3>样式与UI</h3>
-                        <div class="tech-items">
-                            <div class="tech-item">
-                                <div class="tech-icon">🎨</div>
-                                <div class="tech-name">Tailwind CSS</div>
-                            </div>
-                            <div class="tech-item">
-                                <div class="tech-icon">🧩</div>
-                                <div class="tech-name">Headless UI</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tech-category">
-                        <h3>开发工具</h3>
-                        <div class="tech-items">
-                            <div class="tech-item">
-                                <div class="tech-icon">📦</div>
-                                <div class="tech-name">pnpm</div>
-                            </div>
-                            <div class="tech-item">
-                                <div class="tech-icon">🔧</div>
-                                <div class="tech-name">ESLint</div>
-                            </div>
-                            <div class="tech-item">
-                                <div class="tech-icon">🧪</div>
-                                <div class="tech-name">Vitest</div>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-
-            <!-- <h3 style="text-align: center; margin: 3rem 0 2rem; color: #667eea;">📋 环境要求</h3>
-                <div style="background: #f8f9fa; padding: 2rem; border-radius: 12px; text-align: center;">
-                    <p><strong>Node.js:</strong> 18+ (推荐 23.8.0+)</p>
-                    <p><strong>包管理器:</strong> pnpm 8+ 或 npm</p>
-                    <p><strong>浏览器支持:</strong></p>
-                    <ul style="list-style: none; padding: 0; margin-top: 1rem;">
-                        <li>• Chrome 88+</li>
-                        <li>• Microsoft Edge 88+</li>
-                        <li>• Firefox 109+</li>
-                    </ul>
-                </div> -->
-            </section>
-
-            <!-- 下载区域 -->
-            <section id="download" class="content-section">
-                <h2 class="section-title">📥 下载安装</h2>
-                <div style="text-align: center;">
-                    <p style="font-size: 1.2rem; margin-bottom: 2rem; color: #666;">
-                        获取最新版本的 HoverTabOfLink，体验高效的链接预览功能。目前提供开发版本，支持 Chrome、Edge 等主流基于 Chromium 的浏览器。
-                    </p>
-                    <div class="btn-group">
-                        <a href="https://chrome.google.com/webstore/search/HoverTabOfLink"
-                            class="btn btn-primary btn-install" target="_blank">
-                            🌐 Chrome 应用商店
-                        </a>
-                    </div>
-                </div>
-            </section>
         </div>
     </main>
 
     <!-- 页脚 -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 HoverTabOfLink. | <a
+            <div class="footer-links">
+                <a href="#features">功能特性</a>
+                <a href="#install">安装使用</a>
+                <a href="#settings">设置选项</a>
+                <a href="#download">下载</a>
+            </div>
+            <p>&copy; 2025 HoverTabOfLink. 保留所有权利。 | <a
                     href="https://www.termsfeed.com/live/31c973c6-0558-4dca-a3c0-0cb6e5369d1a" target="_blank"
                     style="color: inherit; text-decoration: none; opacity: 0.8;">隐私政策</a></p>
-            <!-- <p style="margin-top: 1rem; opacity: 0.8;">
-                如果这个项目对您有帮助，请给个 ⭐ Star 支持一下！
-            </p> -->
         </div>
     </footer>
-
-    <script>
-        // 平滑滚动
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-
-        // 滚动时头部样式变化
-        window.addEventListener('scroll', function () {
-            const header = document.querySelector('.header');
-            const logo = document.querySelector('.logo');
-            const navLinks = document.querySelectorAll('.nav-links a');
-
-            if (window.scrollY > 100) {
-                header.style.background = 'rgba(255, 255, 255, 0.95)';
-                header.style.color = '#333';
-                logo.style.color = '#333';
-                navLinks.forEach(link => {
-                    link.style.color = '#333';
-                });
-            } else {
-                header.style.background = 'rgba(255, 255, 255, 0.1)';
-                header.style.color = 'white';
-                logo.style.color = 'white';
-                navLinks.forEach(link => {
-                    link.style.color = 'white';
-                });
-            }
-        });
-
-        // 动画观察器
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver(function (entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animation = 'fadeInUp 0.8s ease forwards';
-                }
-            });
-        }, observerOptions);
-
-        // 观察所有需要动画的元素
-        document.querySelectorAll('.content-section, .feature-card, .step').forEach(el => {
-            observer.observe(el);
-        });
-    </script>
 </body>
 
 </html>
