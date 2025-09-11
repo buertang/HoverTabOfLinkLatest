@@ -21,6 +21,13 @@ export function DelaySlider({
   step = 50,
   unit = "ms",
 }: DelaySliderProps) {
+  // 使用内部状态在拖拽时即时显示数值，但不立刻保存
+  const [internalValue, setInternalValue] = React.useState(value)
+  // 当外部值变化（例如加载或重置设置）时，同步到内部状态
+  React.useEffect(() => {
+    setInternalValue(value)
+  }, [value])
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -28,14 +35,17 @@ export function DelaySlider({
           {label}
         </Label>
         <span className="text-sm font-medium text-primary bg-primary/10 px-2 py-1 rounded-md">
-          {value}
+          {internalValue}
           {unit}
         </span>
       </div>
       <div className="space-y-3">
         <Slider
-          value={[value]}
-          onValueChange={([newValue]) => onChange(newValue)}
+          value={[internalValue]}
+          // 拖拽时仅更新内部值，不触发保存
+          onValueChange={([newValue]) => setInternalValue(newValue)}
+          // 松开鼠标/触控结束时再提交保存
+          onValueCommit={([commitValue]) => onChange(commitValue)}
           min={min}
           max={max}
           step={step}
