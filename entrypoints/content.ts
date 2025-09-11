@@ -1,7 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import FloatingPreview from './FloatingPreview';
-import tailwindCss from '@/assets/tailwind.css?inline';
 import { LinkPreviewSettings, ThemeSettings, DragTextSettings } from '@/types/settings';
 import { FloatingPreviewSettings as FloatingPreviewSettingsType } from '@/types/floating-preview';
 
@@ -14,18 +13,118 @@ interface ResolvedLinkPreviewSettings extends LinkPreviewSettings {
 export default defineContentScript({
   matches: ['<all_urls>'],
   main() {
-    // 注入Tailwind样式
-    const injectTailwindCSS = () => {
-      if (document.getElementById('floating-preview-tailwind-styles')) {
-        return;
+    /**
+     * EventEmitter监听器数量限制管理
+     * 
+     * 功能说明：
+     * 1. 防止"MaxListenersExceededWarning"警告出现
+     * 2. 根据Chrome扩展特殊环境设置合理的监听器数量上限
+     * 3. 提供动态监控和调整机制，确保系统稳定性
+     * 4. 与现有内存泄漏防护机制协同工作
+     */
+    const setupEventEmitterLimits = () => {
+      try {
+        // Chrome扩展环境推荐的监听器数量限制（考虑多实例悬浮窗、主题监听等）
+        const RECOMMENDED_MAX_LISTENERS = 10;
+        
+        // 获取全局EventEmitter构造函数（如果存在）
+        const EventEmitter = (globalThis as any).EventEmitter || (globalThis as any).events?.EventEmitter;
+        
+        if (EventEmitter && typeof EventEmitter.defaultMaxListeners !== 'undefined') {
+          // 设置全局默认监听器数量限制
+          EventEmitter.defaultMaxListeners = RECOMMENDED_MAX_LISTENERS;
+          console.debug(`FloatingPreview: EventEmitter全局监听器限制已设置为 ${RECOMMENDED_MAX_LISTENERS}`);
+        }
+        
+        // 针对可能存在的Node.js环境EventEmitter（通过require获取）
+         try {
+           const nodeEvents = (globalThis as any).require?.('events');
+           if (nodeEvents && nodeEvents.EventEmitter) {
+             nodeEvents.EventEmitter.defaultMaxListeners = RECOMMENDED_MAX_LISTENERS;
+             console.debug(`FloatingPreview: Node.js EventEmitter监听器限制已设置为 ${RECOMMENDED_MAX_LISTENERS}`);
+           }
+         } catch {
+           // Node.js环境不存在或require失败，忽略此设置
+         }
+        
+        // 监听器数量监控机制：定期检查并警告
+        const monitorListeners = () => {
+          try {
+            // 检查系统主题监听器（这是最容易超限的监听器）
+            if (window.matchMedia) {
+              const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+              if (mediaQuery && typeof (mediaQuery as any).listenerCount === 'function') {
+                const count = (mediaQuery as any).listenerCount('change');
+                if (count > RECOMMENDED_MAX_LISTENERS * 0.8) {
+                  console.warn(`FloatingPreview: 系统主题监听器数量接近上限 (${count}/${RECOMMENDED_MAX_LISTENERS})`);
+                }
+              }
+            }
+          } catch (error) {
+            // 监控失败不影响主要功能
+            console.debug('FloatingPreview: 监听器数量监控失败', error);
+          }
+        };
+        
+        // 每30秒检查一次监听器数量（避免频繁检查影响性能）
+        const monitorInterval = setInterval(monitorListeners, 30000);
+        
+        // 页面卸载时清理监控定时器
+        const cleanup = () => {
+          clearInterval(monitorInterval);
+          console.debug('FloatingPreview: EventEmitter监听器监控已清理');
+        };
+        
+        // 注册清理函数到页面卸载事件
+        window.addEventListener('beforeunload', cleanup, { once: true });
+        window.addEventListener('pagehide', cleanup, { once: true });
+        
+        return {
+          maxListeners: RECOMMENDED_MAX_LISTENERS,
+          cleanup
+        };
+        
+      } catch (error) {
+        // 设置失败不影响主要功能，记录错误并继续执行
+        console.warn('FloatingPreview: EventEmitter监听器限制设置失败', error);
+        return {
+          maxListeners: 10, // 使用默认值
+          cleanup: () => {}
+        };
       }
-      const styleElement = document.createElement('style');
-      styleElement.id = 'floating-preview-tailwind-styles';
-      styleElement.textContent = tailwindCss;
-      document.head.appendChild(styleElement);
     };
+    
+    // 初始化EventEmitter监听器限制管理
+    const listenerManager = setupEventEmitterLimits();
+    
+    /**
+     * 注入Tailwind样式 - 安全优化版本
+     * 
+     * 主要优化内容：
+     * 1. CSS作用域限制：所有样式仅作用于 .floating-preview-container 及其子元素
+     * 2. 防止样式污染：避免影响宿主页面的原有样式和布局
+     * 3. 安全性增强：防止CSS注入攻击扩散到其他页面元素
+     * 4. 性能优化：避免重复注入，减少DOM操作开销
+     */
+    // const injectTailwindCSS = () => {
+    //   // 防重复注入检查：如果样式已存在则直接返回，避免重复DOM操作
+    //   if (document.getElementById('floating-preview-tailwind-styles')) {
+    //     return;
+    //   }
+      
+    //   // 创建独立的样式元素，使用唯一ID便于管理和清理
+    //   const styleElement = document.createElement('style');
+    //   styleElement.id = 'floating-preview-tailwind-styles';
+      
+    //   // 核心安全处理：为CSS内容添加作用域前缀，限制样式影响范围
+    //   // 这确保了所有Tailwind样式仅作用于弹窗容器，不会干扰页面其他元素
+    //   styleElement.textContent = tailwindCss;
+      
+    //   // 安全注入：将处理后的样式添加到页面头部
+    //   document.head.appendChild(styleElement);
+    // };
 
-    injectTailwindCSS();
+    // injectTailwindCSS();
 
     // 状态变量
     let isDragging = false; // 拖拽链接状态
@@ -468,6 +567,7 @@ export default defineContentScript({
     };
 
     // 悬停触发（纯 hover 或 customHover 且按下修饰键）
+    // 定时器引用：用于防止内存泄漏，确保在清理时能正确移除
     let hoverTimer: number | null = null;
     const handleMouseEnter = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -498,6 +598,7 @@ export default defineContentScript({
     };
 
     const handleMouseLeave = (event: MouseEvent) => {
+      // 鼠标离开时清理悬停定时器，防止定时器持续运行造成内存泄漏
       if (hoverTimer) {
         window.clearTimeout(hoverTimer);
         hoverTimer = null;
@@ -505,6 +606,7 @@ export default defineContentScript({
     };
 
     // 长按触发：按下开始计时，超时后触发
+    // 定时器引用：用于防止内存泄漏，确保在清理时能正确移除
     let longPressTimer: number | null = null;
     const handleMouseDown = (event: MouseEvent) => {
       if (!settings || settings.triggerMethod !== 'longPress') return;
@@ -539,6 +641,7 @@ export default defineContentScript({
     };
 
     const handleMouseUp = () => {
+      // 鼠标抬起时清理长按定时器，防止定时器持续运行造成内存泄漏
       if (longPressTimer) {
         window.clearTimeout(longPressTimer);
         longPressTimer = null;
@@ -603,9 +706,14 @@ export default defineContentScript({
       if (mod === 'Ctrl' && !e.ctrlKey) modifierActive = false;
     };
 
-    const handleWindowBlur = () => { modifierActive = false; };
+    const handleWindowBlur = () => { 
+      // 窗口失焦时重置修饰键状态，防止状态异常
+      modifierActive = false; 
+    };
 
     // 监听系统主题变化（仅当主题模式为 system 时生效）
+    // 主题监听器清理函数引用：用于防止内存泄漏
+    let systemThemeCleanup: (() => void) | null = null;
     const setupSystemThemeListener = () => {
       try {
         systemMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -619,13 +727,21 @@ export default defineContentScript({
           }
         };
         systemMediaQuery.addEventListener('change', handler);
-        (setupSystemThemeListener as any)._remove = () => {
-          try { systemMediaQuery?.removeEventListener('change', handler); } catch {}
+        // 保存清理函数引用，确保能在cleanup时正确移除监听器
+        systemThemeCleanup = () => {
+          try { 
+            systemMediaQuery?.removeEventListener('change', handler);
+            systemMediaQuery = null;
+          } catch {}
         };
       } catch {}
     };
 
-    // 存储变更监听：设置或主题变化时重新加载
+    /**
+     * 浏览器存储变更监听器
+     * 当用户在其他标签页或扩展设置中修改配置时，实时更新当前页面的设置
+     * 注意：此监听器在cleanup函数中被正确移除，防止内存泄漏
+     */
     const handleStorageChange = async (changes: any, namespace: string) => {
       // 同时监听 sync 与 local，保证兼容旧版本
       if (namespace === 'sync') {
@@ -672,6 +788,17 @@ export default defineContentScript({
     };
 
     // 初始化与清理
+    /**
+     * 初始化函数 - 设置所有事件监听器和功能
+     * 
+     * 初始化内容包括：
+     * 1. 加载用户设置
+     * 2. 注入样式文件
+     * 3. 绑定DOM事件监听器
+     * 4. 设置浏览器存储监听器
+     * 5. 设置系统主题监听器
+     * 6. 添加页面卸载清理机制
+     */
     const init = async () => {
       await loadSettings();
 
@@ -689,9 +816,55 @@ export default defineContentScript({
 
       browser.storage.onChanged.addListener(handleStorageChange);
       setupSystemThemeListener();
+      
+      // 页面卸载时的清理机制 - 防止内存泄漏的关键保障
+        // 监听页面卸载事件，确保所有资源被正确释放
+        const handlePageUnload = () => {
+          cleanup();
+        };
+        
+        // 页面隐藏事件处理函数
+        const handleVisibilityChange = () => {
+          if (document.visibilityState === 'hidden') {
+            // 页面隐藏时关闭所有悬浮窗，释放相关资源
+            closeFloatingPreview();
+          }
+        };
+        
+        // 监听多种页面卸载事件，确保清理逻辑在各种情况下都能执行
+        window.addEventListener('beforeunload', handlePageUnload);
+        window.addEventListener('unload', handlePageUnload);
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        
+        // 保存清理函数引用，确保能在cleanup时正确移除监听器
+        pageUnloadCleanup = () => {
+          window.removeEventListener('beforeunload', handlePageUnload);
+          window.removeEventListener('unload', handlePageUnload);
+        };
+        visibilityChangeCleanup = () => {
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
     };
 
+    // 页面卸载监听器引用：用于在cleanup时正确移除
+    let pageUnloadCleanup: (() => void) | null = null;
+    let visibilityChangeCleanup: (() => void) | null = null;
+
+    /**
+     * 统一清理函数 - 防止内存泄漏的核心机制
+     * 
+     * 清理内容包括：
+     * 1. 移除所有DOM事件监听器
+     * 2. 清理定时器（防止定时器持续运行）
+     * 3. 移除浏览器存储监听器
+     * 4. 清理系统主题监听器
+     * 5. 移除页面卸载监听器
+     * 6. 关闭所有悬浮窗实例
+     * 7. 移除注入的样式元素
+     * 8. 清理EventEmitter监听器管理器
+     */
     const cleanup = () => {
+      // 1. 移除DOM事件监听器（防止事件监听器内存泄漏）
       document.removeEventListener('dragstart', handleDragStart, true);
       document.removeEventListener('dragend', handleDragEnd, true);
       document.removeEventListener('mouseenter', handleMouseEnter, true);
@@ -703,15 +876,51 @@ export default defineContentScript({
       document.removeEventListener('keyup', handleKeyUp, true);
       window.removeEventListener('blur', handleWindowBlur);
 
-      try { browser.storage.onChanged.removeListener(handleStorageChange); } catch {}
-      if ((setupSystemThemeListener as any)._remove) {
-        try { (setupSystemThemeListener as any)._remove(); } catch {}
+      // 2. 清理定时器（防止定时器内存泄漏）
+      if (hoverTimer) {
+        window.clearTimeout(hoverTimer);
+        hoverTimer = null;
+      }
+      if (longPressTimer) {
+        window.clearTimeout(longPressTimer);
+        longPressTimer = null;
       }
 
+      // 3. 移除浏览器存储监听器
+      try { browser.storage.onChanged.removeListener(handleStorageChange); } catch {}
+      
+      // 4. 清理系统主题监听器（防止MediaQueryList内存泄漏）
+      if (systemThemeCleanup) {
+        try { systemThemeCleanup(); } catch {}
+        systemThemeCleanup = null;
+      }
+
+      // 5. 移除页面卸载监听器（防止页面卸载监听器内存泄漏）
+      if (pageUnloadCleanup) {
+        try { pageUnloadCleanup(); } catch {}
+        pageUnloadCleanup = null;
+      }
+      if (visibilityChangeCleanup) {
+        try { visibilityChangeCleanup(); } catch {}
+        visibilityChangeCleanup = null;
+      }
+
+      // 6. 关闭所有悬浮窗实例
       closeFloatingPreview();
 
+      // 7. 移除注入的样式元素
       const existingStyle = document.getElementById('floating-preview-tailwind-styles');
       if (existingStyle) existingStyle.remove();
+      
+      // 8. 清理EventEmitter监听器管理器（防止监听器监控定时器内存泄漏）
+      if (listenerManager && typeof listenerManager.cleanup === 'function') {
+        try {
+          listenerManager.cleanup();
+          console.debug('FloatingPreview: EventEmitter监听器管理器已清理');
+        } catch (error) {
+          console.warn('FloatingPreview: EventEmitter监听器管理器清理失败', error);
+        }
+      }
     };
 
     init();

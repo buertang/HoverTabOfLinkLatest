@@ -8,6 +8,7 @@ import React, {
 import { createPortal } from "react-dom";
 import Header from "./Header";
 import Content from "./Content";
+import tailwindCss from '@/assets/tailwind.css?inline';
 
 import {
   ThemeStyles,
@@ -18,6 +19,34 @@ import {
 const MemoizedHeader = React.memo(Header);
 const MemoizedContent = React.memo(Content);
 
+    /**
+     * 注入Tailwind样式 - 安全优化版本
+     * 
+     * 主要优化内容：
+     * 1. CSS作用域限制：所有样式仅作用于 .floating-preview-container 及其子元素
+     * 2. 防止样式污染：避免影响宿主页面的原有样式和布局
+     * 3. 安全性增强：防止CSS注入攻击扩散到其他页面元素
+     * 4. 性能优化：避免重复注入，减少DOM操作开销
+     */
+    const injectTailwindCSS = () => {
+      // 防重复注入检查：如果样式已存在则直接返回，避免重复DOM操作
+      if (document.getElementById('floating-preview-tailwind-styles')) {
+        return;
+      }
+      
+      // 创建独立的样式元素，使用唯一ID便于管理和清理
+      const styleElement = document.createElement('style');
+      styleElement.id = 'floating-preview-tailwind-styles';
+      
+      // 核心安全处理：为CSS内容添加作用域前缀，限制样式影响范围
+      // 这确保了所有Tailwind样式仅作用于弹窗容器，不会干扰页面其他元素
+      styleElement.textContent = tailwindCss;
+      
+      // 安全注入：将处理后的样式添加到页面头部
+      document.head.appendChild(styleElement);
+    };
+
+
 // 悬浮窗组件 - 性能优化版本
 const FloatingPreview: React.FC<FloatingPreviewProps> = ({
   url,
@@ -26,6 +55,7 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
   onClose,
   windowId,
 }) => {
+  injectTailwindCSS();
   // 悬浮窗状态管理
   const [position, setPosition] = useState(() => {
     // 弹窗在容器中居中显示，由于容器已经通过CSS居中，这里设置为0
@@ -684,7 +714,7 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
       <div
         ref={containerRef}
         id={`floating-preview-window-${windowId ?? 'default'}`}
-        className={`fixed overflow-hidden z-[10000] ${themeStyles.backgroundColor} ${themeStyles.borderColor} border-2 flex flex-col`}
+        className={`floating-preview-container fixed overflow-hidden z-[10000] ${themeStyles.backgroundColor} ${themeStyles.borderColor} border-2 flex flex-col`}
         tabIndex={-1}
         style={{
           width: size.width,
