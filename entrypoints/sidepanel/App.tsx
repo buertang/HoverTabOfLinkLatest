@@ -29,6 +29,7 @@ import {
   Sun,
   Settings,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 function App() {
   const config = useAppConfig();
@@ -380,6 +381,27 @@ function App() {
                   max={100}
                   step={5}
                   unit="%"
+                />
+
+                <LabelSelect
+                  label={t.linkPreview.maxWindowsLabel}
+                  description={t.linkPreview.maxWindowsDescription}
+                  value={settings.linkPreviewSettings.maxFloatingWindows}
+                  onChange={(value) => {
+                    const numValue = Number(value);
+                    updateSetting("linkPreviewSettings", {
+                      maxFloatingWindows: numValue,
+                    });
+                  }}
+                  options={[
+                    { value: '1', label: '1' },
+                    { value: '2', label: '2' },
+                    { value: '3', label: '3' },
+                    { value: '4', label: '4' },
+                    { value: '5', label: '5' },
+                    { value: '6', label: '6' },
+                  ]}
+                  layout="complex"
                 />
               </div>
             </ScrollArea>

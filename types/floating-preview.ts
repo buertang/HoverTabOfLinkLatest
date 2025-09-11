@@ -24,6 +24,8 @@ export interface FloatingPreviewSettings {
   hoverDelay: number;
   autoClose: boolean;
   autoCloseDelay: number;
+  // 新增：默认固定新创建的预览窗口
+  autoPin?: boolean;
 }
 
 // FloatingPreview组件的Props接口
@@ -34,6 +36,8 @@ export interface FloatingPreviewProps {
   // 新增：用于固定初始位置的绝对坐标（优先级高于 settings.position）
   initialPosition?: { x: number; y: number };
   onClose: () => void;
+  // 新增：窗口唯一标识，用于多实例管理
+  windowId?: string;
 }
 
 // Header组件的Props接口

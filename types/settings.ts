@@ -17,6 +17,10 @@ export interface LinkPreviewSettings {
   popupPosition: 'last' | 'center' | 'left' | 'right'
   // 背景不透明度：0% - 100%
   backgroundOpacity: number
+  // 最大悬浮窗数量：1-6
+  maxFloatingWindows: number
+  // 是否默认固定新建的预览窗口
+  autoPin: boolean
 }
 
 // 拖拽文本设置接口
@@ -103,7 +107,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
     // 首次打开：中型 + 居中
     popupSize: 'medium',
     popupPosition: 'center',
-    backgroundOpacity: 60
+    backgroundOpacity: 60,
+    maxFloatingWindows: 3,
+    autoPin: false,
   },
   dragTextSettings: {
     searchEngine: 'bing',
@@ -130,6 +136,7 @@ export interface SettingsValidators {
     hoverDelay: SettingsValidator<number>
     longPressDelay: SettingsValidator<number>
     backgroundOpacity: SettingsValidator<number>
+    maxFloatingWindows: SettingsValidator<number>
   }
   dragTextSettings: {
     disabledSites: SettingsValidator<string>
@@ -141,7 +148,8 @@ export const SETTINGS_VALIDATORS: SettingsValidators = {
   linkPreviewSettings: {
     hoverDelay: (value: number) => value >= 0.1 && value <= 3,
     longPressDelay: (value: number) => value >= 0.2 && value <= 3,
-    backgroundOpacity: (value: number) => value >= 0 && value <= 100
+    backgroundOpacity: (value: number) => value >= 0 && value <= 100,
+    maxFloatingWindows: (value: number) => value >= 1 && value <= 6,
   },
   dragTextSettings: {
     disabledSites: (value: string) => {

@@ -30,8 +30,11 @@ export default defineContentScript({
     // 状态变量
     let isDragging = false; // 拖拽链接状态
     let draggedLink: HTMLAnchorElement | null = null; // 当前拖拽的链接
-    let floatingPreview: { container: HTMLElement; root: any } | null = null; // 悬浮窗实例
-    let settings: ResolvedLinkPreviewSettings | null = null; // 运行时设置
+    // legacy single-instance variable removed
+    // 多实例悬浮窗：维护实例集合
+    let previews = new Map<string, { container: HTMLElement; root: any; url: string; createdAt: number }>();
+    let windowSeq = 0; // 用于生成唯一ID
+     let settings: ResolvedLinkPreviewSettings | null = null; // 运行时设置
     // 记录用户在侧边栏选择的主题模式（light/dark/system），用于判断是否需要跟随系统
     let themeMode: 'system' | 'light' | 'dark' = 'system';
     // 系统主题监听器（仅当 themeMode === 'system' 时生效）
@@ -39,7 +42,7 @@ export default defineContentScript({
     // 保存最近一次打开的预览信息，便于在主题变更时重新渲染
     let lastPreviewUrl: string | null = null;
     let lastMousePos: { x: number; y: number } | null = null;
-
+    // 多实例版本不再使用全局最近预览信息
     // 新增：记录上次窗口尺寸与位置（用于 popupSize='last' 和 popupPosition='last'）
     let lastWindowSize: { width: number; height: number } | null = null;
     let lastWindowPosition: { x: number; y: number } | null = null;
@@ -132,8 +135,9 @@ export default defineContentScript({
     };
 
     // 统一渲染函数：用于首次创建和主题变更时的重新渲染
-    const renderFloatingPreview = (url: string, x: number, y: number) => {
+    const renderFloatingPreview = (url: string, x: number, y: number, opts?: { id?: string; forRerender?: boolean; onClose?: () => void }) => {
       if (!settings) return;
+      const { id, forRerender, onClose } = opts || {};
 
       const vw = Math.max(320, window.innerWidth || 0);
       const vh = Math.max(240, window.innerHeight || 0);
@@ -161,7 +165,6 @@ export default defineContentScript({
       const sizeToUse = resolveSize();
 
       // 计算初始位置：根据 popupPosition 传递给悬浮窗组件
-      // center -> 居中；left/right -> 屏幕左右侧并垂直居中；last -> 上次位置（无则居中）；
       let initialPosition: { x: number; y: number } | undefined;
       if (settings.popupPosition === 'center') {
         initialPosition = {
@@ -210,92 +213,93 @@ export default defineContentScript({
         showOnHover: settings.triggerMethod === 'hover' || settings.triggerMethod === 'customHover',
         hoverDelay: settings.hoverDelay || 100,
         autoClose: false,
-        autoCloseDelay: 3000
+        autoCloseDelay: 3000,
+        autoPin: settings.autoPin ?? false,
       };
 
       const element = React.createElement(FloatingPreview, {
         url,
         settings: floatingPreviewSettings,
-        mousePosition: { x, y },
-        initialPosition,
-        onClose: closeFloatingPreview
+        mousePosition: forRerender ? undefined : { x, y },
+        initialPosition: forRerender ? undefined : initialPosition,
+        onClose: onClose ?? (() => {}),
+        windowId: id,
       });
 
-      // 若已存在 root，则复用 root 进行重新渲染，从而更新主题而不丢失内部状态
-      if (floatingPreview) {
-        floatingPreview.root.render(element);
-      }
       return element;
     };
 
-    // 创建悬浮预览窗口 - 使用新的FloatingPreview组件
-    const createFloatingPreview = (url: string, x: number, y: number) => {
-      if (floatingPreview) {
-        closeFloatingPreview();
-      }
-
-      // 创建容器元素
-      const container = document.createElement('div');
-      container.id = 'floating-preview-container';
-      document.body.appendChild(container);
-
-      // 创建React根节点
-      const root = createRoot(container);
-
-      // 记录最近一次的预览参数
-      lastPreviewUrl = url;
-      lastMousePos = { x, y };
-
-      // 首次渲染
-      const element = renderFloatingPreview(url, x, y);
-      if (element) {
-        root.render(element);
-      }
-
-      floatingPreview = { container, root };
-    };
-
-    // 主题或设置变更后，尝试在不销毁的情况下更新现有预览
-    const rerenderFloatingPreview = () => {
-      if (!floatingPreview || !settings || !lastPreviewUrl || !lastMousePos) return;
-      renderFloatingPreview(lastPreviewUrl, lastMousePos.x, lastMousePos.y);
-    };
-
-    const closeFloatingPreview = () => {
-      // 在关闭时记录最后的位置和尺寸
+    // 关闭指定ID的悬浮窗，并记录最后位置与尺寸
+    const closePreviewInstance = (id: string) => {
       try {
-        // 通过全局 id 获取真实浮窗元素（使用 portal 渲染到 document.body）
-        const targetEl = document.getElementById('floating-preview-window') as HTMLElement | null;
+        const targetEl = document.getElementById(`floating-preview-window-${id}`) as HTMLElement | null;
         const rect = targetEl?.getBoundingClientRect();
-    
         if (rect && rect.width > 0 && rect.height > 0) {
           const vw = Math.max(0, window.innerWidth || 0);
           const vh = Math.max(0, window.innerHeight || 0);
           const margin = 16;
-          // 将位置约束到当前视口范围，避免极端值
           const x = Math.round(Math.min(Math.max(margin, rect.left), Math.max(margin, vw - rect.width - margin)));
           const y = Math.round(Math.min(Math.max(margin, rect.top), Math.max(margin, vh - rect.height - margin)));
           const width = Math.round(rect.width);
           const height = Math.round(rect.height);
-    
           browser.storage.local.set({
             floatingPreviewLastPosition: { x, y },
             floatingPreviewLastSize: { width, height },
           });
-          console.log('floatingPreviewLastPosition', { x: Math.round(rect.left), y: Math.round(rect.top) },
-            'floatingPreviewLastSize', { width: Math.round(rect.width), height: Math.round(rect.height) },)
         }
       } catch {}
-    
-      if (floatingPreview) {
-        floatingPreview.root.unmount();
-        document.body.removeChild(floatingPreview.container);
-        floatingPreview = null;
+      const inst = previews.get(id);
+      if (inst) {
+        try { inst.root.unmount(); } catch {}
+        try { document.body.removeChild(inst.container); } catch {}
+        previews.delete(id);
       }
     };
 
-    // ============= 触发方式实现 =============
-    // 拖拽开始
+    const closeAllPreviews = () => {
+      Array.from(previews.keys()).forEach((id) => closePreviewInstance(id));
+    };
+
+    // 创建悬浮预览窗口 - 支持多实例
+    const createFloatingPreview = (url: string, x: number, y: number) => {
+      if (!settings) return;
+      // 达到上限时，关闭最早的实例
+      const maxCount = Math.min(6, Math.max(1, (settings as any).maxFloatingWindows ?? 3));
+      if (previews.size >= maxCount) {
+        const oldest = Array.from(previews.entries()).sort((a, b) => a[1].createdAt - b[1].createdAt)[0];
+        if (oldest) closePreviewInstance(oldest[0]);
+      }
+
+      const id = `w${Date.now()}-${++windowSeq}`;
+      const container = document.createElement('div');
+      container.id = `floating-preview-container-${id}`;
+      document.body.appendChild(container);
+      const root = createRoot(container);
+      const element = renderFloatingPreview(url, x, y, { id, onClose: () => closePreviewInstance(id), forRerender: false });
+      if (element) {
+        root.render(element);
+        previews.set(id, { container, root, url, createdAt: Date.now() });
+      }
+    };
+
+    // 主题或设置变更后，尝试在不销毁的情况下更新现有预览（仅更新主题/遮罩等依赖settings的渲染）
+    const rerenderAllPreviews = () => {
+      if (!settings) return;
+      previews.forEach((inst, id) => {
+        const element = renderFloatingPreview(inst.url, 0, 0, { id, onClose: () => closePreviewInstance(id), forRerender: true });
+        if (element) inst.root.render(element);
+      });
+    };
+
+    const rerenderFloatingPreview = () => {
+      rerenderAllPreviews();
+    };
+
+    const closeFloatingPreview = () => {
+      // 统一改为关闭所有实例
+      closeAllPreviews();
+    };
+
     const handleDragStart = (event: DragEvent) => {
       const target = event.target as HTMLElement;
       const anchor = target?.closest?.('a');
@@ -335,9 +339,7 @@ export default defineContentScript({
       const delay = Math.max(0, settings.hoverDelay || 0);
       if (hoverTimer) window.clearTimeout(hoverTimer);
       hoverTimer = window.setTimeout(() => {
-        if (!floatingPreview) {
-          createFloatingPreview(href, event.clientX, event.clientY);
-        }
+        createFloatingPreview(href, event.clientX, event.clientY);
       }, delay) as unknown as number;
     };
 
@@ -438,7 +440,7 @@ export default defineContentScript({
             const newTheme = getSystemTheme();
             if (settings && settings.theme !== newTheme) {
               settings = { ...(settings as ResolvedLinkPreviewSettings), theme: newTheme };
-              rerenderFloatingPreview();
+              rerenderAllPreviews();
             }
           }
         };
@@ -454,7 +456,7 @@ export default defineContentScript({
       if (namespace !== 'local') return;
       if (changes.linkPreviewSettings || changes.themeSettings || changes.floatingPreviewLastSize || changes.floatingPreviewLastPosition) {
         await loadSettings();
-        rerenderFloatingPreview();
+        rerenderAllPreviews();
       }
     };
 

@@ -9,7 +9,7 @@ interface SelectOption {
 
 interface LabelSelectProps {
   label: string | undefined
-  value: string
+  value: string | number
   onChange: (value: string) => void
   options: SelectOption[]
   placeholder?: string
@@ -35,7 +35,7 @@ export function LabelSelect({
     return (
       <div className={`flex justify-between items-center ${className}`}>
         <Label className="text-base font-semibold text-foreground">{label}</Label>
-        <Select value={value} onValueChange={onChange} disabled={disabled}>
+        <Select value={String(value)} onValueChange={onChange} disabled={disabled}>
           <SelectTrigger className={disabled ? 'opacity-50 cursor-not-allowed' : ''}>
             <SelectValue placeholder={placeholder} />
           </SelectTrigger>
@@ -62,7 +62,7 @@ export function LabelSelect({
           </p>
         )}
       </div>
-      <Select value={value} onValueChange={onChange} disabled={disabled}>
+      <Select value={String(value)} onValueChange={onChange} disabled={disabled}>
         <SelectTrigger className={disabled ? 'opacity-50 cursor-not-allowed' : ''}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>

@@ -25,6 +25,7 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
   mousePosition,
   initialPosition,
   onClose,
+  windowId,
 }) => {
   // 悬浮窗状态管理
   const [position, setPosition] = useState(() => {
@@ -35,7 +36,7 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
     width: settings.width,
     height: settings.height,
   });
-  const [isPinned, setIsPinned] = useState(false); // 是否固定窗口
+  const [isPinned, setIsPinned] = useState(() => Boolean(settings.autoPin)); // 是否固定窗口
   const [isDragging, setIsDragging] = useState(false); // 是否正在拖拽
   const [isResizing, setIsResizing] = useState(false); // 是否正在调整大小
   const [isFollowingMouse, setIsFollowingMouse] = useState(true); // 是否跟随鼠标
@@ -750,7 +751,7 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
       {overlayElement}
       <div
         ref={containerRef}
-        id="floating-preview-window"
+        id={`floating-preview-window-${windowId ?? 'default'}`}
         className={`fixed overflow-hidden z-[10000] ${themeStyles.backgroundColor} ${themeStyles.borderColor} border-2 flex flex-col`}
         tabIndex={-1}
         style={{

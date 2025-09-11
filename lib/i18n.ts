@@ -58,6 +58,8 @@ export interface Translations {
     sizeLabel: string;
     sizeDescription?: string;
     sizes?: Record<string, string>;
+    maxWindowsLabel?: string;
+    maxWindowsDescription?: string;
   };
   
   // Drag Text settings
@@ -205,7 +207,9 @@ export const translations: Record<Language, Translations> = {
         small: '小',
         medium: '中',
         large: '大'
-      }
+      },
+      maxWindowsLabel: '最大悬浮窗数量',
+      maxWindowsDescription: '同屏最多显示的预览悬浮窗数量（1-6）'
     },
     
     dragText: {
@@ -349,7 +353,9 @@ export const translations: Record<Language, Translations> = {
         small: '小',
         medium: '中',
         large: '大'
-      }
+      },
+      maxWindowsLabel: '最大懸浮窗數量',
+      maxWindowsDescription: '同屏最多顯示的預覽懸浮窗數量（1-6）'
     },
     
     dragText: {
@@ -493,7 +499,9 @@ export const translations: Record<Language, Translations> = {
         small: 'Small',
         medium: 'Medium',
         large: 'Large'
-      }
+      },
+      maxWindowsLabel: 'Max floating windows',
+      maxWindowsDescription: 'Maximum number of preview popups shown simultaneously (1-6)'
     },
     
     dragText: {
@@ -645,7 +653,9 @@ export const translations: Record<Language, Translations> = {
         small: '小',
         medium: '中',
         large: '大'
-      }
+      },
+      maxWindowsLabel: '最大フローティングウィンドウ数',
+      maxWindowsDescription: '同時に表示されるプレビューポップアップの最大数（1-6）'
     },
     
     dragText: {
@@ -794,10 +804,12 @@ export const translations: Record<Language, Translations> = {
       sizeLabel: '미리보기 크기',
       sizeDescription: '미리보기 창의 크기 선택',
       sizes: {
-        small: '작게',
+        small: '작음',
         medium: '보통',
-        large: '크게'
-      }
+        large: '큼'
+      },
+      maxWindowsLabel: '최대 플로팅 창 수',
+      maxWindowsDescription: '동시에 표시되는 미리보기 팝업의 최대 수 (1-6)'
     },
     
     dragText: {
@@ -949,7 +961,9 @@ export const translations: Record<Language, Translations> = {
         small: 'Petit',
         medium: 'Moyen',
         large: 'Grand'
-      }
+      },
+      maxWindowsLabel: 'Nombre max de fenêtres flottantes',
+      maxWindowsDescription: 'Nombre maximum de popups de prévisualisation affichés simultanément (1-6)'
     },
     
     dragText: {
@@ -1101,7 +1115,9 @@ export const translations: Record<Language, Translations> = {
         small: 'Klein',
         medium: 'Mittel',
         large: 'Groß'
-      }
+      },
+      maxWindowsLabel: 'Max. schwebende Fenster',
+      maxWindowsDescription: 'Maximale Anzahl gleichzeitig angezeigter Vorschau-Popups (1-6)'
     },
     
     dragText: {
@@ -1253,7 +1269,9 @@ export const translations: Record<Language, Translations> = {
         small: 'Маленький',
         medium: 'Средний',
         large: 'Большой'
-      }
+      },
+      maxWindowsLabel: 'Макс. плавающих окон',
+      maxWindowsDescription: 'Максимальное количество всплывающих окон предварительного просмотра, отображаемых одновременно (1-6)'
     },
     
     dragText: {
@@ -1402,10 +1420,12 @@ export const translations: Record<Language, Translations> = {
       sizeLabel: 'Dimensione anteprima',
       sizeDescription: 'Scegli la dimensione della finestra di anteprima',
       sizes: {
-        small: 'Piccola',
-        medium: 'Media',
+        small: 'Piccolo',
+        medium: 'Medio',
         large: 'Grande'
-      }
+      },
+      maxWindowsLabel: 'Max finestre flottanti',
+      maxWindowsDescription: 'Numero massimo di popup di anteprima mostrati simultaneamente (1-6)'
     },
     
     dragText: {
@@ -1554,11 +1574,13 @@ export const translations: Record<Language, Translations> = {
        sizeLabel: 'Tamaño de vista previa',
        sizeDescription: 'Elegir el tamaño de la ventana de vista previa',
        sizes: {
-         small: 'Pequeño',
-         medium: 'Mediano',
-         large: 'Grande'
-       }
-     },
+        small: 'Pequeño',
+        medium: 'Mediano',
+        large: 'Grande'
+      },
+      maxWindowsLabel: 'Máx. ventanas flotantes',
+      maxWindowsDescription: 'Número máximo de ventanas emergentes de vista previa mostradas simultáneamente (1-6)'
+    },
      
      dragText: {
        title: 'Ajustes de arrastre de texto',
@@ -1706,11 +1728,13 @@ export const translations: Record<Language, Translations> = {
        sizeLabel: 'Tamanho da visualização',
        sizeDescription: 'Escolher o tamanho da janela de visualização',
        sizes: {
-         small: 'Pequeno',
-         medium: 'Médio',
-         large: 'Grande'
-       }
-     },
+        small: 'Pequeno',
+        medium: 'Médio',
+        large: 'Grande'
+      },
+      maxWindowsLabel: 'Máx. janelas flutuantes',
+      maxWindowsDescription: 'Número máximo de popups de visualização exibidos simultaneamente (1-6)'
+    },
      
      dragText: {
        title: 'Definições de arrastar texto',
@@ -1858,11 +1882,13 @@ export const translations: Record<Language, Translations> = {
        sizeLabel: 'حجم المعاينة',
        sizeDescription: 'اختر حجم نافذة المعاينة',
        sizes: {
-         small: 'صغير',
-         medium: 'متوسط',
-         large: 'كبير'
-       }
-     },
+        small: 'صغير',
+        medium: 'متوسط',
+        large: 'كبير'
+      },
+      maxWindowsLabel: 'الحد الأقصى للنوافذ العائمة',
+      maxWindowsDescription: 'العدد الأقصى من النوافذ المنبثقة للمعاينة المعروضة في نفس الوقت (1-6)'
+    },
      
      dragText: {
        title: 'إعدادات سحب النص',
