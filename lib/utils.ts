@@ -10,7 +10,8 @@ export function getPlatform(): 'macos' | 'windows' | 'other' {
   if (typeof navigator === 'undefined') return 'other'
   
   const userAgent = navigator.userAgent.toLowerCase()
-  const platform = navigator.platform?.toLowerCase() || ''
+  // 由于 navigator.platform 已弃用，改用 userAgent 判断
+  const platform = userAgent.includes('mac') ? 'mac' : userAgent.includes('win') ? 'win' : ''
   
   // 检测 macOS
   if (platform.includes('mac') || userAgent.includes('mac os')) {

@@ -84,15 +84,8 @@ class StorageManager {
         console.warn('Browser storage API not available')
         return
       }
-      // 优先写入同步存储，失败时降级到本地存储
-      try {
-        await browser.storage.sync.set({ [key]: value })
-        console.log(`设置已保存(sync): ${key}`, value)
-      } catch (err) {
-        console.warn('写入 chrome.storage.sync 失败，降级使用 local', err)
-        await browser.storage.local.set({ [key]: value })
-        console.log(`设置已保存(local): ${key}`, value)
-      }
+      await browser.storage.sync.set({ [key]: value })
+      console.log(`设置已保存: ${key}`, value)
     } catch (error) {
       console.error(`保存设置失败: ${key}`, error)
       throw error
@@ -114,15 +107,8 @@ class StorageManager {
       })
       
       if (Object.keys(settingsToSave).length > 0) {
-        // 优先写入同步存储，失败时降级到本地存储
-        try {
-          await browser.storage.sync.set(settingsToSave)
-          console.log('增量设置保存完成(sync):', Object.keys(settingsToSave))
-        } catch (err) {
-          console.warn('批量写入 chrome.storage.sync 失败，降级使用 local', err)
-          await browser.storage.local.set(settingsToSave)
-          console.log('增量设置保存完成(local):', Object.keys(settingsToSave))
-        }
+        await browser.storage.sync.set(settingsToSave)
+        console.log('增量设置保存完成:', Object.keys(settingsToSave))
       }
     } catch (error) {
       console.error('批量保存设置失败', error)
@@ -141,33 +127,12 @@ class StorageManager {
         return defaultValue
       }
       
-      // 1) 优先从同步存储读取
-      try {
-        const syncResult = await browser.storage.sync.get([key])
-        const savedSync = (syncResult as any)[key]
-        if (savedSync) {
-          console.log(`设置已从 sync 加载: ${key}`, savedSync)
-          // 合并默认设置和保存的设置，确保新增的配置项有默认值
-          return { ...defaultValue, ...savedSync }
-        }
-      } catch (e) {
-        console.warn(`从 chrome.storage.sync 读取失败: ${key}`, e)
-      }
-      
-      // 2) 回退到本地存储读取，并尝试迁移到同步存储
-      const localResult = await browser.storage.local.get([key])
-      const savedLocal = (localResult as any)[key]
-      
-      if (savedLocal) {
-        console.log(`设置已从 local 加载: ${key}`, savedLocal)
-        // 异步迁移到同步存储（若配额或频率限制导致失败，不影响继续使用）
-        try {
-          await browser.storage.sync.set({ [key]: savedLocal })
-          console.log(`设置已迁移到 sync: ${key}`)
-        } catch (migrateErr) {
-          console.warn(`迁移到 sync 失败，继续使用 local: ${key}`, migrateErr)
-        }
-        return { ...defaultValue, ...savedLocal }
+      const syncResult = await browser.storage.sync.get([key])
+      const savedSync = (syncResult as any)[key]
+      if (savedSync) {
+        console.log(`设置已加载: ${key}`, savedSync)
+        // 合并默认设置和保存的设置，确保新增的配置项有默认值
+        return { ...defaultValue, ...savedSync }
       }
       
       return defaultValue
@@ -271,56 +236,9 @@ export function useSettingsManager(): UseSettingsManagerReturn {
       try {
         setIsLoading(true)
         const loadedSettings = await StorageManager.loadAllSettings()
-  
-        // 迁移兼容：将历史值映射到新枚举（popupSize/popupPosition）
-        const mapSize: Record<string, 'last' | 'small' | 'medium' | 'large'> = {
-          lastSize: 'last',
-          defaultSize: 'medium',
-          contentAdaptive: 'medium',
-          default: 'medium',
-          adaptive: 'medium'
-        }
-        const mapPosition: Record<string, 'last' | 'center' | 'left' | 'right'> = {
-          followMouse: 'center',
-          topRight: 'right',
-          default: 'center'
-        }
-        const originalLP = loadedSettings.linkPreviewSettings
-        const migratedLP = {
-          ...originalLP,
-          popupSize: mapSize[originalLP.popupSize as string] || originalLP.popupSize,
-          popupPosition: mapPosition[originalLP.popupPosition as string] || originalLP.popupPosition
-        }
 
-        // 延迟单位迁移：旧版本以“秒”保存(<=3)，统一转换为“毫秒”
-        const migratedLP2 = { ...migratedLP } as typeof migratedLP & { hoverDelay: number; longPressDelay: number }
-        try {
-          if (typeof migratedLP2.hoverDelay === 'number' && migratedLP2.hoverDelay <= 3) {
-            migratedLP2.hoverDelay = Math.round(migratedLP2.hoverDelay * 1000)
-          }
-          if (typeof migratedLP2.longPressDelay === 'number' && migratedLP2.longPressDelay <= 3) {
-            migratedLP2.longPressDelay = Math.round(migratedLP2.longPressDelay * 1000)
-          }
-        } catch {}
-
-        const finalSettings =
-          (migratedLP.popupSize !== originalLP.popupSize || migratedLP.popupPosition !== originalLP.popupPosition ||
-            (typeof originalLP.hoverDelay === 'number' && migratedLP2.hoverDelay !== originalLP.hoverDelay) ||
-            (typeof originalLP.longPressDelay === 'number' && migratedLP2.longPressDelay !== originalLP.longPressDelay))
-            ? { ...loadedSettings, linkPreviewSettings: migratedLP2 }
-            : loadedSettings
-  
-        // 若发生迁移，落盘保存，避免下次再次迁移
-        if (finalSettings !== loadedSettings) {
-          try {
-            await StorageManager.saveSetting('linkPreviewSettings', (finalSettings.linkPreviewSettings as any))
-          } catch (e) {
-            console.warn('保存迁移后的 linkPreviewSettings 失败，不影响继续使用', e)
-          }
-        }
-  
-        setSettings(finalSettings)
-        previousSettingsRef.current = finalSettings
+        setSettings(loadedSettings)
+        previousSettingsRef.current = loadedSettings
         console.log('所有设置已初始化完成')
       } catch (error) {
         console.error('初始化设置失败:', error)

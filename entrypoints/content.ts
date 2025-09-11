@@ -233,19 +233,15 @@ export default defineContentScript({
     // 加载设置（包含上次窗口尺寸与位置）
     const loadSettings = async () => {
       try {
-        // 优先从 sync 读取用户设置和窗口状态，从 local 读取兜底
-        const [syncRes, localRes] = await Promise.all([
-          browser.storage.sync.get(['linkPreviewSettings', 'themeSettings', 'dragTextSettings', 'floatingPreviewLastSize', 'floatingPreviewLastPosition']),
-          browser.storage.local.get(['floatingPreviewLastSize', 'floatingPreviewLastPosition', 'linkPreviewSettings', 'themeSettings', 'dragTextSettings']),
-        ]);
+        // 仅从 sync 读取用户设置和窗口状态
+        const syncRes = await browser.storage.sync.get(['linkPreviewSettings', 'themeSettings', 'dragTextSettings', 'floatingPreviewLastSize', 'floatingPreviewLastPosition']);
 
         const result: any = {
-          linkPreviewSettings: (syncRes as any).linkPreviewSettings ?? (localRes as any).linkPreviewSettings,
-          themeSettings: (syncRes as any).themeSettings ?? (localRes as any).themeSettings,
-          dragTextSettings: (syncRes as any).dragTextSettings ?? (localRes as any).dragTextSettings,
-          // 位置与尺寸优先使用 sync
-          floatingPreviewLastSize: (syncRes as any).floatingPreviewLastSize ?? (localRes as any).floatingPreviewLastSize,
-          floatingPreviewLastPosition: (syncRes as any).floatingPreviewLastPosition ?? (localRes as any).floatingPreviewLastPosition,
+          linkPreviewSettings: (syncRes as any).linkPreviewSettings,
+          themeSettings: (syncRes as any).themeSettings,
+          dragTextSettings: (syncRes as any).dragTextSettings,
+          floatingPreviewLastSize: (syncRes as any).floatingPreviewLastSize,
+          floatingPreviewLastPosition: (syncRes as any).floatingPreviewLastPosition,
         };
 
         const rawLinkPreviewSettings: LinkPreviewSettings = result.linkPreviewSettings || {
@@ -260,21 +256,9 @@ export default defineContentScript({
           autoPin: false,
         } as any;
 
-        // 兼容旧版本：将历史值 altClick 归一为 click，避免无法触发
         const linkPreviewSettings: LinkPreviewSettings = {
-          ...rawLinkPreviewSettings,
-          triggerMethod: (rawLinkPreviewSettings as any).triggerMethod === 'altClick' ? 'click' : rawLinkPreviewSettings.triggerMethod
+          ...rawLinkPreviewSettings
         } as LinkPreviewSettings;
-
-        // 迁移兼容：旧版本将延迟以“秒”保存（<=3），统一转换为“毫秒”
-        try {
-          if ((linkPreviewSettings as any).hoverDelay <= 3) {
-            (linkPreviewSettings as any).hoverDelay = Math.round((linkPreviewSettings as any).hoverDelay * 1000);
-          }
-          if ((linkPreviewSettings as any).longPressDelay <= 3) {
-            (linkPreviewSettings as any).longPressDelay = Math.round((linkPreviewSettings as any).longPressDelay * 1000);
-          }
-        } catch {}
 
         // 读取拖拽文字设置
         const rawDTS: DragTextSettings = result.dragTextSettings || {
@@ -778,7 +762,7 @@ export default defineContentScript({
      * 注意：此监听器在cleanup函数中被正确移除，防止内存泄漏
      */
     const handleStorageChange = async (changes: any, namespace: string) => {
-      // 同时监听 sync 与 local，保证兼容旧版本
+      // 同时监听 sync 与 local
       if (namespace === 'sync') {
         if (changes.linkPreviewSettings || changes.themeSettings || changes.floatingPreviewLastSize || changes.floatingPreviewLastPosition) {
           await loadSettings();
