@@ -388,6 +388,7 @@ export default defineContentScript({
       if (mod === 'Alt') return (e as MouseEvent).altKey || (e as KeyboardEvent).altKey;
       if (mod === 'Cmd') return (e as MouseEvent).metaKey || (e as KeyboardEvent).metaKey;
       if (mod === 'Shift') return (e as MouseEvent).shiftKey || (e as KeyboardEvent).shiftKey;
+      if (mod === 'Ctrl') return (e as MouseEvent).ctrlKey || (e as KeyboardEvent).ctrlKey;
       return false;
     };
 
@@ -415,7 +416,7 @@ export default defineContentScript({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!settings) return;
       const mod = settings.customShortcut;
-      if ((mod === 'Alt' && e.altKey) || (mod === 'Cmd' && e.metaKey) || (mod === 'Shift' && e.shiftKey)) {
+      if ((mod === 'Alt' && e.altKey) || (mod === 'Cmd' && e.metaKey) || (mod === 'Shift' && e.shiftKey) || (mod === 'Ctrl' && e.ctrlKey)) {
         modifierActive = true;
       }
     };
@@ -427,6 +428,7 @@ export default defineContentScript({
       if (mod === 'Alt' && !e.altKey) modifierActive = false;
       if (mod === 'Cmd' && !e.metaKey) modifierActive = false;
       if (mod === 'Shift' && !e.shiftKey) modifierActive = false;
+      if (mod === 'Ctrl' && !e.ctrlKey) modifierActive = false;
     };
 
     const handleWindowBlur = () => { modifierActive = false; };

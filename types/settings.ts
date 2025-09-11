@@ -5,8 +5,8 @@
 export interface LinkPreviewSettings {
   // 触发方式：拖动链接、鼠标悬停、长按链接、修饰键+鼠标左键点击、修饰键+悬停、禁用
   triggerMethod: 'drag' | 'hover' | 'longPress' | 'click' | 'customHover' | 'disabled'
-  // 自定义快捷键：Alt（Windows）、Cmd（macOS）、Shift（通用）
-  customShortcut: 'Alt' | 'Cmd' | 'Shift'
+  // 自定义快捷键：Ctrl（Windows推荐）、Alt（Windows）、Cmd（macOS）、Shift（通用）
+  customShortcut: 'Alt' | 'Cmd' | 'Shift' | 'Ctrl'
   // 悬停延迟时间（秒）：0.1s - 3s
   hoverDelay: number
   // 长按延迟时间（秒）：0.2s - 3s
@@ -81,7 +81,7 @@ export type SettingsChangeEvent<T extends SettingsStorageKey> = {
 }
 
 // 获取平台默认修饰键的函数（延迟导入避免循环依赖）
-const getDefaultShortcut = (): 'Alt' | 'Cmd' | 'Shift' => {
+const getDefaultShortcut = (): 'Alt' | 'Cmd' | 'Shift' | 'Ctrl' => {
   // 在浏览器环境中检测平台
   if (typeof navigator !== 'undefined') {
     const userAgent = navigator.userAgent.toLowerCase()
@@ -91,10 +91,11 @@ const getDefaultShortcut = (): 'Alt' | 'Cmd' | 'Shift' => {
       return 'Cmd'
     }
     if (platform.includes('win') || userAgent.includes('windows')) {
-      return 'Alt'
+      // Windows系统默认使用Ctrl键，这是最常用的修饰键
+      return 'Ctrl'
     }
   }
-  return 'Alt' // 默认值
+  return 'Ctrl' // 默认值改为Ctrl
 }
 
 // 默认设置配置

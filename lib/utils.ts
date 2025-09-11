@@ -26,26 +26,29 @@ export function getPlatform(): 'macos' | 'windows' | 'other' {
 }
 
 // 根据平台获取可用的修饰键选项
-export function getAvailableModifierKeys(platform: ReturnType<typeof getPlatform> = getPlatform()): Array<'Alt' | 'Cmd' | 'Shift'> {
+export function getAvailableModifierKeys(platform: ReturnType<typeof getPlatform> = getPlatform()): Array<'Alt' | 'Cmd' | 'Shift' | 'Ctrl'> {
   switch (platform) {
     case 'macos':
       return ['Cmd', 'Shift']
     case 'windows':
-      return ['Alt', 'Shift']
+      // Windows系统支持Ctrl、Alt、Shift三个修饰键，按使用频率排序
+      // return ['Ctrl', 'Alt', 'Shift']
+      return ['Ctrl', 'Shift']
     default:
       // 其他平台默认显示所有选项
-      return ['Alt', 'Cmd', 'Shift']
+      return ['Ctrl', 'Alt', 'Cmd', 'Shift']
   }
 }
 
 // 根据平台获取默认修饰键
-export function getDefaultModifierKey(platform: ReturnType<typeof getPlatform> = getPlatform()): 'Alt' | 'Cmd' | 'Shift' {
+export function getDefaultModifierKey(platform: ReturnType<typeof getPlatform> = getPlatform()): 'Alt' | 'Cmd' | 'Shift' | 'Ctrl' {
   switch (platform) {
     case 'macos':
       return 'Cmd'
     case 'windows':
-      return 'Alt'
+      // Windows系统默认使用Ctrl键，这是最常用的修饰键
+      return 'Ctrl'
     default:
-      return 'Alt'
+      return 'Ctrl'
   }
 }

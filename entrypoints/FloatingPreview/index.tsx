@@ -22,7 +22,6 @@ const MemoizedContent = React.memo(Content);
 const FloatingPreview: React.FC<FloatingPreviewProps> = ({
   url,
   settings,
-  mousePosition,
   initialPosition,
   onClose,
   windowId,
@@ -39,7 +38,6 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
   const [isPinned, setIsPinned] = useState(() => Boolean(settings.autoPin)); // 是否固定窗口
   const [isDragging, setIsDragging] = useState(false); // 是否正在拖拽
   const [isResizing, setIsResizing] = useState(false); // 是否正在调整大小
-  const [isFollowingMouse, setIsFollowingMouse] = useState(true); // 是否跟随鼠标
   const [showOverlay, setShowOverlay] = useState(false); // 是否显示遮罩层
   // 新增：是否鼠标在悬浮窗内，用于 ESC 关闭判断
   const [isMouseInside, setIsMouseInside] = useState(false);
@@ -89,7 +87,7 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
   const initialPositionAppliedRef = useRef(false);
   const lastAppliedInitialRef = useRef<{ x: number; y: number } | null>(null);
 
-  // 根据 props.initialPosition 或 settings.position 计算并应用固定位置
+  // 根据 props.initialPosition 计算并应用固定位置（不再使用 settings.position）
   useEffect(() => {
     const margin = 16;
 
@@ -111,7 +109,6 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
         lastAppliedInitialRef.current.x !== targetX ||
         lastAppliedInitialRef.current.y !== targetY;
       if (changed) {
-        setIsFollowingMouse(false);
         // 直接更新到 DOM 与状态，避免引用尚未声明的 updatePosition
         if (containerRef.current) {
           containerRef.current.style.left = `${targetX}px`;
@@ -128,75 +125,23 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
     // 若未提供 initialPosition，且尚未应用过初始定位，则按 settings.position 初始化一次
     if (initialPositionAppliedRef.current) return;
 
-    const pos = settings.position;
-    if (
-      pos === "center" ||
-      pos === "top-right" ||
-      pos === "top-left" ||
-      pos === "bottom-right" ||
-      pos === "bottom-left"
-    ) {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      let x = 0;
-      let y = 0;
-      if (pos === "center") {
-        x = Math.max((vw - size.width) / 2, margin);
-        y = Math.max((vh - size.height) / 2, margin);
-      } else if (pos === "top-right") {
-        x = Math.max(vw - size.width - margin, margin);
-        y = margin;
-      } else if (pos === "top-left") {
-        x = margin;
-        y = margin;
-      } else if (pos === "bottom-right") {
-        x = Math.max(vw - size.width - margin, margin);
-        y = Math.max(vh - size.height - margin, margin);
-      } else if (pos === "bottom-left") {
-        x = margin;
-        y = Math.max(vh - size.height - margin, margin);
-      }
-      setIsFollowingMouse(false);
-      // 直接更新到 DOM 与状态
-      if (containerRef.current) {
-        containerRef.current.style.left = `${x}px`;
-        containerRef.current.style.top = `${y}px`;
-      }
-      currentTransformRef.current = { x, y };
-      setPosition({ x, y });
-      initialPositionAppliedRef.current = true;
-    } else {
-      // 默认跟随鼠标
-      setIsFollowingMouse(true);
-      initialPositionAppliedRef.current = true;
-    }
+    // 未提供 initialPosition 的兜底：本组件不再根据 settings.position 计算固定位置，统一由 content.ts 传入像素坐标
+    // 因此这里仅做一次性兜底
+    initialPositionAppliedRef.current = true;
   }, [
     initialPosition,
-    settings.position,
+    // settings.position,  // 已弃用：位置由 content.ts 传入的 initialPosition 决定
     size.width,
     size.height,
     isDragging,
     isResizing,
   ]);
 
-  // 计算弹窗位置（跟随鼠标或拖拽位置）- 使用useCallback稳定引用
+  // 计算弹窗位置（固定位置）- 使用useCallback稳定引用
   const calculatePosition = useCallback(() => {
-    if (!isFollowingMouse || isDragging) {
-      // 如果不跟随鼠标或正在拖拽，使用当前position
-      return position;
-    }
-
-    if (mousePosition) {
-      // 跟随鼠标，添加偏移避免遮挡鼠标
-      const offset = 20;
-      let x = mousePosition.x + offset;
-      let y = mousePosition.y + offset;
-
-      return { x, y };
-    }
-
+    // 使用当前position作为固定位置
     return position;
-  }, [isFollowingMouse, isDragging, position, mousePosition]);
+  }, [position]);
 
   // 根据主题获取样式类名 - 使用useCallback避免重复计算
   const getThemeStyles = useCallback((theme: "light" | "dark"): ThemeStyles => {
@@ -246,7 +191,6 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
       if (isResizing) return;
 
       setIsDragging(true);
-      setIsFollowingMouse(false); // 开始拖拽时停止跟随鼠标
       setShowOverlay(true); // 拖拽开始时确保遮罩显示
 
       // 获取当前实际位置（考虑transform）
@@ -327,7 +271,6 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
       } catch {}
 
       setIsResizing(true);
-      setIsFollowingMouse(false);
       setShowOverlay(true);
 
       // 记录起始数据
@@ -534,17 +477,6 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
   const handleTogglePin = useCallback(() => {
     const newPinned = !isPinned;
     setIsPinned(newPinned);
-    if (newPinned) {
-      // 固定时停止跟随鼠标，保存当前transform位置
-      setIsFollowingMouse(false);
-      setPosition({
-        x: currentTransformRef.current.x,
-        y: currentTransformRef.current.y,
-      });
-    } else {
-      // 取消固定时恢复跟随鼠标
-      setIsFollowingMouse(true);
-    }
   }, [isPinned]);
 
   // 处理在新标签页打开

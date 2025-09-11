@@ -403,6 +403,23 @@ function App() {
                   ]}
                   layout="complex"
                 />
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-base font-semibold text-foreground">
+                      {t.linkPreview.autoPinLabel}
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      {t.linkPreview.autoPinDescription}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={settings.linkPreviewSettings.autoPin}
+                    onCheckedChange={(checked) =>
+                      updateSetting("linkPreviewSettings", { autoPin: checked })
+                    }
+                  />
+                </div>
               </div>
             </ScrollArea>
           </TabsContent>

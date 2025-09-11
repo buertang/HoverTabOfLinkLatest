@@ -38,6 +38,7 @@ export interface Translations {
       alt: string;
       cmd: string;
       shift: string;
+      ctrl: string;
     };
     clickText: string;
     hoverText: string;
@@ -60,6 +61,8 @@ export interface Translations {
     sizes?: Record<string, string>;
     maxWindowsLabel?: string;
     maxWindowsDescription?: string;
+    autoPinLabel?: string;
+    autoPinDescription?: string;
   };
   
   // Drag Text settings
@@ -164,7 +167,8 @@ export const translations: Record<Language, Translations> = {
       shortcutKeys: {
         alt: 'Alt',
         cmd: 'Cmd',
-        shift: 'Shift'
+        shift: 'Shift',
+        ctrl: 'Ctrl'
       },
       clickText: '点击',
       hoverText: '悬停',
@@ -209,7 +213,9 @@ export const translations: Record<Language, Translations> = {
         large: '大'
       },
       maxWindowsLabel: '最大悬浮窗数量',
-      maxWindowsDescription: '同屏最多显示的预览悬浮窗数量（1-6）'
+      maxWindowsDescription: '同屏最多显示的预览悬浮窗数量（1-6）',
+      autoPinLabel: '自动固定窗口',
+      autoPinDescription: '新打开的预览窗口自动固定，防止意外关闭'
     },
     
     dragText: {
@@ -310,7 +316,8 @@ export const translations: Record<Language, Translations> = {
       shortcutKeys: {
         alt: 'Alt',
         cmd: 'Cmd',
-        shift: 'Shift'
+        shift: 'Shift',
+        ctrl: 'Ctrl'
       },
       clickText: '點擊',
       hoverText: '懸停',
@@ -355,7 +362,9 @@ export const translations: Record<Language, Translations> = {
         large: '大'
       },
       maxWindowsLabel: '最大懸浮窗數量',
-      maxWindowsDescription: '同屏最多顯示的預覽懸浮窗數量（1-6）'
+      maxWindowsDescription: '同屏最多顯示的預覽懸浮窗數量（1-6）',
+      autoPinLabel: '自動固定視窗',
+      autoPinDescription: '新開啟的預覽視窗自動固定，防止意外關閉'
     },
     
     dragText: {
@@ -456,7 +465,8 @@ export const translations: Record<Language, Translations> = {
       shortcutKeys: {
         alt: 'Alt',
         cmd: 'Cmd',
-        shift: 'Shift'
+        shift: 'Shift',
+        ctrl: 'Ctrl'
       },
       clickText: 'Click',
       hoverText: 'Hover',
@@ -501,7 +511,9 @@ export const translations: Record<Language, Translations> = {
         large: 'Large'
       },
       maxWindowsLabel: 'Max floating windows',
-      maxWindowsDescription: 'Maximum number of preview popups shown simultaneously (1-6)'
+      maxWindowsDescription: 'Maximum number of preview popups shown simultaneously (1-6)',
+      autoPinLabel: 'Auto Pin Windows',
+      autoPinDescription: 'Automatically pin newly opened preview windows to prevent accidental closure'
     },
     
     dragText: {
@@ -602,7 +614,8 @@ export const translations: Record<Language, Translations> = {
       shortcutKeys: {
         alt: 'Alt',
         cmd: 'Cmd',
-        shift: 'Shift'
+        shift: 'Shift',
+        ctrl: 'Ctrl'
       },
       clickText: 'クリック',
       hoverText: 'ホバー',
@@ -627,12 +640,9 @@ export const translations: Record<Language, Translations> = {
       },
       themeLabel: 'ポップアップテーマ',
       themes: {
+        system: 'システムに従う',
         light: 'ライト',
-        dark: 'ダーク',
-        blue: 'ブルー',
-        red: 'レッド',
-        yellow: 'イエロー',
-        green: 'グリーン'
+        dark: 'ダーク'
       },
       opacityLabel: '背景透明度',
       positionLabel: 'プレビュー位置',
@@ -655,7 +665,9 @@ export const translations: Record<Language, Translations> = {
         large: '大'
       },
       maxWindowsLabel: '最大フローティングウィンドウ数',
-      maxWindowsDescription: '同時に表示されるプレビューポップアップの最大数（1-6）'
+      maxWindowsDescription: '同時に表示されるプレビューポップアップの最大数（1-6）',
+      autoPinLabel: '自動ピン',
+      autoPinDescription: 'ドラッグ時にプレビューウィンドウを自動的にピン留め'
     },
     
     dragText: {
@@ -756,7 +768,8 @@ export const translations: Record<Language, Translations> = {
       shortcutKeys: {
         alt: 'Alt',
         cmd: 'Cmd',
-        shift: 'Shift'
+        shift: 'Shift',
+        ctrl: 'Ctrl'
       },
       clickText: '클릭',
       hoverText: '호버',
@@ -781,12 +794,9 @@ export const translations: Record<Language, Translations> = {
       },
       themeLabel: '팝업 테마',
       themes: {
+        system: '시스템 따라가기',
         light: '라이트',
-        dark: '다크',
-        blue: '블루',
-        red: '레드',
-        yellow: '옐로우',
-        green: '그린'
+        dark: '다크'
       },
       opacityLabel: '배경 투명도',
       positionLabel: '미리보기 위치',
@@ -809,7 +819,9 @@ export const translations: Record<Language, Translations> = {
         large: '큼'
       },
       maxWindowsLabel: '최대 플로팅 창 수',
-      maxWindowsDescription: '동시에 표시되는 미리보기 팝업의 최대 수 (1-6)'
+      maxWindowsDescription: '동시에 표시되는 미리보기 팝업의 최대 수 (1-6)',
+      autoPinLabel: '자동 고정',
+      autoPinDescription: '드래그 시 미리보기 창을 자동으로 고정'
     },
     
     dragText: {
@@ -910,9 +922,10 @@ export const translations: Record<Language, Translations> = {
       shortcutKeys: {
         alt: 'Alt',
         cmd: 'Cmd',
-        shift: 'Shift'
+        shift: 'Shift',
+        ctrl: 'Ctrl'
       },
-      clickText: 'Clic',
+      clickText: 'Cliquer',
       hoverText: 'Survol',
       popupSizeLabel: 'Taille de la popup',
       popupSizes: {
@@ -935,12 +948,9 @@ export const translations: Record<Language, Translations> = {
       },
       themeLabel: 'Thème de la popup',
       themes: {
+        system: 'Suivre le système',
         light: 'Clair',
-        dark: 'Sombre',
-        blue: 'Bleu',
-        red: 'Rouge',
-        yellow: 'Jaune',
-        green: 'Vert'
+        dark: 'Sombre'
       },
       opacityLabel: 'Opacité de l\'arrière-plan',
       positionLabel: 'Position de l\'aperçu',
@@ -963,7 +973,9 @@ export const translations: Record<Language, Translations> = {
         large: 'Grand'
       },
       maxWindowsLabel: 'Nombre max de fenêtres flottantes',
-      maxWindowsDescription: 'Nombre maximum de popups de prévisualisation affichés simultanément (1-6)'
+      maxWindowsDescription: 'Nombre maximum de popups de prévisualisation affichés simultanément (1-6)',
+      autoPinLabel: 'Épinglage automatique',
+      autoPinDescription: 'Épingler automatiquement la fenêtre d\'aperçu lors du glissement'
     },
     
     dragText: {
@@ -1064,7 +1076,8 @@ export const translations: Record<Language, Translations> = {
       shortcutKeys: {
         alt: 'Alt',
         cmd: 'Cmd',
-        shift: 'Umschalt'
+        shift: 'Umschalt',
+        ctrl: 'Strg'
       },
       clickText: 'Klick',
       hoverText: 'Hover',
@@ -1089,12 +1102,9 @@ export const translations: Record<Language, Translations> = {
       },
       themeLabel: 'Popup-Theme',
       themes: {
+        system: 'System folgen',
         light: 'Hell',
-        dark: 'Dunkel',
-        blue: 'Blau',
-        red: 'Rot',
-        yellow: 'Gelb',
-        green: 'Grün'
+        dark: 'Dunkel'
       },
       opacityLabel: 'Hintergrund-Transparenz',
       positionLabel: 'Vorschau-Position',
@@ -1117,7 +1127,9 @@ export const translations: Record<Language, Translations> = {
         large: 'Groß'
       },
       maxWindowsLabel: 'Max. schwebende Fenster',
-      maxWindowsDescription: 'Maximale Anzahl gleichzeitig angezeigter Vorschau-Popups (1-6)'
+      maxWindowsDescription: 'Maximale Anzahl gleichzeitig angezeigter Vorschau-Popups (1-6)',
+      autoPinLabel: 'Automatisches Anheften',
+      autoPinDescription: 'Vorschaufenster beim Ziehen automatisch anheften'
     },
     
     dragText: {
@@ -1218,7 +1230,8 @@ export const translations: Record<Language, Translations> = {
       shortcutKeys: {
         alt: 'Alt',
         cmd: 'Cmd',
-        shift: 'Shift'
+        shift: 'Shift',
+        ctrl: 'Ctrl'
       },
       clickText: 'Клик',
       hoverText: 'Наведение',
@@ -1243,12 +1256,9 @@ export const translations: Record<Language, Translations> = {
       },
       themeLabel: 'Тема всплывающего окна',
       themes: {
+        system: 'Следовать системе',
         light: 'Светлая',
-        dark: 'Темная',
-        blue: 'Синяя',
-        red: 'Красная',
-        yellow: 'Желтая',
-        green: 'Зеленая'
+        dark: 'Темная'
       },
       opacityLabel: 'Прозрачность фона',
       positionLabel: 'Позиция предварительного просмотра',
@@ -1271,7 +1281,9 @@ export const translations: Record<Language, Translations> = {
         large: 'Большой'
       },
       maxWindowsLabel: 'Макс. плавающих окон',
-      maxWindowsDescription: 'Максимальное количество всплывающих окон предварительного просмотра, отображаемых одновременно (1-6)'
+      maxWindowsDescription: 'Максимальное количество всплывающих окон предварительного просмотра, отображаемых одновременно (1-6)',
+      autoPinLabel: 'Автоматическое закрепление',
+      autoPinDescription: 'Автоматически закреплять окно предварительного просмотра при перетаскивании'
     },
     
     dragText: {
@@ -1372,7 +1384,8 @@ export const translations: Record<Language, Translations> = {
       shortcutKeys: {
         alt: 'Alt',
         cmd: 'Cmd',
-        shift: 'Shift'
+        shift: 'Shift',
+        ctrl: 'Ctrl'
       },
       clickText: 'Clic',
       hoverText: 'Passaggio del mouse',
@@ -1397,12 +1410,9 @@ export const translations: Record<Language, Translations> = {
       },
       themeLabel: 'Tema popup',
       themes: {
+        system: 'Segui il sistema',
         light: 'Chiaro',
-        dark: 'Scuro',
-        blue: 'Blu',
-        red: 'Rosso',
-        yellow: 'Giallo',
-        green: 'Verde'
+        dark: 'Scuro'
       },
       opacityLabel: 'Opacità dello sfondo',
       positionLabel: 'Posizione anteprima',
@@ -1425,7 +1435,9 @@ export const translations: Record<Language, Translations> = {
         large: 'Grande'
       },
       maxWindowsLabel: 'Max finestre flottanti',
-      maxWindowsDescription: 'Numero massimo di popup di anteprima mostrati simultaneamente (1-6)'
+      maxWindowsDescription: 'Numero massimo di popup di anteprima mostrati simultaneamente (1-6)',
+      autoPinLabel: 'Fissaggio automatico',
+      autoPinDescription: 'Fissa automaticamente la finestra di anteprima durante il trascinamento'
     },
     
     dragText: {
@@ -1525,10 +1537,11 @@ export const translations: Record<Language, Translations> = {
        shortcutKeyLabel: 'Tecla de acceso directo',
        shortcutKeys: {
          alt: 'Alt',
-         cmd: 'Cmd',
-         shift: 'Shift'
-       },
-       clickText: 'Clic',
+        cmd: 'Cmd',
+        shift: 'Shift',
+        ctrl: 'Ctrl'
+      },
+      clickText: 'Clic',
        hoverText: 'Pasar el ratón',
        popupSizeLabel: 'Tamaño de ventana emergente',
        popupSizes: {
@@ -1551,12 +1564,9 @@ export const translations: Record<Language, Translations> = {
        },
        themeLabel: 'Tema de ventana emergente',
        themes: {
+         system: 'Seguir el sistema',
          light: 'Claro',
-         dark: 'Oscuro',
-         blue: 'Azul',
-         red: 'Rojo',
-         yellow: 'Amarillo',
-         green: 'Verde'
+         dark: 'Oscuro'
        },
        opacityLabel: 'Opacidad del fondo',
        positionLabel: 'Posición de vista previa',
@@ -1579,7 +1589,9 @@ export const translations: Record<Language, Translations> = {
         large: 'Grande'
       },
       maxWindowsLabel: 'Máx. ventanas flotantes',
-      maxWindowsDescription: 'Número máximo de ventanas emergentes de vista previa mostradas simultáneamente (1-6)'
+      maxWindowsDescription: 'Número máximo de ventanas emergentes de vista previa mostradas simultáneamente (1-6)',
+      autoPinLabel: 'Fijación automática',
+      autoPinDescription: 'Fijar automáticamente la ventana de vista previa durante el arrastre'
     },
      
      dragText: {
@@ -1679,10 +1691,11 @@ export const translations: Record<Language, Translations> = {
        shortcutKeyLabel: 'Tecla de atalho',
        shortcutKeys: {
          alt: 'Alt',
-         cmd: 'Cmd',
-         shift: 'Shift'
-       },
-       clickText: 'Clique',
+        cmd: 'Cmd',
+        shift: 'Shift',
+        ctrl: 'Ctrl'
+      },
+      clickText: 'Clique',
        hoverText: 'Passar o mouse',
        popupSizeLabel: 'Tamanho do popup',
        popupSizes: {
@@ -1705,12 +1718,9 @@ export const translations: Record<Language, Translations> = {
         },
        themeLabel: 'Tema do popup',
        themes: {
+         system: 'Seguir o sistema',
          light: 'Claro',
-         dark: 'Escuro',
-         blue: 'Azul',
-         red: 'Vermelho',
-         yellow: 'Amarelo',
-         green: 'Verde'
+         dark: 'Escuro'
        },
        opacityLabel: 'Opacidade do fundo',
        positionLabel: 'Posição da visualização',
@@ -1733,7 +1743,9 @@ export const translations: Record<Language, Translations> = {
         large: 'Grande'
       },
       maxWindowsLabel: 'Máx. janelas flutuantes',
-      maxWindowsDescription: 'Número máximo de popups de visualização exibidos simultaneamente (1-6)'
+      maxWindowsDescription: 'Número máximo de popups de visualização exibidos simultaneamente (1-6)',
+      autoPinLabel: 'Fixação automática',
+      autoPinDescription: 'Fixar automaticamente a janela de visualização durante o arrasto'
     },
      
      dragText: {
@@ -1833,10 +1845,11 @@ export const translations: Record<Language, Translations> = {
        shortcutKeyLabel: 'مفتاح الاختصار',
        shortcutKeys: {
          alt: 'Alt',
-         cmd: 'Cmd',
-         shift: 'Shift'
-       },
-       clickText: 'نقر',
+        cmd: 'Cmd',
+        shift: 'Shift',
+        ctrl: 'Ctrl'
+      },
+      clickText: 'نقر',
        hoverText: 'تمرير',
        popupSizeLabel: 'حجم النافذة المنبثقة',
        popupSizes: {
@@ -1859,12 +1872,9 @@ export const translations: Record<Language, Translations> = {
         },
        themeLabel: 'موضوع النافذة المنبثقة',
        themes: {
+         system: 'تتبع النظام',
          light: 'فاتح',
-         dark: 'داكن',
-         blue: 'أزرق',
-         red: 'أحمر',
-         yellow: 'أصفر',
-         green: 'أخضر'
+         dark: 'داكن'
        },
        opacityLabel: 'شفافية الخلفية',
        positionLabel: 'موضع المعاينة',
@@ -1887,7 +1897,9 @@ export const translations: Record<Language, Translations> = {
         large: 'كبير'
       },
       maxWindowsLabel: 'الحد الأقصى للنوافذ العائمة',
-      maxWindowsDescription: 'العدد الأقصى من النوافذ المنبثقة للمعاينة المعروضة في نفس الوقت (1-6)'
+      maxWindowsDescription: 'العدد الأقصى من النوافذ المنبثقة للمعاينة المعروضة في نفس الوقت (1-6)',
+      autoPinLabel: 'التثبيت التلقائي',
+      autoPinDescription: 'تثبيت نافذة المعاينة تلقائياً أثناء السحب'
     },
      
      dragText: {
