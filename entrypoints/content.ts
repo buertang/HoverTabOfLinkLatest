@@ -134,13 +134,20 @@ export default defineContentScript({
     // 加载设置（包含上次窗口尺寸与位置）
     const loadSettings = async () => {
       try {
-        const result = await browser.storage.local.get([
-          'linkPreviewSettings',
-          'themeSettings',
-          'floatingPreviewLastSize',
-          'floatingPreviewLastPosition',
-          'dragTextSettings',
+        // 优先从 sync 读取用户设置和窗口状态，从 local 读取兜底
+        const [syncRes, localRes] = await Promise.all([
+          browser.storage.sync.get(['linkPreviewSettings', 'themeSettings', 'dragTextSettings', 'floatingPreviewLastSize', 'floatingPreviewLastPosition']),
+          browser.storage.local.get(['floatingPreviewLastSize', 'floatingPreviewLastPosition', 'linkPreviewSettings', 'themeSettings', 'dragTextSettings']),
         ]);
+
+        const result: any = {
+          linkPreviewSettings: (syncRes as any).linkPreviewSettings ?? (localRes as any).linkPreviewSettings,
+          themeSettings: (syncRes as any).themeSettings ?? (localRes as any).themeSettings,
+          dragTextSettings: (syncRes as any).dragTextSettings ?? (localRes as any).dragTextSettings,
+          // 位置与尺寸优先使用 sync
+          floatingPreviewLastSize: (syncRes as any).floatingPreviewLastSize ?? (localRes as any).floatingPreviewLastSize,
+          floatingPreviewLastPosition: (syncRes as any).floatingPreviewLastPosition ?? (localRes as any).floatingPreviewLastPosition,
+        };
 
         const rawLinkPreviewSettings: LinkPreviewSettings = result.linkPreviewSettings || {
           triggerMethod: 'drag',
@@ -327,6 +334,11 @@ export default defineContentScript({
           const width = Math.round(rect.width);
           const height = Math.round(rect.height);
           browser.storage.local.set({
+            floatingPreviewLastPosition: { x, y },
+            floatingPreviewLastSize: { width, height },
+          });
+          // 同步存储一份
+          browser.storage.sync.set({
             floatingPreviewLastPosition: { x, y },
             floatingPreviewLastSize: { width, height },
           });
@@ -615,22 +627,47 @@ export default defineContentScript({
 
     // 存储变更监听：设置或主题变化时重新加载
     const handleStorageChange = async (changes: any, namespace: string) => {
-      if (namespace !== 'local') return;
-      if (changes.linkPreviewSettings || changes.themeSettings || changes.floatingPreviewLastSize || changes.floatingPreviewLastPosition) {
-        await loadSettings();
-        rerenderAllPreviews();
+      // 同时监听 sync 与 local，保证兼容旧版本
+      if (namespace === 'sync') {
+        if (changes.linkPreviewSettings || changes.themeSettings || changes.floatingPreviewLastSize || changes.floatingPreviewLastPosition) {
+          await loadSettings();
+          rerenderAllPreviews();
+        }
+        if (changes.dragTextSettings) {
+          try {
+            const result = await browser.storage.sync.get(['dragTextSettings']);
+            const rawDTS: DragTextSettings = (result as any).dragTextSettings || {
+              searchEngine: 'bing',
+              enabled: false,
+              disabledSites: ''
+            };
+            dragTextSettings = { ...rawDTS };
+          } catch {}
+        }
+        return;
       }
-      // 新增：监听拖拽文字设置变更
-      if (changes.dragTextSettings) {
-        try {
-          const result = await browser.storage.local.get(['dragTextSettings']);
-          const rawDTS: DragTextSettings = result.dragTextSettings || {
-            searchEngine: 'bing',
-            enabled: false,
-            disabledSites: ''
-          };
-          dragTextSettings = { ...rawDTS };
-        } catch {}
+
+      if (namespace === 'local') {
+        if (changes.linkPreviewSettings || changes.themeSettings || changes.floatingPreviewLastSize || changes.floatingPreviewLastPosition) {
+          // local 变化可能来自旧版本或窗口缓存变化
+          await loadSettings();
+          rerenderAllPreviews();
+        }
+        // 监听拖拽文字设置变更（优先从 sync 读，回退 local）
+        if (changes.dragTextSettings) {
+          try {
+            const [syncRes, localRes] = await Promise.all([
+              browser.storage.sync.get(['dragTextSettings']),
+              browser.storage.local.get(['dragTextSettings']),
+            ]);
+            const rawDTS: DragTextSettings = (syncRes as any).dragTextSettings ?? (localRes as any).dragTextSettings ?? {
+              searchEngine: 'bing',
+              enabled: false,
+              disabledSites: ''
+            };
+            dragTextSettings = { ...rawDTS };
+          } catch {}
+        }
       }
     };
 
