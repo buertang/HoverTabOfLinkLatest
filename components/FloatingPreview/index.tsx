@@ -82,7 +82,8 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
         textColor: '#374151',
         headerBg: '#f9fafb',
         border: 'border-gray-200',
-        bg: 'bg-white'
+        bg: 'bg-white',
+        buttonHover: 'hover:bg-gray-100'
       },
       dark: {
         backgroundColor: '#1f2937',
@@ -90,7 +91,8 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
         textColor: '#f9fafb',
         headerBg: '#111827',
         border: 'border-gray-600',
-        bg: 'bg-gray-800'
+        bg: 'bg-gray-800',
+        buttonHover: 'hover:bg-gray-700'
       },
       blue: {
         backgroundColor: '#dbeafe',
@@ -98,7 +100,8 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
         textColor: '#1e40af',
         headerBg: '#bfdbfe',
         border: 'border-blue-500',
-        bg: 'bg-blue-100'
+        bg: 'bg-blue-100',
+        buttonHover: 'hover:bg-blue-200'
       },
       red: {
         backgroundColor: '#fecaca',
@@ -106,7 +109,8 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
         textColor: '#dc2626',
         headerBg: '#fca5a5',
         border: 'border-red-500',
-        bg: 'bg-red-100'
+        bg: 'bg-red-100',
+        buttonHover: 'hover:bg-red-200'
       },
       yellow: {
         backgroundColor: '#fef3c7',
@@ -114,7 +118,8 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
         textColor: '#d97706',
         headerBg: '#fed7aa',
         border: 'border-yellow-500',
-        bg: 'bg-yellow-100'
+        bg: 'bg-yellow-100',
+        buttonHover: 'hover:bg-yellow-200'
       },
       green: {
         backgroundColor: '#d1fae5',
@@ -122,7 +127,8 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
         textColor: '#059669',
         headerBg: '#a7f3d0',
         border: 'border-green-500',
-        bg: 'bg-green-100'
+        bg: 'bg-green-100',
+        buttonHover: 'hover:bg-green-200'
       }
     }
     

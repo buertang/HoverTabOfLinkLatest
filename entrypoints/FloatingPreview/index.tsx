@@ -8,7 +8,7 @@ import React, {
 import { createPortal } from "react-dom";
 import Header from "./Header";
 import Content from "./Content";
-import tailwindCss from '@/assets/tailwind.css?inline';
+import "./styles.css";
 
 import {
   ThemeStyles,
@@ -19,32 +19,7 @@ import {
 const MemoizedHeader = React.memo(Header);
 const MemoizedContent = React.memo(Content);
 
-    /**
-     * 注入Tailwind样式 - 安全优化版本
-     * 
-     * 主要优化内容：
-     * 1. CSS作用域限制：所有样式仅作用于 .floating-preview-container 及其子元素
-     * 2. 防止样式污染：避免影响宿主页面的原有样式和布局
-     * 3. 安全性增强：防止CSS注入攻击扩散到其他页面元素
-     * 4. 性能优化：避免重复注入，减少DOM操作开销
-     */
-    const injectTailwindCSS = () => {
-      // 防重复注入检查：如果样式已存在则直接返回，避免重复DOM操作
-      if (document.getElementById('floating-preview-tailwind-styles')) {
-        return;
-      }
-      
-      // 创建独立的样式元素，使用唯一ID便于管理和清理
-      const styleElement = document.createElement('style');
-      styleElement.id = 'floating-preview-tailwind-styles';
-      
-      // 核心安全处理：为CSS内容添加作用域前缀，限制样式影响范围
-      // 这确保了所有Tailwind样式仅作用于弹窗容器，不会干扰页面其他元素
-      styleElement.textContent = tailwindCss;
-      
-      // 安全注入：将处理后的样式添加到页面头部
-      document.head.appendChild(styleElement);
-    };
+
 
 
 // 悬浮窗组件 - 性能优化版本
@@ -55,7 +30,6 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
   onClose,
   windowId,
 }) => {
-  injectTailwindCSS();
   // 悬浮窗状态管理
   const [position, setPosition] = useState(() => {
     // 弹窗在容器中居中显示，由于容器已经通过CSS居中，这里设置为0
@@ -177,21 +151,23 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
   const getThemeStyles = useCallback((theme: "light" | "dark"): ThemeStyles => {
     if (theme === "dark") {
       return {
-        backgroundColor: "bg-gray-900",
-        borderColor: "border-gray-700",
-        textColor: "text-white",
-        headerBg: "bg-gray-800",
-        border: "border-gray-700",
-        bg: "bg-gray-900",
+        backgroundColor: "floating-preview-dark",
+        borderColor: "floating-preview-dark",
+        textColor: "floating-preview-dark",
+        headerBg: "floating-preview-header-dark",
+        border: "floating-preview-dark",
+        bg: "floating-preview-content-dark",
+        buttonHover: "floating-preview-button-hover-dark",
       };
     }
     return {
-      backgroundColor: "bg-white",
-      borderColor: "border-gray-300",
-      textColor: "text-gray-900",
-      headerBg: "bg-gray-50",
-      border: "border-gray-300",
-      bg: "bg-white",
+      backgroundColor: "floating-preview-light",
+      borderColor: "floating-preview-light",
+      textColor: "floating-preview-light",
+      headerBg: "floating-preview-header-light",
+      border: "floating-preview-light",
+      bg: "floating-preview-content-light",
+      buttonHover: "floating-preview-button-hover-light",
     };
   }, []);
 
@@ -682,8 +658,13 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
   // 渲染遮罩层 - 拖拽时移除blur效果，显著提升性能
   const overlayElement = showOverlay ? (
     <div
-      className="fixed inset-0 pointer-events-none"
       style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        pointerEvents: "none",
         zIndex: 999998, // 小于悬浮窗的z-index
         // 背景透明度与模糊程度反向关联：透明度100=完全透明无模糊，透明度0=完全不透明且模糊最高
         backgroundColor: "transparent",
@@ -714,7 +695,7 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
       <div
         ref={containerRef}
         id={`floating-preview-window-${windowId ?? 'default'}`}
-        className={`floating-preview-container fixed overflow-hidden z-[10000] ${themeStyles.backgroundColor} ${themeStyles.borderColor} border-2 flex flex-col`}
+        className={`floating-preview-container ${themeStyles.backgroundColor}`}
         tabIndex={-1}
         style={{
           width: size.width,
@@ -755,7 +736,7 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
         onMouseLeave={handleMouseLeave}
       >
         {/* Header组件 - 固定高度40px */}
-        <div className="flex-shrink-0">
+        <div className="floating-preview-flex-shrink-0">
           <MemoizedHeader
             url={url}
             isPinned={isPinned}
@@ -775,7 +756,7 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
         </div>
 
         {/* Content组件 - 占据剩余空间，减去Header(40px)的高度 */}
-        <div className="flex-1 overflow-hidden">
+        <div className="floating-preview-flex-1 floating-preview-overflow-hidden">
           <MemoizedContent
             url={url}
             width={size.width}
@@ -796,7 +777,7 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
               <>
                 {/* 左下角：小尺寸三角形（替代 1/4 圆） */}
                 <div
-                  className={`absolute left-0 bottom-0 cursor-nesw-resize transition-opacity duration-150`}
+                  className="floating-preview-resize-handle floating-preview-resize-handle-bottom-left"
                   style={{
                     width: 22,
                     height: 22,
@@ -815,7 +796,7 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
                 />
                 {/* 右下角：小尺寸三角形（替代 1/4 圆） */}
                 <div
-                  className={`absolute right-0 bottom-0 cursor-nwse-resize transition-opacity duration-150`}
+                  className="floating-preview-resize-handle floating-preview-resize-handle-bottom-right"
                   style={{
                     width: 22,
                     height: 22,

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { ThemeStyles, ContentProps } from "../../types/floating-preview";
+import React, { useEffect, useRef, useState } from 'react';
+import { ThemeStyles, ContentProps } from '../../types/floating-preview';
+import './styles.css';
 
 // Content组件 - 悬浮窗内容区域，纯iframe容器
 const Content: React.FC<ContentProps> = ({
@@ -24,44 +25,26 @@ const Content: React.FC<ContentProps> = ({
   };
 
   return (
-    <div
-      className={`relative ${themeStyles.bg}`}
-      style={{
-        width: `${width}px`,
-        height: `${height}px`,
-      }}
-    >
-      {/* 加载状态 */}
+    <div className={`floating-preview-content ${themeStyles.backgroundColor} ${themeStyles.textColor}`}>
       {loading && (
-        <div
-          className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-base ${themeStyles.textColor} opacity-60`}
-        >
-          <div className="flex items-center space-x-2">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-            <span>正在加载...</span>
-          </div>
+        <div className="floating-preview-loading">
+          <div className="floating-preview-loading-text">加载中...</div>
         </div>
       )}
-
-      {/* 错误状态 */}
+      
       {error && (
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center p-5">
-          <div className="text-red-500 text-sm mb-2">
-            <div className="mb-2">⚠️ 无法加载此页面</div>
-            <div className="text-xs opacity-80 mb-1">
-              可能由于X-Frame-Options限制或网络问题
-            </div>
-            <div className="text-xs opacity-60">
-              请点击Header中的"在新标签页打开"按钮访问
-            </div>
-          </div>
+        <div className="floating-preview-error">
+          <div className="floating-preview-error-text">加载失败: {error}</div>
         </div>
       )}
-
-      {/* iframe内容 */}
+      
       <iframe
         src={url}
-        className="w-full h-full border-0 rounded"
+        className="floating-preview-iframe"
+        style={{
+          display: loading || error ? 'none' : 'block',
+          backgroundColor: themeStyles.backgroundColor.includes('dark') ? '#1f2937' : '#ffffff'
+        }}
         onLoad={handleIframeLoad}
         onError={handleIframeError}
         sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"

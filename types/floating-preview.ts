@@ -8,6 +8,7 @@ export interface ThemeStyles {
   headerBg: string;
   border: string;
   bg: string;
+  buttonHover: string;
 }
 
 // FloatingPreview设置接口

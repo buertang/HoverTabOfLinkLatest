@@ -2,6 +2,7 @@ import React, { useState, useLayoutEffect, useRef, useEffect } from 'react';
 import { Pin, RotateCcw, ExternalLink, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeStyles, HeaderProps } from '../../types/floating-preview';
+import './styles.css';
 
 // Header组件 - 悬浮窗顶部，使用TailwindCSS和shadcn/ui重写
 const Header: React.FC<HeaderProps> = ({
@@ -76,103 +77,108 @@ const Header: React.FC<HeaderProps> = ({
   }, [onHeaderMinWidthChange]);
   
   return (
-    <div 
-      className={`flex items-center justify-between px-3 py-2 ${themeStyles.headerBg} border-b ${themeStyles.border} select-none ${themeStyles.textColor} ${isDragHover ? 'cursor-grabbing' : 'cursor-grab'}`}
-      // 顶层容器作为通用拖拽区域（除按钮区与网址显示区外）
-      onMouseDown={(e) => {
-        setIsDragHover(true);
-        onDragStart(e);
-      }}
-      onMouseUp={() => setIsDragHover(false)}
-      onMouseLeave={() => setIsDragHover(false)}
+    <div
+      className={`floating-preview-header ${themeStyles.headerBg}`}
+      onPointerDown={onDragStart}
       style={{
-        // 硬件加速，确保拖拽更顺滑
-        transform: 'translateZ(0)',
-        willChange: isDragHover ? 'transform' : 'auto'
+        cursor: isDragHover ? "grabbing" : "grab",
+        userSelect: "none",
+        touchAction: "none",
       }}
     >
       {/* 网址显示区 - 允许被压缩：外层flex-1 + min-w-0，内部使用 max-w-full + 溢出省略，最大宽度55% */}
       <div 
-        ref={urlContainerRef}
-        className="flex-1 min-w-0 mr-3 max-w-[55%]"
-        // 阻止在网址区域内触发拖拽
-        onMouseDown={(e) => e.stopPropagation()}
-      >
-        <div
-          className={`flex items-center gap-2 rounded-full px-3 py-1 border ${themeStyles.border} bg-white/70 dark:bg-neutral-800/70 shadow-inner hover:bg-white/80 dark:hover:bg-neutral-800/80 transition-colors duration-150 w-full max-w-full`}
-          title={url}
-          // 网址区域采用浏览器地址栏视觉效果，不参与拖拽
-          // 点击打开新标签页
-          onClick={handleUrlClick}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') handleUrlClick();
-          }}
-          style={{ cursor: 'pointer' }}
-          aria-label="打开当前网址"
-        >
+        ref={urlContainerRef} 
+        className="floating-preview-url-container" 
+        style={{ flex: '1', minWidth: '0', marginRight: '0.75rem', maxWidth: '55%' }}
+        // 阻止在网址区域内触发拖拽 
+        onMouseDown={(e) => e.stopPropagation()} 
+      > 
+        <div 
+          className="floating-preview-url-display"
+          // 网址区域采用浏览器地址栏视觉效果，不参与拖拽 
+          // 点击打开新标签页 
+          onClick={handleUrlClick} 
+          role="button" 
+          tabIndex={0} 
+          onKeyDown={(e) => { 
+            if (e.key === 'Enter' || e.key === ' ') handleUrlClick(); 
+          }} 
+          style={{ cursor: 'pointer' }} 
+          aria-label="打开当前网址" 
+        > 
           <div 
-            className={`text-sm ${themeStyles.textColor} opacity-80 overflow-hidden text-ellipsis whitespace-nowrap w-full hover:opacity-100 transition-opacity`}
-          >
-            {getDisplayUrl(url)}
-          </div>
+            className={`floating-preview-url-text ${themeStyles.textColor}`}
+            title={url}
+            style={{
+              background: "transparent",
+            }}
+          > 
+            {getDisplayUrl(url)} 
+          </div> 
         </div>
       </div>
       
-      {/* 操作按钮区 - 固定尺寸，始终可见 */}
+      {/* 操作按钮区 - 固定尺寸，始终可见 */} 
       <div 
-        ref={actionsRef}
-        className="flex items-center space-x-1 ml-1 flex-none"
-        // 阻止按钮区域触发拖拽
-        onMouseDown={(e) => e.stopPropagation()}
+        ref={actionsRef} 
+        className="floating-preview-actions" 
+        style={{ marginLeft: '0.25rem', flexShrink: '0' }}
+        // 阻止按钮区域触发拖拽 
+        onMouseDown={(e) => e.stopPropagation()} 
       >
-        {/* 固定按钮 - 使用shadcn/ui Button组件 */}
-        <Button
-          variant="ghost"
-          size="sm"
+        <button
           onClick={onTogglePin}
-          title={isPinned ? '取消固定' : '固定窗口'}
-          className={`h-8 w-8 p-0 hover:bg-opacity-20 ${themeStyles.textColor}`}
+          className={`floating-preview-button ${themeStyles.buttonHover} ${
+            isPinned ? "floating-preview-button-pinned" : ""
+          }`}
+          title={isPinned ? "取消固定" : "固定窗口"}
+          aria-label={isPinned ? "取消固定" : "固定窗口"}
         >
-          <Pin 
-            size={16} 
-            className={`${isPinned ? 'fill-current' : ''} transition-all`} 
+          <Pin
+            size={14}
+            className={`${themeStyles.textColor} ${
+              isPinned ? "fill-current" : ""
+              }`}
+            style={{
+              background: "transparent",
+              fill: isPinned ? "currentColor" : "",
+            }}
           />
-        </Button>
+        </button>
         
-        {/* 刷新按钮 */}
-        <Button
-          variant="ghost"
-          size="sm"
+        <button
           onClick={onRefresh}
+          className={`floating-preview-button ${themeStyles.buttonHover}`}
           title="刷新页面"
-          className={`h-8 w-8 p-0 hover:bg-opacity-20 ${themeStyles.textColor}`}
+          aria-label="刷新页面"
         >
-          <RotateCcw size={16} className="transition-transform hover:rotate-180 duration-300" />
-        </Button>
+          <RotateCcw size={14} className={themeStyles.textColor} style={{
+            background: "transparent",
+          }} />
+        </button>
          
-        {/* 新标签页打开按钮 */}
-        <Button
-          variant="ghost"
-          size="sm"
+        <button
           onClick={onOpenInNewTab}
-          title="在新标签页打开"
-          className={`h-8 w-8 p-0 hover:bg-opacity-20 ${themeStyles.textColor}`}
+          className={`floating-preview-button ${themeStyles.buttonHover}`}
+          title="在新标签页中打开"
+          aria-label="在新标签页中打开"
         >
-          <ExternalLink size={16} className="transition-transform hover:scale-110" />
-        </Button>
+          <ExternalLink size={14} className={themeStyles.textColor} style={{
+            background: "transparent",
+          }} /> 
+        </button>
          
-        {/* 关闭按钮 */}
-        <Button
-          variant="ghost"
-          size="sm"
+        <button
           onClick={onClose}
+          className={`floating-preview-button floating-preview-close-button ${themeStyles.buttonHover}`}
           title="关闭"
-          className={`h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600 ${themeStyles.textColor} transition-colors`}
+          aria-label="关闭"
         >
-          <X size={16} className="transition-transform hover:scale-110" />
-        </Button>
+          <X size={14} className={themeStyles.textColor} style={{
+            background: "transparent",
+          }} />
+        </button>
       </div>
     </div>
   );

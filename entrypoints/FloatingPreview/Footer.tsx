@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ThemeStyles, FooterProps } from '../../types/floating-preview';
+import './styles.css';
 
 // Footer组件 - 悬浮窗底部，使用TailwindCSS重写
 const Footer: React.FC<FooterProps> = ({
@@ -103,46 +104,43 @@ const Footer: React.FC<FooterProps> = ({
   }, [isResizingHeight, isResizingCorner]);
   
   return (
-    <div 
-      className={`flex items-center justify-between ${themeStyles.headerBg} border-t ${themeStyles.border} h-6`}
-      style={{ width: `${width}px` }}
+    <div
+      className={`floating-preview-footer ${themeStyles.headerBg}`}
+      style={{
+        userSelect: 'none',
+        touchAction: 'none',
+      }}
     >
       {/* 左侧区域 - 占位 */}
       <div className="flex-1" />
       
       {/* 中间区域 - 高度调整把手 */}
       <div
-        className={`flex-1 h-full cursor-ns-resize hover:bg-blue-400 hover:bg-opacity-15 transition-all duration-150 ease-out flex items-center justify-center ${isResizingHeight ? 'bg-blue-400 bg-opacity-20' : ''}`}
+        className="floating-preview-height-handle"
         onMouseDown={handleHeightResizeStart}
-        title="拖拽调整高度"
         style={{
-          // 添加硬件加速
-          transform: 'translateZ(0)',
-          willChange: isResizingHeight ? 'background-color' : 'auto'
+          userSelect: 'none',
+          touchAction: 'none',
         }}
+        title="拖拽调整高度"
+        aria-label="拖拽调整高度"
       >
-        {/* 高度调整指示器 - 增强视觉反馈 */}
-        <div className={`w-12 h-0.5 ${themeStyles.textColor} opacity-50 hover:opacity-90 rounded transition-all duration-150 ${isResizingHeight ? 'opacity-100 bg-blue-500' : ''}`} />
+        <div className={`floating-preview-height-handle-bar ${themeStyles.textColor}`} />
       </div>
       
       {/* 右侧区域 - 角落调整把手 */}
       <div className="flex-1 flex justify-end">
         <div
-          className={`w-6 h-6 cursor-nw-resize group hover:bg-blue-400 hover:bg-opacity-15 transition-all duration-150 ease-out relative flex items-center justify-center rounded ${isResizingCorner ? 'bg-blue-400 bg-opacity-20' : ''}`}
+          className="floating-preview-corner-handle"
           onMouseDown={handleCornerResizeStart}
-          title="拖拽调整宽度和高度"
           style={{
-            // 添加硬件加速
-            transform: 'translateZ(0)',
-            willChange: isResizingCorner ? 'background-color' : 'auto'
+            userSelect: 'none',
+            touchAction: 'none',
           }}
+          title="拖拽调整尺寸"
+          aria-label="拖拽调整尺寸"
         >
-          {/* 角落调整指示器 - 优化的视觉效果 */}
-          <div className="relative">
-            <div className={`w-3 h-0.5 ${isResizingCorner ? 'bg-blue-500' : themeStyles.textColor} opacity-50 group-hover:opacity-90 rounded transform rotate-45 absolute -top-1 -left-1 transition-all duration-150`} />
-            <div className={`w-2 h-0.5 ${isResizingCorner ? 'bg-blue-500' : themeStyles.textColor} opacity-50 group-hover:opacity-90 rounded transform rotate-45 absolute top-0 left-0 transition-all duration-150`} />
-            <div className={`w-1 h-0.5 ${isResizingCorner ? 'bg-blue-500' : themeStyles.textColor} opacity-50 group-hover:opacity-90 rounded transform rotate-45 absolute top-1 left-1 transition-all duration-150`} />
-          </div>
+          <div className={`floating-preview-corner-handle-icon ${themeStyles.borderColor}`} />
         </div>
       </div>
     </div>
