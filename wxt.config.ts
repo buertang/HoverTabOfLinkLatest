@@ -20,7 +20,17 @@ export default defineConfig({
     },
   }),
   manifest: {
-    permissions: ['sidePanel', 'storage', 'activeTab'],
+    permissions: ['sidePanel', 'storage', 'activeTab', 'declarativeNetRequest'],
+    host_permissions: ['*://*/*'],
+    declarative_net_request: {
+      rule_resources: [
+        {
+          id: 'dnr-rules',
+          enabled: true,
+          path: 'dnr_rules.json',
+        },
+      ],
+    },
     side_panel: {
       default_path: 'sidepanel.html'
     },

@@ -159,6 +159,9 @@
 }
 
 .floating-preview-button svg {
+  fill: none;
+  stroke-width: 2;
+  stroke: currentColor;
   transition: transform 0.3s ease;
 }
 
