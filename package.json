@@ -2,7 +2,7 @@
   "name": "HoverTabOfLink",
   "description": "一款现代化的浏览器链接预览工具，旨在通过提供流畅、高效、可高度自定义的悬浮窗口预览体验",
   "private": true,
-  "version": "1.0.2",
+  "version": "1.0.3",
   "type": "module",
   "scripts": {
     "dev": "wxt",

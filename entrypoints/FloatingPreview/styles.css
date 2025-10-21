@@ -191,6 +191,116 @@
   background-color: #111827;
 }
 
+/* 小鲨鱼加载动画样式 */
+.floating-preview-shark-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.floating-preview-shark {
+  width: 6rem;
+  height: 2.4rem;
+  color: #87CEEB;
+  animation: shark-swim 2s ease-in-out infinite;
+}
+
+/* 深色模式下的鲨鱼颜色 */
+.floating-preview-dark .floating-preview-shark {
+  color: oklch(0.708 0.19 237.1);
+}
+
+/* 鲨鱼游泳动画 */
+@keyframes shark-swim {
+  0%, 100% {
+    transform: translateX(-10px) rotate(-2deg);
+  }
+  50% {
+    transform: translateX(10px) rotate(2deg);
+  }
+}
+
+/* 鲨鱼身体描边动画 */
+.shark-body {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: shark-body-draw 3s ease-in-out infinite;
+}
+
+@keyframes shark-body-draw {
+  0% {
+    stroke-dashoffset: 60;
+  }
+  40% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -60;
+  }
+}
+
+/* 鲨鱼尾巴摆动动画 */
+.shark-tail {
+  transform-origin: 8px 20px;
+  animation: shark-tail-wag 1s ease-in-out infinite alternate;
+}
+
+@keyframes shark-tail-wag {
+  0% {
+    transform: rotate(-5deg);
+  }
+  100% {
+    transform: rotate(5deg);
+  }
+}
+
+/* 鲨鱼背鳍动画 */
+.shark-fin {
+  stroke-dasharray: 20;
+  stroke-dashoffset: 20;
+  animation: shark-fin-draw 2.5s ease-in-out infinite;
+}
+
+@keyframes shark-fin-draw {
+  0%, 20% {
+    stroke-dashoffset: 20;
+  }
+  60%, 100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* 鲨鱼眼睛闪烁动画 */
+.shark-eye {
+  animation: shark-blink 3s ease-in-out infinite;
+}
+
+@keyframes shark-blink {
+  0%, 90%, 100% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 0.3;
+  }
+}
+
+/* 水波纹动画 */
+.water-wave {
+  stroke-dasharray: 15, 5;
+  stroke-dashoffset: 0;
+  animation: water-flow 1.5s linear infinite;
+}
+
+@keyframes water-flow {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -20;
+  }
+}
+
 .floating-preview-loading {
   position: absolute;
   top: 50%;

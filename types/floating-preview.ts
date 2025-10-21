@@ -62,6 +62,9 @@ export interface ContentProps {
   width: number;
   height: number;
   themeStyles: ThemeStyles;
+  // 新增：外部控制的加载状态
+  loading?: boolean;
+  onLoadingChange?: (loading: boolean) => void;
 }
 
 // Footer组件的Props接口

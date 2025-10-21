@@ -45,6 +45,7 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
   const [showOverlay, setShowOverlay] = useState(false); // 是否显示遮罩层
   // 新增：是否鼠标在悬浮窗内，用于 ESC 关闭判断
   const [isMouseInside, setIsMouseInside] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // 新增：加载状态
 
   // 最小尺寸限制（可根据产品需要再调整）
   const MIN_WIDTH = 320; // 最小宽度
@@ -492,14 +493,24 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
 
   // 处理刷新
   const handleRefresh = useCallback(() => {
-    // 通过重新设置iframe的src来刷新
+    // 立即显示加载状态
+    setIsLoading(true);
+    
     const iframe = containerRef.current?.querySelector("iframe");
     if (iframe) {
       const currentSrc = iframe.src;
-      iframe.src = "";
-      setTimeout(() => {
-        iframe.src = currentSrc;
-      }, 100);
+      try {
+        const urlObj = new URL(currentSrc);
+        urlObj.searchParams.set("_hover_refresh", String(Date.now()));
+        const newSrc = urlObj.toString();
+        iframe.src = newSrc; // 直接载入带防缓存参数的URL，避免出现about:blank中间态
+      } catch (err) {
+        // 部分非标准URL无法被URL解析，使用安全回退方案
+        iframe.src = "";
+        setTimeout(() => {
+          iframe.src = currentSrc;
+        }, 100);
+      }
     }
   }, []);
 
@@ -762,6 +773,8 @@ const FloatingPreview: React.FC<FloatingPreviewProps> = ({
             width={size.width}
             height={size.height - 40} // 减去Header(40px)的高度
             themeStyles={themeStyles}
+            loading={isLoading}
+            onLoadingChange={setIsLoading}
           />
         </div>
 

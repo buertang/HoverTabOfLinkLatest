@@ -538,14 +538,14 @@ export default defineContentScript({
           const normalized = normalizeUrlFromText(text);
           const targetUrl = normalized ? normalized : buildSearchUrl(dragTextSettings.searchEngine, text);
           // 对百度、Perplexity、Google、DuckDuckGo 搜索结果采用新标签打开，避免 X-Frame-Options/CSP 导致的 iframe 拒绝加载
-          try {
-            const host = new URL(targetUrl).hostname.toLowerCase();
-            if (host.endsWith('baidu.com') || host.endsWith('perplexity.ai') || host.endsWith('google.com') || host.endsWith('duckduckgo.com')) {
-              window.open(targetUrl, '_blank');
-              lastMousePos = null; // 清理坐标
-              return;
-            }
-          } catch (_) {}
+          // try {
+          //   const host = new URL(targetUrl).hostname.toLowerCase();
+          //   if (host.endsWith('baidu.com') || host.endsWith('perplexity.ai') || host.endsWith('google.com') || host.endsWith('duckduckgo.com')) {
+          //     window.open(targetUrl, '_blank');
+          //     lastMousePos = null; // 清理坐标
+          //     return;
+          //   }
+          // } catch (_) {}
           createFloatingPreview(targetUrl, posX, posY);
         }
         isDragging = false;
