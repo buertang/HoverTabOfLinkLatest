@@ -13,6 +13,8 @@ const Content: React.FC<ContentProps> = ({
 }) => {
   const [internalLoading, setInternalLoading] = useState(true); // 内部加载状态
   const [error, setError] = useState(false); // 错误状态
+  // 新增：加载超时兜底定时器
+  const loadTimeoutRef = useRef<number | null>(null);
   
   // 使用外部loading状态或内部loading状态
   const loading = externalLoading !== undefined ? externalLoading : internalLoading;
@@ -29,17 +31,17 @@ const Content: React.FC<ContentProps> = ({
     }
   };
 
-  // 处理iframe加载完成（忽略 about:blank 或非目标URL的中间加载事件）
+  // 处理iframe加载完成：只忽略 about:blank，其余都视为加载完成
   const handleIframeLoad = (e: React.SyntheticEvent<HTMLIFrameElement>) => {
     const loadedSrc = (e.currentTarget as HTMLIFrameElement).src || '';
-    const targetSrc = url || '';
     // 跳过空白页加载事件（例如刷新时先置空src再恢复）
     if (!loadedSrc || loadedSrc === 'about:blank') {
       return;
     }
-    // 仅当加载完成的是目标URL时才结束loading，避免中间态导致空白
-    if (normalizeUrl(loadedSrc) !== normalizeUrl(targetSrc)) {
-      return;
+    // 新增：清理加载超时兜底定时器
+    if (loadTimeoutRef.current) {
+      clearTimeout(loadTimeoutRef.current);
+      loadTimeoutRef.current = null;
     }
     setInternalLoading(false);
     setError(false);
@@ -50,6 +52,11 @@ const Content: React.FC<ContentProps> = ({
 
   // 处理iframe加载错误
   const handleIframeError = () => {
+    // 新增：清理加载超时兜底定时器
+    if (loadTimeoutRef.current) {
+      clearTimeout(loadTimeoutRef.current);
+      loadTimeoutRef.current = null;
+    }
     setInternalLoading(false);
     setError(true);
     // 通知父组件加载完成（即使是错误）
@@ -67,6 +74,35 @@ const Content: React.FC<ContentProps> = ({
       onLoadingChange(true);
     }
   }, [url, onLoadingChange]);
+
+  // 新增：当 loading 为 true 时，启动加载超时兜底（8秒）
+  useEffect(() => {
+    // 每次 loading 或 URL 变化时重置定时器
+    if (loadTimeoutRef.current) {
+      clearTimeout(loadTimeoutRef.current);
+      loadTimeoutRef.current = null;
+    }
+
+    if (loading) {
+      loadTimeoutRef.current = window.setTimeout(() => {
+        // 超时后自动结束 loading，防止动画卡住
+        setInternalLoading(false);
+        setError(false);
+        if (onLoadingChange) {
+          onLoadingChange(false);
+        }
+        loadTimeoutRef.current = null;
+      }, 8000);
+    }
+
+    // 卸载或依赖变化时清理
+    return () => {
+      if (loadTimeoutRef.current) {
+        clearTimeout(loadTimeoutRef.current);
+        loadTimeoutRef.current = null;
+      }
+    };
+  }, [loading, url, onLoadingChange]);
 
   return (
     <div className={`floating-preview-content ${themeStyles.backgroundColor} ${themeStyles.textColor}`}>
